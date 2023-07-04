@@ -1,8 +1,8 @@
 package kuit.project.beering.controller;
 
-import kuit.project.beering.dto.request.MemberLoginRequest;
-import kuit.project.beering.dto.request.MemberSignupRequest;
-import kuit.project.beering.dto.response.MemberLoginResponse;
+import kuit.project.beering.dto.request.member.MemberLoginRequest;
+import kuit.project.beering.dto.request.member.MemberSignupRequest;
+import kuit.project.beering.dto.response.member.MemberLoginResponse;
 import kuit.project.beering.service.MemberService;
 import kuit.project.beering.util.BaseResponse;
 import lombok.RequiredArgsConstructor;

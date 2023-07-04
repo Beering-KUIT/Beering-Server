@@ -1,4 +1,4 @@
-package kuit.project.beering.dto.response;
+package kuit.project.beering.dto.response.member;
 
 import kuit.project.beering.security.jwt.JwtInfo;
 import lombok.AllArgsConstructor;

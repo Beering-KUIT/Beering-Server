@@ -1,9 +1,9 @@
 package kuit.project.beering.service;
 
 import kuit.project.beering.domain.Member;
-import kuit.project.beering.dto.request.MemberLoginRequest;
-import kuit.project.beering.dto.request.MemberSignupRequest;
-import kuit.project.beering.dto.response.MemberLoginResponse;
+import kuit.project.beering.dto.request.member.MemberLoginRequest;
+import kuit.project.beering.dto.request.member.MemberSignupRequest;
+import kuit.project.beering.dto.response.member.MemberLoginResponse;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.security.jwt.JwtInfo;
