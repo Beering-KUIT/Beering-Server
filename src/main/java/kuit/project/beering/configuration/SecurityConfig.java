@@ -36,10 +36,10 @@ public class SecurityConfig {
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequest -> {
-                    authorizeRequest.requestMatchers("/").permitAll();
+                    authorizeRequest.requestMatchers("/", "/signup", "/login", "/members").permitAll();
                 })
+                .authorizeHttpRequests(authorizeRequest -> authorizeRequest.anyRequest().authenticated())
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
-
 
         return http.build();
     }
