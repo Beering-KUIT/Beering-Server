@@ -10,6 +10,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -100,7 +101,7 @@ public class JwtTokenProvider {
                 Arrays.stream(claims.get("auth").toString().split(","))
                 .map(SimpleGrantedAuthority::new).toList();
 
-        AuthMember authMember =
+        UserDetails authMember =
                 AuthMember.builder()
                 .id(claims.get("memberId", Long.class))
                 .username(claims.getSubject())
