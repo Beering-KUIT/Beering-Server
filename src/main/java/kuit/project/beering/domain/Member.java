@@ -28,7 +28,7 @@ public class Member extends BaseTimeEntity {
     private Status status;
 
     //연관관계 mapping
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "image_id")
     private Image image;
 

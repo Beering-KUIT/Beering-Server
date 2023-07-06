@@ -25,7 +25,7 @@ public class SelectedOption extends BaseTimeEntity {
     private Status status;
 
     //연관관계 mapping
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_option_id")
     private ReviewOption reviewOption;
 
