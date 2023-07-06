@@ -21,10 +21,10 @@ public class Beer extends BaseTimeEntity{
     private Long id;
 
     @Column(nullable = false)
-    private String name_kr;
+    private String nameKr;
 
     @Column(nullable = false)
-    private String name_en;
+    private String nameEn;
 
     @Column(nullable = false)
     private int price;
