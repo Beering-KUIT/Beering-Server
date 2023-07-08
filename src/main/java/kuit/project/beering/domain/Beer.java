@@ -30,7 +30,7 @@ public class Beer extends BaseTimeEntity{
     private int price;
 
     @Column(nullable = false)
-    private float alchol;
+    private float alcohol;
 
     @Column(columnDefinition = "TEXT", nullable = false)
     private String description;
