@@ -15,7 +15,7 @@ public class Agreement extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private AgreementName name;
 
     @Column(nullable = false)
     private Boolean isAgreed;
@@ -29,4 +29,13 @@ public class Agreement extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
+    public static Agreement createAgreementMember(Boolean isAgreed, String name, Member member) {
+        Agreement agreement = new Agreement();
+        agreement.isAgreed = isAgreed;
+        agreement.name = AgreementName.valueOf(name);
+        agreement.member = member;
+
+        member.getAgreements().add(agreement);
+        return agreement;
+    }
 }
