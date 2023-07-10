@@ -2,6 +2,7 @@ package kuit.project.beering.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,9 @@ import java.util.List;
 @Builder
 public class Member extends BaseTimeEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "member_id", nullable = false)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "member_id", nullable = false)
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -40,4 +43,13 @@ public class Member extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "member")
     private List<Review> reviews = new ArrayList<>();
+
+    public static Member createMember(String username, String password, String nickname) {
+        Member member = new Member();
+        member.username = username;
+        member.password = password;
+        member.nickname = nickname;
+
+        return member;
+    }
 }
