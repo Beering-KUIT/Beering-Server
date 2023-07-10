@@ -15,6 +15,9 @@ public class AgreementMember extends BaseTimeEntity {
     private Long id;
 
     @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
     private Boolean isAgreed;
 
     @Enumerated(EnumType.STRING)
@@ -26,7 +29,4 @@ public class AgreementMember extends BaseTimeEntity {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "agreement_id")
-    private Agreement agreement;
 }
