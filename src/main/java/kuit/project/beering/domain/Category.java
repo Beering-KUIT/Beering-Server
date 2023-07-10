@@ -29,7 +29,7 @@ public class Category extends BaseTimeEntity {
 
     //연관관계 mapping
     @OneToMany(mappedBy = "category")
-    private List<Beer> beers = new ArrayList<>();
+    private List<Drink> drinks = new ArrayList<>();
 
     @OneToMany(mappedBy = "category")
     private List<ReviewOption> reviewOptions = new ArrayList<>();
