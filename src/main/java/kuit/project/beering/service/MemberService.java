@@ -1,9 +1,12 @@
 package kuit.project.beering.service;
 
+import kuit.project.beering.domain.Agreement;
 import kuit.project.beering.domain.Member;
+import kuit.project.beering.dto.request.member.AgreementRequest;
 import kuit.project.beering.dto.request.member.MemberLoginRequest;
 import kuit.project.beering.dto.request.member.MemberSignupRequest;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
+import kuit.project.beering.repository.AgreementRepository;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.security.jwt.JwtInfo;
@@ -15,28 +18,46 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Slf4j
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final AgreementRepository agreementRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
 
-
+    @Transactional
     public void signup(MemberSignupRequest request) {
+        List<AgreementRequest> agreementRequest = request.getAgreements();
 
-        memberRepository.save(
-                Member.builder()
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .nickname(request.getNickname())
-                .build());
+        /**
+         * @Brief 회원부터 저장, username이 중복일 경우에는 예외 발생하고 더이상 진행되지 않고 종료
+         */
+        Member member = memberRepository.saveAndFlush(
+                Member.createMember(
+                        request.getUsername(),
+                        passwordEncoder.encode(request.getPassword()),
+                        request.getNickname()));
+
+        List<Agreement> agreements = agreementRequest.stream().map(
+                agreementRequest1 -> Agreement.createAgreementMember(
+                        agreementRequest1.getIsAgreed(),
+                        agreementRequest1.getName(),
+                        member)
+        ).toList();
+
+        agreementRepository.saveAll(agreements);
     }
 
+    @Transactional
     public MemberLoginResponse login(MemberLoginRequest request) {
         /**
          * @Brief username, password 기반으로 인증 객체 생성
