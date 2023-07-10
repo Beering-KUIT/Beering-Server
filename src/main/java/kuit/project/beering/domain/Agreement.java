@@ -7,7 +7,7 @@ import lombok.*;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class AgreementMember extends BaseTimeEntity {
+public class Agreement extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
