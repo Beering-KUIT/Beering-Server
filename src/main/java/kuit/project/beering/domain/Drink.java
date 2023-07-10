@@ -10,21 +10,34 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Review extends BaseTimeEntity {
+public class Drink extends BaseTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "review_id")
+    @Column(name = "drink_id")
     private Long id;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
-    private String content;
+    @Column(nullable = false)
+    private String nameKr;
 
     @Column(nullable = false)
-    private float totalRating;
+    private String nameEn;
+
+    @Column(nullable = false)
+    private int price;
+
+    @Column(nullable = false)
+    private float alcohol;
+
+    @Column(columnDefinition = "TEXT", nullable = false)
+    private String description;
+
+    @Column(nullable = false)
+    private String manufacturer;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -35,17 +48,12 @@ public class Review extends BaseTimeEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
-    private Member member;
+    @OneToMany(mappedBy = "drink")
+    private List<Favorite> favorites = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "beer_id")
-    private Drink drink;
+    @OneToMany(mappedBy = "drink")
+    private List<Review> reviews = new ArrayList<>();
 
-    @OneToMany(mappedBy = "review")
-    private List<SelectedOption> selectedOptions = new ArrayList<>();
-
-    @OneToMany(mappedBy = "review")
+    @OneToMany(mappedBy = "drink")
     private List<Image> images = new ArrayList<>();
 }

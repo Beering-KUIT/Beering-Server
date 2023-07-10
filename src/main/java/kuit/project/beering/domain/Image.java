@@ -31,7 +31,7 @@ public class Image extends BaseTimeEntity {
     //연관관계 mapping
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "beer_id")
-    private Beer beer;
+    private Drink drink;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
