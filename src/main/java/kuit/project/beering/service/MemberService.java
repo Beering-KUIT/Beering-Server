@@ -1,6 +1,7 @@
 package kuit.project.beering.service;
 
 import kuit.project.beering.domain.Member;
+import kuit.project.beering.domain.Status;
 import kuit.project.beering.dto.AgreementBulkInsertDto;
 import kuit.project.beering.dto.request.member.MemberLoginRequest;
 import kuit.project.beering.dto.request.member.MemberSignupRequest;
@@ -48,6 +49,7 @@ public class MemberService {
                 agreementRequest -> AgreementBulkInsertDto.builder()
                         .name(agreementRequest.getName().name())
                         .isAgreed(agreementRequest.getIsAgreed())
+                        .status(Status.ACTIVE.name())
                         .memberId(member.getId()).build()
         ).toList();
 
