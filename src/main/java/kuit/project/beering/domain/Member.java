@@ -33,11 +33,15 @@ public class Member extends BaseTimeEntity {
     private Image image;
 
     @OneToMany(mappedBy = "member")
-    private List<AgreementMember> agreementMembers = new ArrayList<>();
+    private List<Agreement> agreements = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
     private List<Favorite> favorites = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
     private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Tabom> taboms = new ArrayList<>();
+
 }
