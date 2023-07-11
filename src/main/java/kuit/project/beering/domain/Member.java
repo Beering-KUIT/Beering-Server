@@ -40,4 +40,8 @@ public class Member extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "member")
     private List<Review> reviews = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member")
+    private List<Tabom> taboms = new ArrayList<>();
+
 }
