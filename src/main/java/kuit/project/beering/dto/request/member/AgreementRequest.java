@@ -1,5 +1,6 @@
 package kuit.project.beering.dto.request.member;
 
+import kuit.project.beering.domain.AgreementName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AgreementRequest {
 
-    private String name;
+    private AgreementName name;
     private Boolean isAgreed;
 }
