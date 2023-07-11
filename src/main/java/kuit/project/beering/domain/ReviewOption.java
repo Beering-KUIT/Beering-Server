@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Getter
 @AllArgsConstructor
@@ -29,6 +31,6 @@ public class ReviewOption extends BaseTimeEntity {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @OneToOne(mappedBy = "reviewOption")
-    private SelectedOption selectedOption;
+    @OneToMany(mappedBy = "reviewOption")
+    private List<SelectedOption> selectedOption;
 }
