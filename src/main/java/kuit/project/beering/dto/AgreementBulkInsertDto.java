@@ -11,5 +11,6 @@ public class AgreementBulkInsertDto {
 
     private String name;
     private Boolean isAgreed;
+    private String status;
     private Long memberId;
 }
