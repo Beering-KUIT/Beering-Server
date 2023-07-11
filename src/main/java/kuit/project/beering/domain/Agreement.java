@@ -14,6 +14,7 @@ public class Agreement extends BaseTimeEntity {
     @Column(name = "agreement_member_id")
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private AgreementName name;
 
