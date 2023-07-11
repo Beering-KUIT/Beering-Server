@@ -16,7 +16,7 @@ public class AgreementJdbcRepository {
     private final NamedParameterJdbcTemplate jdbcTemplate;
 
     /**
-     * @Brief 벌크 삽입 쿼리 생성을 위한 메서드
+     * @Brief bulk insert query 생성을 위한 메서드
      * @param dtos
      */
     public void bulkInsertAgreement(List<AgreementBulkInsertDto> dtos) {

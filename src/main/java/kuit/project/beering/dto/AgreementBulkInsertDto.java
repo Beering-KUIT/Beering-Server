@@ -4,6 +4,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * @Brief 약관 삽입 시 사용되는 Dto
+ */
 @Getter
 @AllArgsConstructor
 @Builder

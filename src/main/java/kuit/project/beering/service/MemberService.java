@@ -45,6 +45,9 @@ public class MemberService {
                         passwordEncoder.encode(request.getPassword()),
                         request.getNickname()));
 
+        /**
+         * @Brief RequestDto 사용해서 AgreementBulkInsertDto 생성
+         */
         List<AgreementBulkInsertDto> agreements = request.getAgreements().stream().map(
                 agreementRequest -> AgreementBulkInsertDto.builder()
                         .name(agreementRequest.getName().name())
