@@ -30,6 +30,6 @@ public class Favorite extends BaseTimeEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "beer_id")
+    @JoinColumn(name = "drink_id")
     private Drink drink;
 }

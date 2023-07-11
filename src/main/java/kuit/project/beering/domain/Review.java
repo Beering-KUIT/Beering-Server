@@ -40,7 +40,7 @@ public class Review extends BaseTimeEntity {
     private Member member;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "beer_id")
+    @JoinColumn(name = "drink_id")
     private Drink drink;
 
     @OneToMany(mappedBy = "review")
@@ -48,4 +48,8 @@ public class Review extends BaseTimeEntity {
 
     @OneToMany(mappedBy = "review")
     private List<Image> images = new ArrayList<>();
+
+    @OneToMany(mappedBy = "review")
+    private List<Tabom> taboms = new ArrayList<>();
+
 }

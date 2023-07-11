@@ -11,7 +11,7 @@ public class Agreement extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "agreement_member_id")
+    @Column(name = "agreement_id")
     private Long id;
 
     @Enumerated(EnumType.STRING)
