@@ -82,8 +82,13 @@ public enum BaseResponseStatus {
      */
     // AWS S3
     POST_IMAGE_CONVERT_ERROR(false, 5000, "사진이 없거나 변환되지 않았습니다."),
-    POST_IMAGE_INVALID_EXTENSION(false, 5001, "올바른 확장자가 아닙니다.");
+    POST_IMAGE_INVALID_EXTENSION(false, 5001, "올바른 확장자가 아닙니다."),
 
+    /**
+     * 6000 : Request 오
+     */
+    // DrinkException
+    NONE_DRINK(false, 6050, "해당 주류가 존재하지 않습니다.");
 
     private final boolean isSuccess;
     private final int responseCode;
