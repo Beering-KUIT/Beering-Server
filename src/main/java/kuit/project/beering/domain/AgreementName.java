@@ -6,7 +6,5 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum AgreementName {
-    SERVICE("SERVICE"), PERSONAL("PERSONAL"), MARKETING("MARKETING");
-
-    private final String name;
+    SERVICE, PERSONAL, MARKETING
 }
