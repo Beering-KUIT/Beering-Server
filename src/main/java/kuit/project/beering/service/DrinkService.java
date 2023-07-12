@@ -2,9 +2,13 @@ package kuit.project.beering.service;
 
 import kuit.project.beering.domain.Drink;
 import kuit.project.beering.domain.Image;
+import kuit.project.beering.domain.Member;
+import kuit.project.beering.domain.Review;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
+import kuit.project.beering.dto.response.drink.ReviewPreview;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
 import kuit.project.beering.repository.DrinkRepository;
+import kuit.project.beering.repository.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
@@ -18,7 +22,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DrinkService {
     private final DrinkRepository drinkRepository;
-    private FavoriteService favoriteService;
+    private final FavoriteService favoriteService;
+    private final ReviewRepository reviewRepository;
 
     private final int SIZE = 10;
 
@@ -80,6 +85,18 @@ public class DrinkService {
         // 유저의 주류 찜 여부
         boolean is_liked = favoriteService.is_liked(drink.getId());
 
+        // 리뷰 프리뷰 배열
+        List<Review> reviews = reviewRepository.findTop5ByDrinkIdOrderByCreatedAtDesc(beerId);
+        List<ReviewPreview> reviewPreviews;
+        reviewPreviews = reviews.stream()
+                .map(review -> new ReviewPreview(
+                        getProfileImageUrl(review),
+                        review.getMember().getNickname(),
+                        review.getContent(),
+                        review.getCreatedAt())
+                )
+                .collect(Collectors.toList());
+
         return GetDrinkResponse.builder()
                 .beerId(drink.getId())
                 .nameKr(drink.getNameKr())
@@ -91,7 +108,20 @@ public class DrinkService {
                 .totalRating(drink.getAvgRating())
                 .reviewCount(drink.getCountOfReview())
                 .isLiked(is_liked)
+                .reviewPreviews(reviewPreviews)
                 .build();
+    }
+
+    private String getProfileImageUrl(Review review){
+        String imgUrl = null;
+        Member member;
+        Image img;
+        if((member = review.getMember())!=null){
+            if((img = member.getImage())!=null){
+                imgUrl = img.getImageUrl();
+            }
+        }
+        return imgUrl;
     }
 
 }
