@@ -12,6 +12,7 @@ import kuit.project.beering.util.UserValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -31,7 +32,7 @@ public class MemberController {
     public BaseResponse<Object> signup(@RequestBody @Valid MemberSignupRequest request,
                                        BindingResult bindingResult) {
 
-        validateAgreementName(request, bindingResult);
+        validateAgreement(request, bindingResult);
 
         if (bindingResult.hasErrors()) throw new UserValidationException(bindingResult);
 
@@ -49,12 +50,13 @@ public class MemberController {
     }
 
     /**
-     * @Brief Agreement 값 제대로 들어왔는지 확인. 개수, 약관 포함 여부
      * @param memberSignupRequest
      * @param bindingResult
+     * @Brief Agreement 값 제대로 들어왔는지 확인. 개수, 약관 포함 여부
      */
-    private static void validateAgreementName(MemberSignupRequest memberSignupRequest, BindingResult bindingResult) {
-        List<AgreementName> agreementNames = memberSignupRequest.getAgreements().stream()
+    private static void validateAgreement(MemberSignupRequest memberSignupRequest, BindingResult bindingResult) {
+        List<AgreementRequest> agreements = memberSignupRequest.getAgreements();
+        List<AgreementName> agreementNames = agreements.stream()
                 .map(AgreementRequest::getName).toList();
 
         /**
@@ -65,5 +67,17 @@ public class MemberController {
             bindingResult.addError(new ObjectError
                     ("Agreement", "SERVICE, PERSONAL, MARKETING 을 모두 포함"));
         }
+
+        List<AgreementRequest> agreementRequests = agreements.stream().filter(agreementRequest ->
+                AgreementName.SERVICE.equals(agreementRequest.getName()) ||
+                        AgreementName.PERSONAL.equals(agreementRequest.getName())).toList();
+
+        agreementRequests.forEach(agreementRequest -> {
+            if (!agreementRequest.getIsAgreed())
+                bindingResult.addError(new FieldError(
+                        "Agreement", "name", agreementRequest.getName(),
+                        true, null, null,
+                        "SERVICE, PERSONAL 의 isAgreed 값은 반드시 TRUE"));
+        });
     }
 }
