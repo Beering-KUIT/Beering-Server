@@ -1,5 +1,6 @@
 package kuit.project.beering.dto.request.member;
 
+import jakarta.validation.constraints.NotNull;
 import kuit.project.beering.domain.AgreementName;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,5 +14,7 @@ import lombok.Setter;
 public class AgreementRequest {
 
     private AgreementName name;
+
+    @NotNull(message = "NULL 일 수 없음")
     private Boolean isAgreed;
 }
