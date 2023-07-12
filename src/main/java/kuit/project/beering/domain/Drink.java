@@ -60,10 +60,10 @@ public class Drink extends BaseTimeEntity{
 
     // 가상 칼럼
     @Basic(fetch = FetchType.LAZY)
-    @Formula("(select count(1) from review where review.drink_id = drink_id)")
+    @Formula("(ifnull((select COUNT(1) from review where review.drink_id = d1_0.drink_id), 0))")
     private int countOfReview;
 
     @Basic(fetch = FetchType.LAZY)
-    @Formula("(select avg(r.total_rating) from review as r where r.drink_id = drink_id)")
-    private int avgRating;
+    @Formula("(ifnull((select AVG(r.total_rating) from review as r where r.drink_id = d1_0.drink_id), 0.0))")
+    private float avgRating;
 }
