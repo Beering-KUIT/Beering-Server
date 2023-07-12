@@ -28,7 +28,8 @@ public class MemberControllerAdvice {
         errorStatus.put("영문 또는 한글 1 ~ 10자리 이내", 456);
         errorStatus.put("SERVICE, PERSONAL, MARKETING 중 하나만 허용", 567);
         errorStatus.put("SERVICE, PERSONAL, MARKETING 을 모두 포함", 678);
-        errorStatus.put("NULL 일 수 없음", 789);
+        errorStatus.put("SERVICE, PERSONAL 의 isAgreed 값은 반드시 TRUE", 789);
+        errorStatus.put("NULL 일 수 없음", 891);
     }
 
     /**
