@@ -1,6 +1,7 @@
 package kuit.project.beering.controller;
 
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
+import kuit.project.beering.dto.response.drink.GetDrinkResponse;
 import kuit.project.beering.util.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,5 +35,12 @@ public class DrinkController {
         return new BaseResponse<>(result);
     }
 
+
+    @GetMapping("/{beerId}")
+    public BaseResponse<GetDrinkResponse> getDrink(@PathVariable Long beerId){
+
+        GetDrinkResponse getDrinkResponse = drinkService.getDrinkById(beerId);
+        return new BaseResponse<>(getDrinkResponse);
+    }
 
 }
