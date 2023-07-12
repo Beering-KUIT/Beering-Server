@@ -3,6 +3,7 @@ package kuit.project.beering.service;
 import kuit.project.beering.domain.Drink;
 import kuit.project.beering.domain.Image;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
+import kuit.project.beering.dto.response.drink.GetDrinkResponse;
 import kuit.project.beering.repository.DrinkRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,4 +69,23 @@ public class DrinkService {
         }
         return imgUrl;
     }
+
+
+    public GetDrinkResponse getDrinkById(Long beerId) {
+        log.info("DrinkService.getDrinkById");
+        Drink drink = drinkRepository.findById(beerId).get();
+
+        return GetDrinkResponse.builder()
+                .beerId(drink.getId())
+                .nameKr(drink.getNameKr())
+                .nameEn(drink.getNameEn())
+                .price(drink.getPrice())
+                .alcohol(drink.getAlcohol())
+                .description(drink.getDescription())
+                .manufacturer(drink.getManufacturer())
+                .totalRating(drink.getAvgRating())
+                .reviewCount(drink.getCountOfReview())
+                .build();
+    }
+
 }
