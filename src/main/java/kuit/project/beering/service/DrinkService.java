@@ -18,6 +18,8 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DrinkService {
     private final DrinkRepository drinkRepository;
+    private FavoriteService favoriteService;
+
     private final int SIZE = 10;
 
     public Page<DrinkSearchResponse> searchDrinksByName(String name, String orderBy, int page) {

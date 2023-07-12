@@ -19,5 +19,5 @@ public class FavoriteService {
 
         return favoriteRepository.existsByDrinkIdAndMemberId(drink_id, user_id);
     }
-    
+
 }
