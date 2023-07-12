@@ -24,6 +24,23 @@ public class DrinkService {
         Sort.Direction sortDirection = Sort.Direction.ASC;
         Sort.Order order = new Sort.Order(sortDirection, "createdAt");
 
+        switch (orderBy) {
+            case "name" -> {
+                order = new Sort.Order(sortDirection, "nameKr");
+            }
+            case "rating" -> {
+                sortDirection = Sort.Direction.DESC;
+                order = new Sort.Order(sortDirection, "totalRating");
+            }
+            case "review" -> {
+                sortDirection = Sort.Direction.DESC;
+                order = new Sort.Order(sortDirection, "countOfReview");
+            }
+            case "price" -> {
+                order = new Sort.Order(sortDirection, "price");
+            }
+        }
+
         Pageable pageable = PageRequest.of(page, SIZE, Sort.by(order));
 
         Page<Drink> drinkPage = drinkRepository.findByNameKrContainingOrNameEnContainingIgnoreCase(name, name, pageable);
