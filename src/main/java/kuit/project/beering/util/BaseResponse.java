@@ -35,4 +35,12 @@ public class BaseResponse<T> {
         this.responseCode = status.getResponseCode();
         this.result = null;
     }
+
+    // validated Exception, 검증 예외 처리,
+    public BaseResponse(BaseResponseStatus status, T result) {
+        this.isSuccess = status.isSuccess();
+        this.responseMessage = status.getResponseMessage();
+        this.responseCode = status.getResponseCode();
+        this.result = result;
+    }
 }
