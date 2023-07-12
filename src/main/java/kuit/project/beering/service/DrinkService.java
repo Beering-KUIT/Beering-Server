@@ -75,6 +75,9 @@ public class DrinkService {
         log.info("DrinkService.getDrinkById");
         Drink drink = drinkRepository.findById(beerId).get();
 
+        // 유저의 주류 찜 여부
+        boolean is_liked = favoriteService.is_liked(drink.getId());
+
         return GetDrinkResponse.builder()
                 .beerId(drink.getId())
                 .nameKr(drink.getNameKr())
@@ -85,6 +88,7 @@ public class DrinkService {
                 .manufacturer(drink.getManufacturer())
                 .totalRating(drink.getAvgRating())
                 .reviewCount(drink.getCountOfReview())
+                .isLiked(is_liked)
                 .build();
     }
 
