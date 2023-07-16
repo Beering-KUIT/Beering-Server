@@ -1,5 +1,6 @@
 package kuit.project.beering.controller;
 
+import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
 import kuit.project.beering.util.BaseResponse;
@@ -32,7 +33,7 @@ public class DrinkController {
             maxPrice = Integer.MAX_VALUE;
         }
 
-        Page<DrinkSearchResponse> result = drinkService.searchDrinksByName(name, page, orderBy, category, minPrice, maxPrice);
+        Page<DrinkSearchResponse> result = drinkService.searchDrinksByName(page, orderBy, new DrinkSearchCondition(name, name, category, minPrice, maxPrice));
         return new BaseResponse<>(result);
     }
 

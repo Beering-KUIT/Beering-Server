@@ -4,9 +4,11 @@ import kuit.project.beering.domain.Drink;
 import kuit.project.beering.domain.Image;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.Review;
+import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import kuit.project.beering.dto.response.drink.ReviewPreview;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
+import kuit.project.beering.repository.CustomDrinkRepository;
 import kuit.project.beering.repository.DrinkRepository;
 import kuit.project.beering.repository.ReviewRepository;
 import kuit.project.beering.util.exception.DrinkException;
@@ -34,16 +36,13 @@ public class DrinkService {
     /**
      * 주류 검색 메소드 <br>
      * <br>
-     * @param name 검색할 주류의 이름
      * @param page 페이지 번호
      * @param orderBy 정렬 : 이름순, 리뷰많은순, 최저가순, 평점순
-     * @param category 필터 : 검색하고 싶은 주류의 카테고리
-     * @param maxPrice 필터 : 최고가
-     * @param minPrice 필터 : 최저가
+     * @param drinkSearchCondition 필터 : 이름, 카테고리이름, 하한선, 상한선
      * @return 검색 결과 10개 // 페이징
      * @exception DrinkException 유효하지 않은 정렬 방식 입력시 예외 발생
      */
-    public Page<DrinkSearchResponse> searchDrinksByName(String name, Integer page, String orderBy, String category, Integer minPrice, Integer maxPrice) {
+    public Page<DrinkSearchResponse> searchDrinksByName(Integer page, String orderBy, DrinkSearchCondition drinkSearchCondition) {
         /**
          * 정렬 적용
          */
@@ -69,7 +68,8 @@ public class DrinkService {
 
         Pageable pageable = PageRequest.of(page, SIZE, Sort.by(order));
 
-        Page<Drink> drinkPage = drinkRepository.findByNameKrContainingOrNameEnContainingIgnoreCase(name, name, pageable);
+//        Page<Drink> drinkPage = drinkRepository.findByNameKrContainingOrNameEnContainingIgnoreCase(name, name, pageable);
+        Page<Drink> drinkPage = drinkRepository.search(drinkSearchCondition, pageable);
         List<Drink> drinkList = drinkPage.getContent();
 
 
