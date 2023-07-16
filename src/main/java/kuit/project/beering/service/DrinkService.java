@@ -97,7 +97,8 @@ public class DrinkService {
                         getProfileImageUrl(review),
                         review.getMember().getNickname(),
                         review.getContent(),
-                        review.getCreatedAt())
+                        review.getCreatedAt(),
+                        review.getTotalRating())
                 )
                 .collect(Collectors.toList());
 

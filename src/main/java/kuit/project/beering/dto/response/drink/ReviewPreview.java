@@ -12,8 +12,9 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class ReviewPreview {
-    String profile_image_url;
+    String profileImageUrl;
     String nickname;
     String content;
     LocalDateTime createdAt;
+    float totalRating;
 }
