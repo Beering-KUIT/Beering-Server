@@ -23,6 +23,7 @@ import java.util.stream.Collectors;
 public class DrinkService {
     private final DrinkRepository drinkRepository;
     private final FavoriteService favoriteService;
+    private final MemberService memberService;
     private final ReviewRepository reviewRepository;
 
     private final int SIZE = 10;
@@ -113,15 +114,8 @@ public class DrinkService {
     }
 
     private String getProfileImageUrl(Review review){
-        String imgUrl = null;
-        Member member;
-        Image img;
-        if((member = review.getMember())!=null){
-            if((img = member.getImage())!=null){
-                imgUrl = img.getImageUrl();
-            }
-        }
-        return imgUrl;
+        Member member = review.getMember();
+        return memberService.getProfileImageUrl(member);
     }
 
 }

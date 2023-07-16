@@ -1,5 +1,6 @@
 package kuit.project.beering.service;
 
+import kuit.project.beering.domain.Image;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.dto.request.member.MemberLoginRequest;
 import kuit.project.beering.dto.request.member.MemberSignupRequest;
@@ -62,5 +63,10 @@ public class MemberService {
                 .memberId(principal.getId())
                 .jwtInfo(jwtInfo)
                 .build();
+    }
+
+    public String getProfileImageUrl(Member member) {
+        Image profileImage = member.getImage();
+        return profileImage != null ? profileImage.getImageUrl() : null;
     }
 }
