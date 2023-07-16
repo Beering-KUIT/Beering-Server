@@ -3,6 +3,7 @@ package kuit.project.beering.controller;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
 import kuit.project.beering.util.BaseResponse;
+import kuit.project.beering.util.exception.DrinkException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,7 +32,7 @@ public class DrinkController {
             maxPrice = Integer.MAX_VALUE;
         }
 
-        Page<DrinkSearchResponse> result = drinkService.searchDrinksByName(name, orderBy, page);
+        Page<DrinkSearchResponse> result = drinkService.searchDrinksByName(name, page, orderBy, category, minPrice, maxPrice);
         return new BaseResponse<>(result);
     }
 

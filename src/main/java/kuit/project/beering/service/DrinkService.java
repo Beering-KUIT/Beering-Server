@@ -31,8 +31,22 @@ public class DrinkService {
 
     private final int SIZE = 10;
 
-    public Page<DrinkSearchResponse> searchDrinksByName(String name, String orderBy, int page) {
-        /* 페이징 & 정렬 설정 */
+    /**
+     * 주류 검색 메소드 <br>
+     * <br>
+     * @param name 검색할 주류의 이름
+     * @param page 페이지 번호
+     * @param orderBy 정렬 : 이름순, 리뷰많은순, 최저가순, 평점순
+     * @param category 필터 : 검색하고 싶은 주류의 카테고리
+     * @param maxPrice 필터 : 최고가
+     * @param minPrice 필터 : 최저가
+     * @return 검색 결과 10개 // 페이징
+     * @exception DrinkException 유효하지 않은 정렬 방식 입력시 예외 발생
+     */
+    public Page<DrinkSearchResponse> searchDrinksByName(String name, Integer page, String orderBy, String category, Integer minPrice, Integer maxPrice) {
+        /**
+         * 정렬 적용
+         */
         Sort.Direction sortDirection = Sort.Direction.ASC;
         Sort.Order order = new Sort.Order(sortDirection, "createdAt");
 
@@ -57,6 +71,7 @@ public class DrinkService {
 
         Page<Drink> drinkPage = drinkRepository.findByNameKrContainingOrNameEnContainingIgnoreCase(name, name, pageable);
         List<Drink> drinkList = drinkPage.getContent();
+
 
         List<DrinkSearchResponse> responseList;
 
