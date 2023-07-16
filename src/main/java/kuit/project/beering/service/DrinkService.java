@@ -70,12 +70,11 @@ public class DrinkService {
     }
 
     private String getTop1DrinkImgUrl(Drink drink){
-        String imgUrl = null;
-        List<Image> images;
-        if((images = drink.getImages()).size()!=0){
-            imgUrl = images.get(0).getImageUrl();
+        List<Image> images = drink.getImages();
+        if(!images.isEmpty()){
+            return images.get(0).getImageUrl();
         }
-        return imgUrl;
+        return null;
     }
 
 
