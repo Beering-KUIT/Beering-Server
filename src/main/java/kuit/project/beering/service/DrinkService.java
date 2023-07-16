@@ -68,10 +68,8 @@ public class DrinkService {
 
         Pageable pageable = PageRequest.of(page, SIZE, Sort.by(order));
 
-//        Page<Drink> drinkPage = drinkRepository.findByNameKrContainingOrNameEnContainingIgnoreCase(name, name, pageable);
         Page<Drink> drinkPage = drinkRepository.search(drinkSearchCondition, pageable);
         List<Drink> drinkList = drinkPage.getContent();
-
 
         List<DrinkSearchResponse> responseList;
 
