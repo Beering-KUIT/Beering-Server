@@ -9,6 +9,7 @@ import kuit.project.beering.dto.response.drink.ReviewPreview;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
 import kuit.project.beering.repository.DrinkRepository;
 import kuit.project.beering.repository.ReviewRepository;
+import kuit.project.beering.util.exception.DrinkException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
@@ -16,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static kuit.project.beering.util.BaseResponseStatus.NONE_DRINK;
 
 @Service
 @RequiredArgsConstructor
@@ -80,7 +83,8 @@ public class DrinkService {
 
     public GetDrinkResponse getDrinkById(Long beerId) {
         log.info("DrinkService.getDrinkById");
-        Drink drink = drinkRepository.findById(beerId).get();
+        Drink drink = drinkRepository.findById(beerId)
+                .orElseThrow(() -> new DrinkException(NONE_DRINK));
 
         // 유저의 주류 찜 여부
         boolean is_liked = favoriteService.is_liked(drink.getId());
