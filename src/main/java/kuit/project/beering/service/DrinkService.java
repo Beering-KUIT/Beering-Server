@@ -5,6 +5,7 @@ import kuit.project.beering.domain.Image;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.Review;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
+import kuit.project.beering.dto.request.drink.SortType;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import kuit.project.beering.dto.response.drink.ReviewPreview;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static kuit.project.beering.util.BaseResponseStatus.INVALID_ORDER;
 import static kuit.project.beering.util.BaseResponseStatus.NONE_DRINK;
 
 @Service
@@ -46,27 +48,8 @@ public class DrinkService {
         /**
          * 정렬 적용
          */
-        Sort.Direction sortDirection = Sort.Direction.ASC;
-        Sort.Order order = new Sort.Order(sortDirection, "createdAt");
 
-        switch (orderBy) {
-            case "name" -> {
-                order = new Sort.Order(sortDirection, "nameKr");
-            }
-            case "rating" -> {
-                sortDirection = Sort.Direction.DESC;
-                order = new Sort.Order(sortDirection, "totalRating");
-            }
-            case "review" -> {
-                sortDirection = Sort.Direction.DESC;
-                order = new Sort.Order(sortDirection, "countOfReview");
-            }
-            case "price" -> {
-                order = new Sort.Order(sortDirection, "price");
-            }
-        }
-
-        Pageable pageable = PageRequest.of(page, SIZE, Sort.by(order));
+        Pageable pageable = PageRequest.of(page, SIZE, SortType.getMatchedSort(orderBy));
 
         Page<Drink> drinkPage = drinkRepository.search(drinkSearchCondition, pageable);
 
