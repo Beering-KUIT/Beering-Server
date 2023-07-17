@@ -69,11 +69,10 @@ public class DrinkService {
         Pageable pageable = PageRequest.of(page, SIZE, Sort.by(order));
 
         Page<Drink> drinkPage = drinkRepository.search(drinkSearchCondition, pageable);
-        List<Drink> drinkList = drinkPage.getContent();
 
         List<DrinkSearchResponse> responseList;
 
-        responseList = drinkList.stream()
+        responseList = drinkPage.getContent().stream()
                         .map(drink -> new DrinkSearchResponse(
                             drink.getId(),
                             getTop1DrinkImgUrl(drink),
