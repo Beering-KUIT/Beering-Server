@@ -1,5 +1,6 @@
 package kuit.project.beering.dto.request.drink;
 
+import kuit.project.beering.util.exception.DrinkException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;
@@ -8,6 +9,7 @@ import org.springframework.data.domain.Sort.Direction;
 import java.util.Arrays;
 import java.util.Locale;
 
+import static kuit.project.beering.util.BaseResponseStatus.INVALID_ORDER;
 
 @Getter
 @RequiredArgsConstructor
@@ -24,7 +26,7 @@ public enum SortType {
         return Arrays.stream(values())
                 .filter(sortType -> sortType.name().equals(sorting.toUpperCase(Locale.ROOT)))
                 .findAny()
-                .orElse(OTHER)
+                .orElseThrow(() -> new DrinkException(INVALID_ORDER))
                 .sort;
     }
 }
