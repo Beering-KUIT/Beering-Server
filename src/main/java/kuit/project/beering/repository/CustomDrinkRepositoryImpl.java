@@ -1,19 +1,32 @@
 package kuit.project.beering.repository;
 
+import com.querydsl.core.types.Expression;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
 import kuit.project.beering.domain.Drink;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
+
+import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static kuit.project.beering.domain.QDrink.*;
+import kuit.project.beering.domain.QDrink;
 
+@Slf4j
 public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
@@ -27,6 +40,7 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
                                 .where(eqName(condition.getNameKr(), condition.getNameEn()),
                                         drink.price.between(condition.getMinPrice(), condition.getMaxPrice()),
                                         eqCategory(condition.getCategoryName()))
+                                .orderBy(drinkSort(pageable))
                                 .offset(pageable.getOffset())
                                 .limit(pageable.getPageSize())
                                 .fetch();
@@ -41,6 +55,23 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 
     }
+
+    private OrderSpecifier<?> drinkSort(Pageable pageable) {
+        if (!pageable.getSort().isEmpty()) {
+            for (Sort.Order order : pageable.getSort()) {
+                Order direction = order.getDirection().isAscending() ? Order.ASC : Order.DESC;
+                return switch (order.getProperty()) {
+                    case "avgRating" -> new OrderSpecifier<>(direction, drink.avgRating);
+                    case "countOfReview" -> new OrderSpecifier<>(direction, drink.countOfReview);
+                    case "nameKr" -> new OrderSpecifier<>(direction, drink.nameKr);
+                    case "price" -> new OrderSpecifier<>(direction, drink.price);
+                    default -> new OrderSpecifier<>(direction, drink.id);
+                };
+            }
+        }
+        return null;
+    }
+
 
     private BooleanExpression eqCategory(String categoryName) {
         if(!StringUtils.hasText(categoryName))
