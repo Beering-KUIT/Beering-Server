@@ -25,6 +25,10 @@ public class Member extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
+    private Role role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Status status;
 
     //연관관계 mapping
@@ -44,4 +48,14 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     private List<Tabom> taboms = new ArrayList<>();
 
+    public static Member createMember(String username, String password, String nickname) {
+        Member member = new Member();
+        member.username = username;
+        member.password = password;
+        member.nickname = nickname;
+
+        member.status = Status.ACTIVE;
+        member.role = Role.MEMBER;
+        return member;
+    }
 }
