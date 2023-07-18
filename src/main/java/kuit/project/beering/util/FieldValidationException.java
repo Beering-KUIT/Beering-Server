@@ -9,7 +9,7 @@ import org.springframework.validation.BindingResult;
  */
 @Getter
 @AllArgsConstructor
-public class MemberValidationException extends RuntimeException {
+public class FieldValidationException extends RuntimeException {
 
     private BindingResult bindingResult;
 
