@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ObjectValidationError {
 
-    private int code;
     private String ObjectName;
     private String message;
 }
