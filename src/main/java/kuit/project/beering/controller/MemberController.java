@@ -1,19 +1,20 @@
 package kuit.project.beering.controller;
 
-import jakarta.validation.Valid;
 import kuit.project.beering.domain.AgreementName;
 import kuit.project.beering.dto.request.member.AgreementRequest;
 import kuit.project.beering.dto.request.member.MemberLoginRequest;
 import kuit.project.beering.dto.request.member.MemberSignupRequest;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
 import kuit.project.beering.service.MemberService;
+import kuit.project.beering.util.AgreementValidationException;
 import kuit.project.beering.util.BaseResponse;
-import kuit.project.beering.util.UserValidationException;
+import kuit.project.beering.util.FieldValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -29,12 +30,13 @@ public class MemberController {
     private final MemberService memberService;
 
     @PostMapping("/signup")
-    public BaseResponse<Object> signup(@RequestBody @Valid MemberSignupRequest request,
+    public BaseResponse<Object> signup(@RequestBody @Validated MemberSignupRequest request,
                                        BindingResult bindingResult) {
 
         validateAgreement(request, bindingResult);
 
-        if (bindingResult.hasErrors()) throw new UserValidationException(bindingResult);
+        if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
+        if (bindingResult.hasGlobalErrors()) throw new AgreementValidationException(bindingResult);
 
         memberService.signup(request);
 
@@ -42,7 +44,10 @@ public class MemberController {
     }
 
     @PostMapping("/login")
-    public BaseResponse<MemberLoginResponse> login(@RequestBody MemberLoginRequest request) {
+    public BaseResponse<MemberLoginResponse> login(@RequestBody @Validated MemberLoginRequest request,
+                                                   BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) throw new FieldValidationException(bindingResult);
 
         MemberLoginResponse response = memberService.login(request);
 
