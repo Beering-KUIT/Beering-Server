@@ -1,17 +1,12 @@
 package kuit.project.beering.controller.advice;
 
 import kuit.project.beering.controller.MemberController;
-import kuit.project.beering.util.AgreementValidationException;
-import kuit.project.beering.util.BaseResponse;
-import kuit.project.beering.util.BaseResponseStatus;
-import kuit.project.beering.util.ObjectValidationError;
+import kuit.project.beering.util.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.sql.SQLIntegrityConstraintViolationException;
 
 @Slf4j
 @RestControllerAdvice(assignableTypes = MemberController.class)
@@ -38,8 +33,8 @@ public class MemberControllerAdvice {
     /**
      * @Brief 이메일 중복 예외 처리
      */
-    @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
-    public BaseResponse<Object> duplicateException(SQLIntegrityConstraintViolationException ex) {
+    @ExceptionHandler(DuplicateUsernameException.class)
+    public BaseResponse<Object> duplicateException(DuplicateUsernameException ex) {
         return new BaseResponse<>(BaseResponseStatus.DUPLICATED_EMAIL);
     }
 }
