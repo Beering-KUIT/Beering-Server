@@ -10,4 +10,9 @@ public class HomeController {
     public String hello() {
         return "hello world";
     }
+
+    @GetMapping("/test")
+    public String authTest() {
+        return "인가 성공";
+    }
 }
