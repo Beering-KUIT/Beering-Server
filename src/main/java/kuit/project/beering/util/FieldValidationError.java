@@ -9,7 +9,6 @@ import lombok.Getter;
 @Builder
 public class FieldValidationError {
 
-    private int code;
     private String fieldName;
     private String rejectValue;
     private String message;
