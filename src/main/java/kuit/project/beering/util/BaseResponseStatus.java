@@ -88,7 +88,13 @@ public enum BaseResponseStatus {
      * 6000 : Request 오
      */
     // DrinkException
-    NONE_DRINK(false, 6050, "해당 주류가 존재하지 않습니다.");
+    NONE_DRINK(false, 6050, "해당 주류가 존재하지 않습니다."),
+
+    // MemberException
+    NONE_MEMBER(false, 6060, "해당 유저가 존재하지 않습니다."),
+
+    // ReviewException
+    UNMATCHED_OPTION_SIZE(false, 6070, "리뷰 옵션의 개수가 올바르지 않습니다.");
 
     private final boolean isSuccess;
     private final int responseCode;
