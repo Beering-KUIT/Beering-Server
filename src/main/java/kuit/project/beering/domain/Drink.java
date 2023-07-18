@@ -56,4 +56,8 @@ public class Drink extends BaseTimeEntity{
 
     @OneToMany(mappedBy = "drink")
     private List<Image> images = new ArrayList<>();
+
+    public void addReview(Review review) {
+        this.reviews.add(review);
+    }
 }
