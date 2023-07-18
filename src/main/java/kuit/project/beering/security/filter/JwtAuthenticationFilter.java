@@ -2,8 +2,6 @@ package kuit.project.beering.security.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import kuit.project.beering.security.jwt.JwtTokenProvider;
@@ -11,7 +9,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
-import org.springframework.web.filter.GenericFilterBean;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -29,7 +26,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
          * @Breif 토큰 검증 후 Spring Security Context에 인증 정보 담음
          * @Condition 토큰 값이 존재하고, 검증 되었으면 실행
          */
-        if (token != null && !jwtTokenProvider.isExpiredToken(token)) {
+        if (token != null && !jwtTokenProvider.validateToken(token)) {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
