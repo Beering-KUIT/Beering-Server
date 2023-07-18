@@ -1,6 +1,7 @@
 package kuit.project.beering.configuration;
 
 import kuit.project.beering.security.filter.JwtAuthenticationFilter;
+import kuit.project.beering.security.filter.JwtExceptionFilter;
 import kuit.project.beering.security.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -39,7 +40,8 @@ public class SecurityConfig {
                     authorizeRequest.requestMatchers("/", "/signup", "/login", "/error").permitAll();
                 })
                 .authorizeHttpRequests(authorizeRequest -> authorizeRequest.anyRequest().authenticated())
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtExceptionFilter(), JwtAuthenticationFilter.class);
 
         return http.build();
     }
