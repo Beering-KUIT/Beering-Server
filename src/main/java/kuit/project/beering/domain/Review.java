@@ -1,10 +1,7 @@
 package kuit.project.beering.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,4 +49,31 @@ public class Review extends BaseTimeEntity {
     @OneToMany(mappedBy = "review")
     private List<Tabom> taboms = new ArrayList<>();
 
+    //리뷰 엔티티에 빌더 추가
+    @Builder
+    public Review(Member member, Drink drink, String content, float totalRating, Status status) {
+
+        this.member = member;
+        if (member != null) {
+            member.addReview(this);
+        }
+
+        this.drink = drink;
+        if (drink != null) {
+            drink.addReview(this);
+        }
+
+        this.category = drink.getCategory();
+        if (drink.getCategory() != null) {
+            category.addReview(this);
+        }
+
+        this.content = content;
+        this.totalRating = totalRating;
+        this.status = status;
+    }
+
+    public void addSelectedOption(SelectedOption selectedOption) {
+        this.selectedOptions.add(selectedOption);
+    }
 }
