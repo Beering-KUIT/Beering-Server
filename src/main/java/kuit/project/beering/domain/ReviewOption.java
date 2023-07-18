@@ -32,5 +32,9 @@ public class ReviewOption extends BaseTimeEntity {
     private Category category;
 
     @OneToMany(mappedBy = "reviewOption")
-    private List<SelectedOption> selectedOption;
+    private List<SelectedOption> selectedOptions;
+
+    public void addSelectedOption(SelectedOption selectedOption) {
+        this.selectedOptions.add(selectedOption);
+    }
 }
