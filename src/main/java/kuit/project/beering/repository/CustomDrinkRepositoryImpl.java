@@ -1,11 +1,8 @@
 package kuit.project.beering.repository;
 
-import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -18,13 +15,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.util.StringUtils;
 
-import java.lang.reflect.Field;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static kuit.project.beering.domain.QDrink.*;
-import kuit.project.beering.domain.QDrink;
 
 @Slf4j
 public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
