@@ -48,13 +48,13 @@ public class JwtTokenProvider {
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("auth", authorities)
-                .claim("userId", ((AuthMember) authentication.getPrincipal()).getId())
+                .claim("memberId", ((AuthMember) authentication.getPrincipal()).getId())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRED_IN))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
         String refreshToken = Jwts.builder()
-                .claim("userId", ((AuthMember) authentication.getPrincipal()).getId())
+                .claim("memberId", ((AuthMember) authentication.getPrincipal()).getId())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRED_IN))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
