@@ -17,9 +17,6 @@ public class Favorite extends BaseTimeEntity {
     @Column(name = "favorite_id")
     private Long id;
 
-    @Column(nullable = false)
-    private Boolean isClicked;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
