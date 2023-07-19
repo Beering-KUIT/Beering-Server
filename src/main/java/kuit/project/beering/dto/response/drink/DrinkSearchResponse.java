@@ -10,9 +10,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class DrinkSearchResponse {
-    Long beer_id;
-    String beer_image_url;
-    String name_kr;
-    String name_en;
+    Long beerId;
+    String imgUrl;
+    String nameKr;
+    String nameEn;
     String manufacturer;
+    Boolean isLiked;
 }
