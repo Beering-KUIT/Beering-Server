@@ -5,6 +5,8 @@ import kuit.project.beering.util.*;
 import kuit.project.beering.util.exception.AgreementValidationException;
 import kuit.project.beering.util.exception.DuplicateUsernameException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -39,4 +41,15 @@ public class MemberControllerAdvice {
     public BaseResponse<Object> duplicateException(DuplicateUsernameException ex) {
         return new BaseResponse<>(BaseResponseStatus.DUPLICATED_EMAIL);
     }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public BaseResponse<Object> usernameNotFound(UsernameNotFoundException ex) {
+        return new BaseResponse<>(BaseResponseStatus.NONE_USER);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public BaseResponse<Object> badCredential(BadCredentialsException ex) {
+        return new BaseResponse<>(BaseResponseStatus.INVALID_CHECKED_PASSWORD);
+    }
+
 }
