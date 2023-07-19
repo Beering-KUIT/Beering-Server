@@ -3,10 +3,12 @@ package kuit.project.beering.controller;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
+import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.util.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import kuit.project.beering.service.DrinkService;
 
@@ -26,21 +28,20 @@ public class DrinkController {
             @RequestParam(defaultValue = "name", required = false) String orderBy,
             @RequestParam(required = false) String category,
             @RequestParam(defaultValue = "0", required = false) Integer minPrice,
-            @RequestParam(required = false) Integer maxPrice
+            @RequestParam(defaultValue = "2147483647", required = false) Integer maxPrice,
+            @AuthenticationPrincipal AuthMember member
     ) {
-        if (maxPrice == null) {
-            maxPrice = Integer.MAX_VALUE;
-        }
-
-        Page<DrinkSearchResponse> result = drinkService.searchDrinksByName(page, orderBy, new DrinkSearchCondition(name, name, category, minPrice, maxPrice));
+        Page<DrinkSearchResponse> result = drinkService.searchDrinksByName(member.getId(), page, orderBy, new DrinkSearchCondition(name, name, category, minPrice, maxPrice));
         return new BaseResponse<>(result);
     }
 
 
     @GetMapping("/{beerId}")
-    public BaseResponse<GetDrinkResponse> getDrink(@PathVariable Long beerId){
+    public BaseResponse<GetDrinkResponse> getDrink(
+            @PathVariable Long beerId,
+            @AuthenticationPrincipal AuthMember member){
 
-        GetDrinkResponse getDrinkResponse = drinkService.getDrinkById(beerId);
+        GetDrinkResponse getDrinkResponse = drinkService.getDrinkById(beerId, member.getId());
         return new BaseResponse<>(getDrinkResponse);
     }
 
