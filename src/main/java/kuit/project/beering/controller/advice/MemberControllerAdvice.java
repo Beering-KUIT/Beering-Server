@@ -2,6 +2,8 @@ package kuit.project.beering.controller.advice;
 
 import kuit.project.beering.controller.MemberController;
 import kuit.project.beering.util.*;
+import kuit.project.beering.util.exception.AgreementValidationException;
+import kuit.project.beering.util.exception.DuplicateUsernameException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;

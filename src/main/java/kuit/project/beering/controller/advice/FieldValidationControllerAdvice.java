@@ -3,7 +3,7 @@ package kuit.project.beering.controller.advice;
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.FieldValidationError;
-import kuit.project.beering.util.FieldValidationException;
+import kuit.project.beering.util.exception.FieldValidationException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;

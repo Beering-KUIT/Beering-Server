@@ -6,7 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.util.BaseResponseStatus;
-import kuit.project.beering.util.CustomJwtException;
+import kuit.project.beering.util.exception.CustomJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
