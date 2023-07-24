@@ -60,7 +60,7 @@ public class Member extends BaseTimeEntity {
         return member;
     }
 
-    public void setStatusToDormant() {
+    public void UpdateStatusToDormant() {
         this.status = Status.DORMANT;
     }
 }

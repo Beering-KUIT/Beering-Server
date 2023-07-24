@@ -56,7 +56,7 @@ public class TokenService {
         if (!refreshToken.equals(redisRefreshToken.getRefreshToken())) {
             // 보안 이슈 발생!! -> 사용자 status 변경
             Member findMember = memberRepository.findById(memberId).orElseThrow(EntityNotFoundException::new);
-            findMember.setStatusToDormant();
+            findMember.UpdateStatusToDormant();
             memberRepository.save(findMember);
             System.out.println("findMember.getStatus() = " + findMember.getStatus());
 
