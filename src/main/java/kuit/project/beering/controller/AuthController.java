@@ -90,7 +90,7 @@ public class AuthController {
         });
     }
 
-    @PostMapping("/auth/token")
+    @PostMapping("/token")
     public BaseResponse<JwtInfo> reissueToken(@RequestBody RefreshTokenRequest refreshToken) {
         JwtInfo jwtInfo = tokenService.reissueToken(refreshToken);
 
