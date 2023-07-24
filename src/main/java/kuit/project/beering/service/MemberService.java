@@ -7,6 +7,8 @@ import kuit.project.beering.dto.AgreementBulkInsertDto;
 import kuit.project.beering.dto.request.member.MemberLoginRequest;
 import kuit.project.beering.dto.request.member.MemberSignupRequest;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
+import kuit.project.beering.redis.RefreshToken;
+import kuit.project.beering.redis.RefreshTokenRepository;
 import kuit.project.beering.repository.AgreementJdbcRepository;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.security.auth.AuthMember;
@@ -32,6 +34,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final AgreementJdbcRepository agreementJdbcRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -85,6 +88,8 @@ public class MemberService {
          */
         JwtInfo jwtInfo = jwtTokenProvider.createToken(authentication);
         AuthMember principal = (AuthMember) authentication.getPrincipal();
+
+        refreshTokenRepository.save(new RefreshToken(String.valueOf(principal.getId()), jwtInfo.getRefreshToken()));
 
         return MemberLoginResponse.builder()
                 .memberId(principal.getId())
