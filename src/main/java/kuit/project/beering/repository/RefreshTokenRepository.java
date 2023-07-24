@@ -1,5 +1,6 @@
-package kuit.project.beering.redis;
+package kuit.project.beering.repository;
 
+import kuit.project.beering.redis.RefreshToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;

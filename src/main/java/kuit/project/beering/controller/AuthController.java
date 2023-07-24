@@ -1,7 +1,7 @@
 package kuit.project.beering.controller;
 
 import kuit.project.beering.dto.request.auth.RefreshTokenRequest;
-import kuit.project.beering.redis.TokenService;
+import kuit.project.beering.service.TokenService;
 import kuit.project.beering.security.jwt.JwtInfo;
 import kuit.project.beering.util.BaseResponse;
 import lombok.RequiredArgsConstructor;

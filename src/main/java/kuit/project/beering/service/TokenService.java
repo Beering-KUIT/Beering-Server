@@ -1,9 +1,11 @@
-package kuit.project.beering.redis;
+package kuit.project.beering.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.dto.request.auth.RefreshTokenRequest;
+import kuit.project.beering.redis.RefreshToken;
 import kuit.project.beering.repository.MemberRepository;
+import kuit.project.beering.repository.RefreshTokenRepository;
 import kuit.project.beering.security.jwt.JwtInfo;
 import kuit.project.beering.security.jwt.JwtTokenProvider;
 import kuit.project.beering.util.BaseResponseStatus;

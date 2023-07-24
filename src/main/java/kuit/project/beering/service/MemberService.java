@@ -8,7 +8,7 @@ import kuit.project.beering.dto.request.member.MemberLoginRequest;
 import kuit.project.beering.dto.request.member.MemberSignupRequest;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
 import kuit.project.beering.redis.RefreshToken;
-import kuit.project.beering.redis.RefreshTokenRepository;
+import kuit.project.beering.repository.RefreshTokenRepository;
 import kuit.project.beering.repository.AgreementJdbcRepository;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.security.auth.AuthMember;
