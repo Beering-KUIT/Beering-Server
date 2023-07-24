@@ -34,7 +34,6 @@ public class TokenService {
 
         // 3. 액세스 토큰, 리프레시 토큰 재발급
         JwtInfo jwtInfo = jwtTokenProvider.createToken(jwtTokenProvider.getAuthentication(refreshToken));
-        refreshTokenRepository.delete(memberId);
         refreshTokenRepository.save(new RefreshToken(memberId, jwtInfo.getRefreshToken()));
 
         return jwtInfo;
