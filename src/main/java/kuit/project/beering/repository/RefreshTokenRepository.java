@@ -21,9 +21,9 @@ public class RefreshTokenRepository {
     private long JWT_EXPIRED_IN;
 
     public void save(RefreshToken refreshToken) {
-        ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
-        valueOperations.set(refreshToken.getMemberId(), refreshToken.getRefreshToken());
-        redisTemplate.expire(refreshToken.getRefreshToken(), JWT_EXPIRED_IN * 7, TimeUnit.SECONDS);
+        redisTemplate.opsForValue()
+                .set(refreshToken.getMemberId(), refreshToken.getRefreshToken(),
+                        JWT_EXPIRED_IN * 7, TimeUnit.MILLISECONDS);
     }
 
     public Optional<RefreshToken> findById(String accessToken) {
