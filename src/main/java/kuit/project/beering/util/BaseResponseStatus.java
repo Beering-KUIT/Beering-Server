@@ -70,7 +70,13 @@ public enum BaseResponseStatus {
      */
     // AWS S3
     IMAGE_CONVERT_ERROR(false, 5000, "사진이 없거나 변환되지 않았습니다."),
-    IMAGE_INVALID_EXTENSION(false, 5001, "올바른 확장자가 아닙니다.");
+    IMAGE_INVALID_EXTENSION(false, 5001, "올바른 확장자가 아닙니다."),
+
+    /**
+     * 6000 : 보안 이슈
+     */
+    // 보안(리프레시 토큰 탈취) 이슈
+    USING_STOLEN_TOKEN(false, 6000, "토큰이 탈취되었습니다.");
 
     private final boolean isSuccess;
     private final int responseCode;

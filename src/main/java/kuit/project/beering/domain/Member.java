@@ -2,6 +2,7 @@ package kuit.project.beering.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Where(clause = "status = 'ACTIVE'")
 public class Member extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "member_id", nullable = false)
@@ -56,5 +58,9 @@ public class Member extends BaseTimeEntity {
         member.status = Status.ACTIVE;
         member.role = Role.MEMBER;
         return member;
+    }
+
+    public void UpdateStatusToDormant() {
+        this.status = Status.DORMANT;
     }
 }
