@@ -1,6 +1,8 @@
-package kuit.project.beering.domain;
+package kuit.project.beering.domain.image;
 
 import jakarta.persistence.*;
+import kuit.project.beering.domain.BaseTimeEntity;
+import kuit.project.beering.domain.Status;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -27,15 +29,4 @@ public class Image extends BaseTimeEntity {
     @Column(nullable = false)
     private Status status;
 
-    //연관관계 mapping
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "drink_id")
-//    private Drink drink;
-//
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "review_id")
-//    private Review review;
-//
-//    @OneToOne(mappedBy = "image")
-//    private Member member;
 }
