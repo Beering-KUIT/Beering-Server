@@ -1,6 +1,8 @@
 package kuit.project.beering.domain;
 
 import jakarta.persistence.*;
+import kuit.project.beering.domain.image.Image;
+import kuit.project.beering.domain.image.ReviewImage;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -47,7 +49,7 @@ public class Review extends BaseTimeEntity {
     private List<SelectedOption> selectedOptions = new ArrayList<>();
 
     @OneToMany(mappedBy = "review")
-    private List<Image> images = new ArrayList<>();
+    private List<ReviewImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "review")
     private List<Tabom> taboms = new ArrayList<>();
