@@ -5,10 +5,10 @@ import kuit.project.beering.domain.Image;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.Review;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
+import kuit.project.beering.dto.request.drink.SortType;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import kuit.project.beering.dto.response.drink.ReviewPreview;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
-import kuit.project.beering.repository.CustomDrinkRepository;
 import kuit.project.beering.repository.DrinkRepository;
 import kuit.project.beering.repository.ReviewRepository;
 import kuit.project.beering.util.exception.DrinkException;
@@ -42,31 +42,12 @@ public class DrinkService {
      * @return 검색 결과 10개 // 페이징
      * @exception DrinkException 유효하지 않은 정렬 방식 입력시 예외 발생
      */
-    public Page<DrinkSearchResponse> searchDrinksByName(Integer page, String orderBy, DrinkSearchCondition drinkSearchCondition) {
+    public Page<DrinkSearchResponse> searchDrinksByName(Long memberId, Integer page, String orderBy, DrinkSearchCondition drinkSearchCondition) {
         /**
          * 정렬 적용
          */
-        Sort.Direction sortDirection = Sort.Direction.ASC;
-        Sort.Order order = new Sort.Order(sortDirection, "createdAt");
 
-        switch (orderBy) {
-            case "name" -> {
-                order = new Sort.Order(sortDirection, "nameKr");
-            }
-            case "rating" -> {
-                sortDirection = Sort.Direction.DESC;
-                order = new Sort.Order(sortDirection, "totalRating");
-            }
-            case "review" -> {
-                sortDirection = Sort.Direction.DESC;
-                order = new Sort.Order(sortDirection, "countOfReview");
-            }
-            case "price" -> {
-                order = new Sort.Order(sortDirection, "price");
-            }
-        }
-
-        Pageable pageable = PageRequest.of(page, SIZE, Sort.by(order));
+        Pageable pageable = PageRequest.of(page, SIZE, SortType.getMatchedSort(orderBy));
 
         Page<Drink> drinkPage = drinkRepository.search(drinkSearchCondition, pageable);
 
@@ -78,7 +59,8 @@ public class DrinkService {
                             getTop1DrinkImgUrl(drink),
                             drink.getNameKr(),
                             drink.getNameEn(),
-                            drink.getManufacturer()))
+                            drink.getManufacturer(),
+                            isLiked(drink.getId(), memberId)))
                         .collect(Collectors.toList());
 
         return new PageImpl<>(responseList, pageable, drinkPage.getTotalElements());
@@ -91,15 +73,15 @@ public class DrinkService {
         }
         return null;
     }
+    
 
-
-    public GetDrinkResponse getDrinkById(Long beerId) {
+    public GetDrinkResponse getDrinkById(Long beerId, Long memberId) {
         log.info("DrinkService.getDrinkById");
         Drink drink = drinkRepository.findById(beerId)
                 .orElseThrow(() -> new DrinkException(NONE_DRINK));
 
         // 유저의 주류 찜 여부
-        boolean is_liked = favoriteService.is_liked(drink.getId());
+        boolean is_liked = isLiked(drink.getId(), memberId);
 
         // 리뷰 프리뷰 배열
         List<Review> reviews = reviewRepository.findTop5ByDrinkIdOrderByCreatedAtDesc(beerId);
@@ -127,6 +109,10 @@ public class DrinkService {
                 .isLiked(is_liked)
                 .reviewPreviews(reviewPreviews)
                 .build();
+    }
+
+    private boolean isLiked(Long drinkId, Long memberId) {
+        return favoriteService.is_liked(drinkId, memberId);
     }
 
     private String getProfileImageUrl(Review review){

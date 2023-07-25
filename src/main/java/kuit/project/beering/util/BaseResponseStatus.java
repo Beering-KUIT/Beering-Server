@@ -47,6 +47,7 @@ public enum BaseResponseStatus {
 
     // DrinkException
     NONE_DRINK(false, 2101, "해당 주류가 존재하지 않습니다."),
+    INVALID_ORDER(false, 2102, "유효하지 않은 정렬방식 입니다."),
 
     // RequestParam exception
     EMPTY_REQUEST_PARAMETER(false, 2098, "Request Parameter가 존재하지 않습니다."),
