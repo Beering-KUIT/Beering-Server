@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,21 +23,19 @@ public class Image extends BaseTimeEntity {
 
     private String uploadName;
 
-    private String serverName;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
 
     //연관관계 mapping
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "drink_id")
-    private Drink drink;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id")
-    private Review review;
-
-    @OneToOne(mappedBy = "image")
-    private Member member;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "drink_id")
+//    private Drink drink;
+//
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "review_id")
+//    private Review review;
+//
+//    @OneToOne(mappedBy = "image")
+//    private Member member;
 }
