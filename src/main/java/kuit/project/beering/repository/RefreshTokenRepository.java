@@ -20,21 +20,24 @@ public class RefreshTokenRepository {
     @Value("${jwt-expired-in}")
     private long JWT_EXPIRED_IN;
 
+    /**
+     * @Brief 저장 및 수정(덮어쓰기). 키, 밸류 및 유효시간 설정
+     * @param refreshToken
+     */
     public void save(RefreshToken refreshToken) {
         redisTemplate.opsForValue()
                 .set(refreshToken.getMemberId(), refreshToken.getRefreshToken(),
                         JWT_EXPIRED_IN * 7, TimeUnit.MILLISECONDS);
     }
 
-    public Optional<RefreshToken> findById(String accessToken) {
-        ValueOperations<String, Object> valueOperations = redisTemplate.opsForValue();
-        String refreshToken = String.valueOf(valueOperations.get(accessToken));
+    public Optional<RefreshToken> findById(String memberId) {
+        String refreshToken = String.valueOf(redisTemplate.opsForValue().get(memberId));
 
         if (Objects.isNull(refreshToken)) {
             return Optional.empty();
         }
 
-        return Optional.of(new RefreshToken(accessToken, refreshToken));
+        return Optional.of(new RefreshToken(memberId, refreshToken));
     }
 
     public void delete(String memberId) {

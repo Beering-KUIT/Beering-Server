@@ -44,8 +44,15 @@ public class TokenService {
      */
     private String validateRefreshToken(String refreshToken) {
         // 리프레시 토큰 자체 검증
+        try {
+            jwtTokenProvider.validateToken(refreshToken);
+        } catch (CustomJwtException ex) {
+            if (ex.getStatus().equals(BaseResponseStatus.EXPIRED_ACCESS_TOKEN)) {
+                throw new CustomJwtException(BaseResponseStatus.EXPIRED_REFRESH_TOKEN);
+            }
+            throw ex;
+        }
 
-        jwtTokenProvider.validateToken(refreshToken);
 
         // 리프레시 토큰 2차 검증 - redis 와 비교
         Long memberId = jwtTokenProvider.parseMemberId(refreshToken);

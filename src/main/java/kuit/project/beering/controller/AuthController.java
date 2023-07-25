@@ -59,6 +59,18 @@ public class AuthController {
     }
 
     /**
+     * @Brief 토큰 재발행 api
+     * @param refreshToken
+     * @return
+     */
+    @PostMapping("/token")
+    public BaseResponse<JwtInfo> reissueToken(@RequestBody RefreshTokenRequest refreshToken) {
+        JwtInfo jwtInfo = tokenService.reissueToken(refreshToken);
+
+        return new BaseResponse<>(jwtInfo);
+    }
+
+    /**
      * @param memberSignupRequest
      * @param bindingResult
      * @Brief Agreement 값 제대로 들어왔는지 확인. 개수, 약관 포함 여부
@@ -88,12 +100,5 @@ public class AuthController {
                         true, null, null,
                         "SERVICE, PERSONAL 의 isAgreed 값은 반드시 TRUE"));
         });
-    }
-
-    @PostMapping("/token")
-    public BaseResponse<JwtInfo> reissueToken(@RequestBody RefreshTokenRequest refreshToken) {
-        JwtInfo jwtInfo = tokenService.reissueToken(refreshToken);
-
-        return new BaseResponse<>(jwtInfo);
     }
 }
