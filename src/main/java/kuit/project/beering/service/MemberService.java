@@ -12,6 +12,7 @@ import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.security.jwt.JwtInfo;
 import kuit.project.beering.security.jwt.JwtTokenProvider;
+import kuit.project.beering.util.exception.DuplicateUsernameException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -40,6 +41,9 @@ public class MemberService {
         /**
          * @Brief 회원부터 저장, username이 중복일 경우에는 예외 발생하고 더이상 진행되지 않고 종료
          */
+        if (memberRepository.existsByUsernameAndStatus(request.getUsername(), Status.ACTIVE))
+            throw new DuplicateUsernameException();
+
         Member member = memberRepository.saveAndFlush(
                 Member.createMember(
                         request.getUsername(),

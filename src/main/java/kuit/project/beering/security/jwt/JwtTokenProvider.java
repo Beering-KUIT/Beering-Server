@@ -3,7 +3,10 @@ package kuit.project.beering.security.jwt;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import kuit.project.beering.security.auth.AuthMember;
+import kuit.project.beering.util.BaseResponseStatus;
+import kuit.project.beering.util.exception.CustomJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -45,13 +48,13 @@ public class JwtTokenProvider {
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("auth", authorities)
-                .claim("userId", ((AuthMember) authentication.getPrincipal()).getId())
+                .claim("memberId", ((AuthMember) authentication.getPrincipal()).getId())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRED_IN))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
         String refreshToken = Jwts.builder()
-                .claim("userId", ((AuthMember) authentication.getPrincipal()).getId())
+                .claim("memberId", ((AuthMember) authentication.getPrincipal()).getId())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRED_IN))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -67,20 +70,23 @@ public class JwtTokenProvider {
      * @param token
      * @return
      */
-    public boolean isExpiredToken(String token) {
+    public boolean validateToken(String token) {
+
         try {
             Jws<Claims> claims = Jwts.parserBuilder()
                     .setSigningKey(key).build()
                     .parseClaimsJws(token);
-            return claims.getBody().getExpiration().before(new Date());
+            return claims.getBody().getExpiration().after(new Date());
         } catch (ExpiredJwtException e) {
-            return true;
+            throw new CustomJwtException(BaseResponseStatus.EXPIRED_ACCESS_TOKEN);
         } catch (UnsupportedJwtException e) {
-            throw new JwtException("지원되지 않는 토큰 형식입니다.");
+            throw new CustomJwtException(BaseResponseStatus.UNSUPPORTED_TOKEN_TYPE);
+        } catch (SignatureException e) {
+            throw new CustomJwtException(BaseResponseStatus.INVALID_SIGNATURE_JWT);
         } catch (MalformedJwtException e) {
-            throw new JwtException("토큰이 올바르게 구성되지 않았습니다.");
+            throw new CustomJwtException(BaseResponseStatus.MALFORMED_TOKEN_TYPE);
         } catch (IllegalArgumentException e) {
-            throw new JwtException("유효하지 않은 토큰입니다.");
+            throw new CustomJwtException(BaseResponseStatus.INVALID_TOKEN_TYPE);
         } catch (JwtException e) {
             log.error("[JwtTokenProvider.validateAccessToken]", e);
             throw e;

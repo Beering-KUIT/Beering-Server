@@ -58,5 +58,8 @@ out/
 /src/main/resources/application.yml
 /src/main/resources/application.properties
 
+### QType file ###
+/src/main/generated
+
 ### Mac file ###
 .DS_Store

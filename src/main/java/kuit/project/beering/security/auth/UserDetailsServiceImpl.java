@@ -1,6 +1,7 @@
 package kuit.project.beering.security.auth;
 
 import kuit.project.beering.domain.Member;
+import kuit.project.beering.domain.Status;
 import kuit.project.beering.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +25,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("UserDetailsServiceImpl 진입");
-        Member member = memberRepository.findByUsername(username).orElseThrow(() ->
+        Member member = memberRepository.findByUsernameAndStatus(username, Status.ACTIVE).orElseThrow(() ->
                 new UsernameNotFoundException("해당 사용자가 존재하지 않습니다. : " + username));
 
         List<GrantedAuthority> authorities = new ArrayList<>();
