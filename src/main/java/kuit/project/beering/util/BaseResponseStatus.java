@@ -47,6 +47,7 @@ public enum BaseResponseStatus {
 
     // DrinkException
     NONE_DRINK(false, 2101, "해당 주류가 존재하지 않습니다."),
+    INVALID_ORDER(false, 2102, "유효하지 않은 정렬방식 입니다."),
 
     // RequestParam exception
     EMPTY_REQUEST_PARAMETER(false, 2098, "Request Parameter가 존재하지 않습니다."),
@@ -68,9 +69,8 @@ public enum BaseResponseStatus {
      * 5000 : AWS 오류
      */
     // AWS S3
-    POST_IMAGE_CONVERT_ERROR(false, 5000, "사진이 없거나 변환되지 않았습니다."),
-    POST_IMAGE_INVALID_EXTENSION(false, 5001, "올바른 확장자가 아닙니다.");
-
+    IMAGE_CONVERT_ERROR(false, 5000, "사진이 없거나 변환되지 않았습니다."),
+    IMAGE_INVALID_EXTENSION(false, 5001, "올바른 확장자가 아닙니다.");
 
     private final boolean isSuccess;
     private final int responseCode;
