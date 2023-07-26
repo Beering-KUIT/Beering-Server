@@ -2,16 +2,15 @@ package kuit.project.beering.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import kuit.project.beering.dto.request.auth.KakaoLoginRequest;
+import kuit.project.beering.dto.response.SignupNotCompletedResponse;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
 import kuit.project.beering.service.OAuthService;
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.BaseResponseStatus;
+import kuit.project.beering.util.exception.SignupNotCompletedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Slf4j
@@ -32,4 +31,11 @@ public class OAuthController {
 
     }
 
+    @ExceptionHandler(SignupNotCompletedException.class)
+    public BaseResponse<SignupNotCompletedResponse> loginNotCompleted(SignupNotCompletedException ex) {
+
+        return new BaseResponse<>(SignupNotCompletedResponse.builder()
+                .isLoginCompleted(false)
+                .sub(ex.getSub()).build());
+    }
 }
