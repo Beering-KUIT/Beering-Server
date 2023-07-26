@@ -3,10 +3,7 @@ package kuit.project.beering.domain.image;
 import jakarta.persistence.*;
 import kuit.project.beering.domain.BaseTimeEntity;
 import kuit.project.beering.domain.Status;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
@@ -29,4 +26,10 @@ public class Image extends BaseTimeEntity {
     @Column(nullable = false)
     private Status status;
 
+
+    public Image (String imageUrl, String uploadName) {
+        this.imageUrl = imageUrl;
+        this.uploadName = uploadName;
+        this.status = Status.ACTIVE;
+    }
 }
