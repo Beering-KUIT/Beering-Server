@@ -1,7 +1,8 @@
 package kuit.project.beering.service;
 
 import kuit.project.beering.domain.Drink;
-import kuit.project.beering.domain.Image;
+import kuit.project.beering.domain.image.DrinkImage;
+import kuit.project.beering.domain.image.Image;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.Review;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
@@ -67,7 +68,7 @@ public class DrinkService {
     }
 
     private String getTop1DrinkImgUrl(Drink drink){
-        List<Image> images = drink.getImages();
+        List<DrinkImage> images = drink.getImages();
         if(!images.isEmpty()){
             return images.get(0).getImageUrl();
         }
