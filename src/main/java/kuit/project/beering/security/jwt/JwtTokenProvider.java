@@ -122,6 +122,10 @@ public class JwtTokenProvider {
         return parseClaims(token).get("memberId", Long.class);
     }
 
+    public String parseSub(String token) {
+         return parseClaims(token).get("sub", String.class);
+    }
+
     /**
      * @Brief Authentication에서 유저 인증 권한 파싱
      * @param authentication
