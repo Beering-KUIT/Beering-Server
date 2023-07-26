@@ -1,6 +1,8 @@
 package kuit.project.beering.domain;
 
 import jakarta.persistence.*;
+import kuit.project.beering.domain.image.DrinkImage;
+import kuit.project.beering.domain.image.Image;
 import lombok.AccessLevel;
 import org.hibernate.annotations.Formula;
 import lombok.AllArgsConstructor;
@@ -56,7 +58,11 @@ public class Drink extends BaseTimeEntity{
     private List<Review> reviews = new ArrayList<>();
 
     @OneToMany(mappedBy = "drink")
-    private List<Image> images = new ArrayList<>();
+    private List<DrinkImage> images = new ArrayList<>();
+
+    public void addReview(Review review) {
+        this.reviews.add(review);
+    }
 
     // 가상 칼럼
     @Basic(fetch = FetchType.LAZY)

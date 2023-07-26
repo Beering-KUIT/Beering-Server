@@ -69,6 +69,20 @@ public enum BaseResponseStatus {
      * 5000 : AWS 오류
      */
     // AWS S3
+    POST_IMAGE_CONVERT_ERROR(false, 5000, "사진이 없거나 변환되지 않았습니다."),
+    POST_IMAGE_INVALID_EXTENSION(false, 5001, "올바른 확장자가 아닙니다."),
+
+    /**
+     * 6000 : Request 오
+     */
+    // DrinkException
+    //NONE_DRINK(false, 6050, "해당 주류가 존재하지 않습니다."),
+
+    // MemberException
+    NONE_MEMBER(false, 6060, "해당 유저가 존재하지 않습니다."),
+
+    // ReviewException
+    UNMATCHED_OPTION_SIZE(false, 6070, "리뷰 옵션의 개수가 올바르지 않습니다."),
     IMAGE_CONVERT_ERROR(false, 5000, "사진이 없거나 변환되지 않았습니다."),
     IMAGE_INVALID_EXTENSION(false, 5001, "올바른 확장자가 아닙니다."),
 
