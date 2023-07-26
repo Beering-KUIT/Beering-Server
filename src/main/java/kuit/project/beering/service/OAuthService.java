@@ -3,6 +3,7 @@ package kuit.project.beering.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kuit.project.beering.dto.KakaoMemberInfo;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,9 @@ public class OAuthService {
     public MemberLoginResponse kakaoOAuth(String code) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         OAuthTokenInfo oAuthTokenInfo = getAccessToken(code);
+
+        // 2. 토큰으로 카카오 API 호출
+        KakaoMemberInfo kakaoMemberInfo = getKakaoUserInfo(oAuthTokenInfo.getAccessToken());
 
     }
 
@@ -63,6 +67,35 @@ public class OAuthService {
                 .accessToken(jsonNode.get("access_token").asText())
                 .refreshToken(jsonNode.get("refresh_token").asText()).build();
 
+    }
+
+    private KakaoMemberInfo getKakaoUserInfo(String accessToken) throws JsonProcessingException {
+        // HTTP Header 생성
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        // HTTP 요청 보내기
+        HttpEntity<MultiValueMap<String, String>> kakaoUserInfoRequest = new HttpEntity<>(headers);
+        RestTemplate rt = new RestTemplate();
+        ResponseEntity<String> response = rt.exchange(
+                "https://kapi.kakao.com/v2/user/me",
+                HttpMethod.POST,
+                kakaoUserInfoRequest,
+                String.class
+        );
+
+        // responseBody에 있는 정보를 꺼냄
+        String responseBody = response.getBody();
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(responseBody);
+
+        Long id = jsonNode.get("id").asLong();
+        String email = jsonNode.get("kakao_account").get("email").asText();
+        String nickname = jsonNode.get("properties")
+                .get("nickname").asText();
+
+        return new KakaoMemberInfo(id, email, nickname);
     }
 
 }
