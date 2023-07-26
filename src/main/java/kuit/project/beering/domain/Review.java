@@ -82,4 +82,8 @@ public class Review extends BaseTimeEntity {
     public void addSelectedOption(SelectedOption selectedOption) {
         this.selectedOptions.add(selectedOption);
     }
+
+    public void clearImages() {
+        this.images.clear();
+    }
 }
