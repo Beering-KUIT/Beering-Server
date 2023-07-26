@@ -16,7 +16,7 @@ import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.security.jwt.JwtInfo;
 import kuit.project.beering.security.jwt.JwtTokenProvider;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
-import kuit.project.beering.util.exception.LoginNotCompletedException;
+import kuit.project.beering.util.exception.SignupNotCompletedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -142,7 +142,7 @@ public class OAuthService {
                 .orElseThrow(() -> {
                     OAuth oAuth = oAuthRepository.save(OAuth.createOAuth(jwtTokenProvider.parseSub(oAuthTokenInfo.getIdToken()),
                             OAuthType.KAKAO, oAuthTokenInfo.getAccessToken(), oAuthTokenInfo.getRefreshToken()));
-                    throw new LoginNotCompletedException(oAuth.getSub());
+                    throw new SignupNotCompletedException(oAuth.getSub());
                 });
 
         forceLogin(member, oAuthTokenInfo.getRefreshToken());

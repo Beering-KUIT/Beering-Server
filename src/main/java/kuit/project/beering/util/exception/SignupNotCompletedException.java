@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class LoginNotCompletedException extends RuntimeException {
+public class SignupNotCompletedException extends RuntimeException {
 
     private final String sub;
 

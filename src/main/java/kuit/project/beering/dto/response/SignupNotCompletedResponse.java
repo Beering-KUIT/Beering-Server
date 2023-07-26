@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Builder
-public class LoginNotCompletedResponse {
+public class SignupNotCompletedResponse {
 
     private boolean isLoginCompleted;
     private String sub;
