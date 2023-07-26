@@ -3,20 +3,40 @@ package kuit.project.beering.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import kuit.project.beering.domain.Member;
+import kuit.project.beering.domain.OAuth;
+import kuit.project.beering.domain.OAuthType;
 import kuit.project.beering.dto.KakaoMemberInfo;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
+import kuit.project.beering.redis.RefreshToken;
+import kuit.project.beering.repository.MemberRepository;
+import kuit.project.beering.repository.OAuthRepository;
+import kuit.project.beering.repository.RefreshTokenRepository;
+import kuit.project.beering.security.auth.AuthMember;
+import kuit.project.beering.security.jwt.JwtInfo;
+import kuit.project.beering.security.jwt.JwtTokenProvider;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
+import kuit.project.beering.util.exception.LoginNotCompletedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +45,10 @@ public class OAuthService {
 
     @Value(value = "${oauth2-kakao-restapi-key}")
     private String CLIENT_ID;
+    private final MemberRepository memberRepository;
+    private final OAuthRepository oAuthRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public MemberLoginResponse kakaoOAuth(String code) throws JsonProcessingException {
@@ -34,6 +58,16 @@ public class OAuthService {
         // 2. 토큰으로 카카오 API 호출
         KakaoMemberInfo kakaoMemberInfo = getKakaoUserInfo(oAuthTokenInfo.getAccessToken());
 
+        // 3. 카카오ID로 회원가입 처리
+        Member kakaoMember = registerKakaoUserIfNeed(kakaoMemberInfo, oAuthTokenInfo);
+
+        return MemberLoginResponse.builder()
+                .memberId(kakaoMember.getId())
+                .jwtInfo(JwtInfo.builder()
+                        .accessToken(oAuthTokenInfo.getIdToken())
+                        .refreshToken(oAuthTokenInfo.getRefreshToken())
+                        .build())
+                .build();
     }
 
     private OAuthTokenInfo getAccessToken(String code) throws JsonProcessingException {
@@ -46,7 +80,7 @@ public class OAuthService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "authorization_code");
         body.add("client_id", CLIENT_ID);
-        body.add("redirect_uri", "http://localhost:9000/auth2/login");
+        body.add("redirect_uri", "http://localhost:9000/oauth/kakao/callback");
         body.add("code", code);
 
         // HTTP 요청 보내기
@@ -96,6 +130,45 @@ public class OAuthService {
                 .get("nickname").asText();
 
         return new KakaoMemberInfo(id, email, nickname);
+    }
+
+    // 3. 카카오ID로 회원가입 처리
+    private Member registerKakaoUserIfNeed(KakaoMemberInfo kakaoMemberInfo, OAuthTokenInfo oAuthTokenInfo) {
+        // DB 에 중복된 email이 있는지 확인
+        // 없으면 닉네임 및 약관 요청 있으면 강제 로그인..
+        // password: random UUID
+
+        Member member = memberRepository.findByUsername(kakaoMemberInfo.getEmail())
+                .orElseThrow(() -> {
+                    OAuth oAuth = oAuthRepository.save(OAuth.createOAuth(jwtTokenProvider.parseSub(oAuthTokenInfo.getIdToken()),
+                            OAuthType.KAKAO, oAuthTokenInfo.getAccessToken(), oAuthTokenInfo.getRefreshToken()));
+                    throw new LoginNotCompletedException(oAuth.getSub());
+                });
+
+        forceLogin(member, oAuthTokenInfo.getRefreshToken());
+
+        return member;
+    }
+
+    // 4. 강제 로그인 처리
+    private void forceLogin(Member member, String refreshToken) {
+
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority("MEMBER"));
+
+        UserDetails userDetails = AuthMember.builder()
+                .id(member.getId())
+                .username(member.getUsername())
+                .password(member.getPassword())
+                .authorities(authorities)
+                .build();
+
+        Authentication authentication =
+                new UsernamePasswordAuthenticationToken
+                        (userDetails, "", userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        refreshTokenRepository.save(new RefreshToken(String.valueOf(member.getId()), refreshToken));
     }
 
 }
