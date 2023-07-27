@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
 @Entity
 @Getter
@@ -34,5 +35,10 @@ public class OAuth extends BaseTimeEntity {
         oAuth.refreshToken = refreshToken;
         oAuth.status = Status.DORMANT;
         return oAuth;
+    }
+
+    public void tokenReissue(String accessToken, String refreshToken) {
+        this.accessToken = accessToken;
+        if (StringUtils.hasText(refreshToken)) this.refreshToken = refreshToken;
     }
 }
