@@ -36,7 +36,7 @@ import org.springframework.web.client.RestTemplate;
 @Transactional(readOnly = true)
 public class OAuthService {
 
-    @Value(value = "${oauth2-kakao-restapi-key}")
+    @Value(value = "${kakao-restapi-key}")
     private String CLIENT_ID;
     private final MemberService memberService;
     private final MemberRepository memberRepository;
