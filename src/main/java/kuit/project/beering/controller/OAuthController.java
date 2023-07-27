@@ -45,16 +45,16 @@ public class OAuthController {
 
     @PostMapping("/signup")
     public BaseResponse<Object> signup(@RequestBody @Validated OAuthSignupRequest request,
-                                       BindingResult bindingResult) {
+                                       BindingResult bindingResult) throws JsonProcessingException {
 
         validateAgreement(request, bindingResult);
 
         if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
         if (bindingResult.hasGlobalErrors()) throw new AgreementValidationException(bindingResult);
 
-        oAuthService.signup(request);
+        MemberLoginResponse response = oAuthService.signup(request);
 
-        return new BaseResponse<>(new Object());
+        return new BaseResponse<>(response);
     }
 
     @ExceptionHandler(SignupNotCompletedException.class)
