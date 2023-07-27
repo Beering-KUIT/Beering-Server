@@ -52,7 +52,7 @@ public class Member extends BaseTimeEntity {
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "oauth_id")
-    private OAuth oAuth;
+    private OAuth oauth;
 
     public void addReview(Review review) {
         this.reviews.add(review);
@@ -73,7 +73,7 @@ public class Member extends BaseTimeEntity {
         this.status = Status.DORMANT;
     }
 
-    public void createOAuthAssociation(OAuth oAuth) {
-        this.oAuth = oAuth;
+    public void createOauthAssociation(OAuth oAuth) {
+        this.oauth = oAuth;
     }
 }

@@ -30,14 +30,14 @@ import java.util.List;
 @RequestMapping("/oauth")
 public class OAuthController {
 
-    private final OAuthService oAuthService;
+    private final OAuthService oauthService;
 
     @GetMapping("/kakao/callback")
     public BaseResponse<MemberLoginResponse> kakaoOauth(@ModelAttribute KakaoLoginRequest kakaoLoginRequest) throws JsonProcessingException {
 
         if (!kakaoLoginRequest.getError().isBlank()) return new BaseResponse<>(BaseResponseStatus.OAUTH_LOGIN_FAILED);
 
-        MemberLoginResponse memberLoginResponse = oAuthService.kakaoOAuth(kakaoLoginRequest.getCode());
+        MemberLoginResponse memberLoginResponse = oauthService.kakaoOauth(kakaoLoginRequest.getCode());
 
         return new BaseResponse<>(memberLoginResponse);
 
@@ -52,7 +52,7 @@ public class OAuthController {
         if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
         if (bindingResult.hasGlobalErrors()) throw new AgreementValidationException(bindingResult);
 
-        MemberLoginResponse response = oAuthService.signup(request);
+        MemberLoginResponse response = oauthService.signup(request);
 
         return new BaseResponse<>(response);
     }

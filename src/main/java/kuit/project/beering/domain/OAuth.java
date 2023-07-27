@@ -17,24 +17,24 @@ public class OAuth extends BaseTimeEntity {
     private String sub;
 
     @Column(name = "type") @Enumerated(EnumType.STRING)
-    private OAuthType oAuthType;
+    private OAuthType oauthType;
     private String accessToken;
     private String refreshToken;
 
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @OneToOne(mappedBy = "oAuth")
+    @OneToOne(mappedBy = "oauth")
     private Member member;
 
-    public static OAuth createOAuth(String sub, OAuthType oAuthType, String accessToken, String refreshToken) {
-        OAuth oAuth = new OAuth();
-        oAuth.sub = sub;
-        oAuth.oAuthType = oAuthType;
-        oAuth.accessToken = accessToken;
-        oAuth.refreshToken = refreshToken;
-        oAuth.status = Status.DORMANT;
-        return oAuth;
+    public static OAuth createOauth(String sub, OAuthType oauthType, String accessToken, String refreshToken) {
+        OAuth oauth = new OAuth();
+        oauth.sub = sub;
+        oauth.oauthType = oauthType;
+        oauth.accessToken = accessToken;
+        oauth.refreshToken = refreshToken;
+        oauth.status = Status.DORMANT;
+        return oauth;
     }
 
     public void tokenReissue(String accessToken, String refreshToken) {

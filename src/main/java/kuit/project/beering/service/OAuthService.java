@@ -40,26 +40,26 @@ public class OAuthService {
     private String CLIENT_ID;
     private final MemberService memberService;
     private final MemberRepository memberRepository;
-    private final OAuthRepository oAuthRepository;
+    private final OAuthRepository oauthRepository;
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
-    public MemberLoginResponse kakaoOAuth(String code) throws JsonProcessingException {
+    public MemberLoginResponse kakaoOauth(String code) throws JsonProcessingException {
         // 1. "인가 코드"로 "액세스 토큰" 요청
-        OAuthTokenInfo oAuthTokenInfo = getAccessToken(code);
+        OAuthTokenInfo oauthTokenInfo = getAccessToken(code);
 
         // 2. 토큰으로 카카오 API 호출
-        KakaoMemberInfo kakaoMemberInfo = getKakaoUserInfo(oAuthTokenInfo.getAccessToken());
+        KakaoMemberInfo kakaoMemberInfo = getKakaoUserInfo(oauthTokenInfo.getAccessToken());
 
         // 3. 카카오ID로 회원가입 처리
-        Member kakaoMember = registerKakaoUserIfNeed(kakaoMemberInfo, oAuthTokenInfo);
+        Member kakaoMember = registerKakaoUserIfNeed(kakaoMemberInfo, oauthTokenInfo);
 
         return MemberLoginResponse.builder()
                 .memberId(kakaoMember.getId())
                 .jwtInfo(JwtInfo.builder()
-                        .accessToken(oAuthTokenInfo.getIdToken())
-                        .refreshToken(oAuthTokenInfo.getRefreshToken())
+                        .accessToken(oauthTokenInfo.getIdToken())
+                        .refreshToken(oauthTokenInfo.getRefreshToken())
                         .build())
                 .build();
     }
@@ -67,10 +67,10 @@ public class OAuthService {
     @Transactional
     public MemberLoginResponse signup(OAuthSignupRequest request) throws JsonProcessingException {
 
-        OAuth oAuth = oAuthRepository.findBySub(request.getSub())
+        OAuth oauth = oauthRepository.findBySub(request.getSub())
                 .orElseThrow(EntityNotFoundException::new);
 
-        JsonNode kakaoAccountResponseBody = getKakaoAccount(oAuth.getAccessToken());
+        JsonNode kakaoAccountResponseBody = getKakaoAccount(oauth.getAccessToken());
 
         String email = kakaoAccountResponseBody.get("kakao_account").get("email").asText();
         String nickname = kakaoAccountResponseBody.get("properties")
@@ -78,15 +78,15 @@ public class OAuthService {
 
         memberService.signup(new MemberSignupRequest(email, "!oauthpassword321", nickname, request.getAgreements()));
         Member member = memberRepository.findByUsername(email).orElseThrow(EntityNotFoundException::new);
-        member.createOAuthAssociation(oAuth);
+        member.createOauthAssociation(oauth);
 
-        JsonNode tokenResponseBody = getTokenReissue(oAuth);
+        JsonNode tokenResponseBody = getTokenReissue(oauth);
 
         String idToken = tokenResponseBody.get("id_token").asText();
         String accessToken = tokenResponseBody.get("access_token").asText();
         String refreshToken = tokenResponseBody.get("refresh_token").asText();
 
-        oAuth.tokenReissue(accessToken, refreshToken);
+        oauth.tokenReissue(accessToken, refreshToken);
 
         refreshTokenRepository.save(new RefreshToken(String.valueOf(member.getId()), refreshToken));
 
@@ -140,17 +140,17 @@ public class OAuthService {
     }
 
     // 3. 카카오ID로 회원가입 처리
-    private Member registerKakaoUserIfNeed(KakaoMemberInfo kakaoMemberInfo, OAuthTokenInfo oAuthTokenInfo) {
+    private Member registerKakaoUserIfNeed(KakaoMemberInfo kakaoMemberInfo, OAuthTokenInfo oauthTokenInfo) {
         // DB 에 중복된 email이 있는지 확인
         // 없으면 닉네임 및 약관 요청 있으면 강제 로그인..
         Member member = memberRepository.findByUsername(kakaoMemberInfo.getEmail())
                 .orElseThrow(() -> {
-                    OAuth oAuth = oAuthRepository.save(OAuth.createOAuth(jwtTokenProvider.parseSub(oAuthTokenInfo.getIdToken()),
-                            OAuthType.KAKAO, oAuthTokenInfo.getAccessToken(), oAuthTokenInfo.getRefreshToken()));
-                    throw new SignupNotCompletedException(oAuth.getSub());
+                    OAuth oauth = oauthRepository.save(OAuth.createOauth(jwtTokenProvider.parseSub(oauthTokenInfo.getIdToken()),
+                            OAuthType.KAKAO, oauthTokenInfo.getAccessToken(), oauthTokenInfo.getRefreshToken()));
+                    throw new SignupNotCompletedException(oauth.getSub());
                 });
 
-        refreshTokenRepository.save(new RefreshToken(String.valueOf(member.getId()), oAuthTokenInfo.getRefreshToken()));
+        refreshTokenRepository.save(new RefreshToken(String.valueOf(member.getId()), oauthTokenInfo.getRefreshToken()));
 
         return member;
     }
@@ -174,7 +174,7 @@ public class OAuthService {
         return getResponseBody(response);
     }
 
-    private JsonNode getTokenReissue(OAuth oAuth) throws JsonProcessingException {
+    private JsonNode getTokenReissue(OAuth oauth) throws JsonProcessingException {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded;charset=utf-8");
 
@@ -183,7 +183,7 @@ public class OAuthService {
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("grant_type", "refresh_token");
         body.add("client_id", CLIENT_ID);
-        body.add("refresh_token", oAuth.getRefreshToken());
+        body.add("refresh_token", oauth.getRefreshToken());
 
         // HTTP 요청 보내기
         HttpEntity<MultiValueMap<String, String>> kakaoTokenRequest = new HttpEntity<>(body, headers);
