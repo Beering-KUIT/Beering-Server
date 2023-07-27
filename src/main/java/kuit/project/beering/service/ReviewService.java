@@ -4,6 +4,7 @@ import kuit.project.beering.domain.*;
 import kuit.project.beering.domain.image.ReviewImage;
 import kuit.project.beering.dto.request.review.ReviewCreateRequestDto;
 import kuit.project.beering.dto.request.selectedOption.SelectedOptionCreateRequestDto;
+import kuit.project.beering.dto.response.review.ReviewDetailReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewResponseDto;
 import kuit.project.beering.repository.*;
 import kuit.project.beering.util.exception.DrinkException;
@@ -102,5 +103,15 @@ public class ReviewService {
                 .uploadName(uploadName)
                 .review(review)
                 .build());
+    }
+
+    // 리뷰 상세 보기
+    public ReviewDetailReadResponseDto readReviewDetail(long reviewId) {
+
+        // todo 예외 처리하기!!
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 존재하지 않습니다"));
+
+        return new ReviewDetailReadResponseDto(review);
     }
 }
