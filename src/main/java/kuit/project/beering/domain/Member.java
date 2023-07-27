@@ -3,6 +3,7 @@ package kuit.project.beering.domain;
 import jakarta.persistence.*;
 import kuit.project.beering.domain.image.Image;
 import kuit.project.beering.domain.image.MemberImage;
+import kuit.project.beering.domain.image.ReviewImage;
 import lombok.*;
 
 import java.util.ArrayList;
@@ -33,9 +34,8 @@ public class Member extends BaseTimeEntity {
     private Status status;
 
     //연관관계 mapping
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "image_id")
-    private MemberImage image;
+    @OneToMany(mappedBy = "member")
+    private List<MemberImage> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "member")
     private List<Agreement> agreements = new ArrayList<>();
