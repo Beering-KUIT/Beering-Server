@@ -1,6 +1,7 @@
 package kuit.project.beering.controller;
 
 import kuit.project.beering.dto.request.review.ReviewCreateRequestDto;
+import kuit.project.beering.dto.response.review.ReviewDetailReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewResponseDto;
 import kuit.project.beering.dto.response.reviewOption.ReviewOptionReadResponseDto;
 import kuit.project.beering.service.ReviewService;
@@ -28,6 +29,13 @@ public class ReviewController {
             @RequestPart List<MultipartFile> reviewImages) {
 
         ReviewResponseDto responseDto = reviewService.save(memberId, drinkId, requestDto, reviewImages);
+        return new BaseResponse<>(responseDto);
+    }
+
+    @GetMapping(value = "/reviews/{reviewId}")
+    public BaseResponse<ReviewDetailReadResponseDto> readReviewDetail(@PathVariable Long reviewId) {
+
+        ReviewDetailReadResponseDto responseDto = reviewService.readReviewDetail(reviewId);
         return new BaseResponse<>(responseDto);
     }
 }
