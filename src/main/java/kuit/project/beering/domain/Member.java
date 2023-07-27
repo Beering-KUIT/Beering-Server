@@ -72,4 +72,8 @@ public class Member extends BaseTimeEntity {
     public void UpdateStatusToDormant() {
         this.status = Status.DORMANT;
     }
+
+    public void createOAuthAssociation(OAuth oAuth) {
+        this.oAuth = oAuth;
+    }
 }
