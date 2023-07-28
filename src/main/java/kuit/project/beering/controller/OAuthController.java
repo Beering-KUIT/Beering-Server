@@ -35,7 +35,7 @@ public class OAuthController {
     @GetMapping("/kakao/callback")
     public BaseResponse<MemberLoginResponse> kakaoOauth(@ModelAttribute KakaoLoginRequest kakaoLoginRequest) throws JsonProcessingException {
 
-        if (!kakaoLoginRequest.getError().isBlank()) return new BaseResponse<>(BaseResponseStatus.OAUTH_LOGIN_FAILED);
+        if (kakaoLoginRequest.getError() != null) return new BaseResponse<>(BaseResponseStatus.OAUTH_LOGIN_FAILED);
 
         MemberLoginResponse memberLoginResponse = oauthService.kakaoOauth(kakaoLoginRequest.getCode());
 
