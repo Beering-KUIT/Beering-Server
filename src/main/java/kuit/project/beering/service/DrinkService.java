@@ -63,17 +63,7 @@ public class DrinkService {
         boolean is_liked = favoriteRepository.existsByDrinkIdAndMemberId(drinkId, memberId);
 
         // 리뷰 프리뷰 배열
-        List<Review> reviews = reviewRepository.findTop5ByDrinkIdOrderByCreatedAtDesc(drinkId);
-        List<ReviewPreview> reviewPreviews;
-        reviewPreviews = reviews.stream()
-                .map(review -> new ReviewPreview(
-                        getProfileImageUrl(review),
-                        review.getMember().getNickname(),
-                        review.getContent(),
-                        review.getCreatedAt(),
-                        review.getTotalRating())
-                )
-                .collect(Collectors.toList());
+        List<ReviewPreview> reviewPreviews = getReviewPreviews(drinkId);
 
         return GetDrinkResponse.builder()
                 .beerId(drink.getId())
@@ -88,6 +78,20 @@ public class DrinkService {
                 .isLiked(is_liked)
                 .reviewPreviews(reviewPreviews)
                 .build();
+    }
+
+    private List<ReviewPreview> getReviewPreviews(Long drinkId) {
+        // TODO : 생성순 -> 좋아요순으로 정렬하면 더 좋을 듯.
+        List<Review> reviews = reviewRepository.findTop5ByDrinkIdOrderByCreatedAtDesc(drinkId);
+        return reviews.stream()
+                .map(review -> new ReviewPreview(
+                        getProfileImageUrl(review),
+                        review.getMember().getNickname(),
+                        review.getContent(),
+                        review.getCreatedAt(),
+                        review.getTotalRating())
+                )
+                .collect(Collectors.toList());
     }
 
     private String getProfileImageUrl(Review review){
