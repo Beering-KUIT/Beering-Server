@@ -1,8 +1,6 @@
 package kuit.project.beering.service;
 
 import kuit.project.beering.domain.Drink;
-import kuit.project.beering.domain.image.DrinkImage;
-import kuit.project.beering.domain.image.Image;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.Review;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
@@ -11,6 +9,7 @@ import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import kuit.project.beering.dto.response.drink.ReviewPreview;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
 import kuit.project.beering.repository.DrinkRepository;
+import kuit.project.beering.repository.FavoriteRepository;
 import kuit.project.beering.repository.ReviewRepository;
 import kuit.project.beering.util.exception.DrinkException;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +27,7 @@ import static kuit.project.beering.util.BaseResponseStatus.NONE_DRINK;
 @Slf4j
 public class DrinkService {
     private final DrinkRepository drinkRepository;
-    private final FavoriteService favoriteService;
+    private final FavoriteRepository favoriteRepository;
     private final MemberService memberService;
     private final ReviewRepository reviewRepository;
 
@@ -55,16 +54,16 @@ public class DrinkService {
         return new PageImpl<>(drinkPage.getContent(), pageable, drinkPage.getTotalElements());
     }
 
-    public GetDrinkResponse getDrinkById(Long beerId, Long memberId) {
+    public GetDrinkResponse getDrinkById(Long drinkId, Long memberId) {
         log.info("DrinkService.getDrinkById");
-        Drink drink = drinkRepository.findById(beerId)
+        Drink drink = drinkRepository.findById(drinkId)
                 .orElseThrow(() -> new DrinkException(NONE_DRINK));
 
         // 유저의 주류 찜 여부
-        boolean is_liked = isLiked(drink.getId(), memberId);
+        boolean is_liked = favoriteRepository.existsByDrinkIdAndMemberId(drinkId, memberId);
 
         // 리뷰 프리뷰 배열
-        List<Review> reviews = reviewRepository.findTop5ByDrinkIdOrderByCreatedAtDesc(beerId);
+        List<Review> reviews = reviewRepository.findTop5ByDrinkIdOrderByCreatedAtDesc(drinkId);
         List<ReviewPreview> reviewPreviews;
         reviewPreviews = reviews.stream()
                 .map(review -> new ReviewPreview(
@@ -89,10 +88,6 @@ public class DrinkService {
                 .isLiked(is_liked)
                 .reviewPreviews(reviewPreviews)
                 .build();
-    }
-
-    private boolean isLiked(Long drinkId, Long memberId) {
-        return favoriteService.is_liked(drinkId, memberId);
     }
 
     private String getProfileImageUrl(Review review){
