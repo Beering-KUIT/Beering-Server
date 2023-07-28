@@ -9,6 +9,7 @@ import org.springframework.util.StringUtils;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Table(name = "oauth")
 public class OAuth extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "oauth_id")
@@ -16,7 +17,7 @@ public class OAuth extends BaseTimeEntity {
 
     private String sub;
 
-    @Column(name = "type") @Enumerated(EnumType.STRING)
+    @Column @Enumerated(EnumType.STRING)
     private OAuthType oauthType;
     private String accessToken;
     private String refreshToken;
