@@ -22,6 +22,7 @@ import java.util.List;
 
 import static kuit.project.beering.domain.QDrink.*;
 import static kuit.project.beering.domain.QFavorite.favorite;
+import static kuit.project.beering.domain.image.QDrinkImage.drinkImage;
 
 @Slf4j
 public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
@@ -55,6 +56,12 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
                                 .fetchJoin()
                                 .fetch();
 
+        for (DrinkSearchResponse response : content) {
+            Long drinkId = response.getDrinkId();
+            List<String> imageUrlList = getImageUrlsByDrinkId(drinkId);
+            response.setImageUrlList(imageUrlList);
+        }
+
         JPAQuery<Long> countQuery = jpaQueryFactory
                                     .select(drink.count())
                                     .from(drink)
@@ -64,6 +71,15 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
 
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchOne);
 
+    }
+
+    private List<String> getImageUrlsByDrinkId(Long drinkId) {
+        List<String> imageUrls = jpaQueryFactory
+                .select(drinkImage.imageUrl)
+                .from(drinkImage)
+                .where(drinkImage.drink.id.eq(drinkId))
+                .fetch();
+        return imageUrls != null ? imageUrls : Collections.emptyList();
     }
 
     private OrderSpecifier<?> drinkSort(Pageable pageable) {
