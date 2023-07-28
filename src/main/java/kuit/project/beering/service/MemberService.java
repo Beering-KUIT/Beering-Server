@@ -98,7 +98,7 @@ public class MemberService {
     }
 
     public String getProfileImageUrl(Member member) {
-        Image profileImage = member.getImage();
+        Image profileImage = member.getImages().get(0);
         return profileImage != null ? profileImage.getImageUrl() : null;
     }
 }
