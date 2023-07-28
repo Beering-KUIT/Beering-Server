@@ -43,38 +43,17 @@ public class DrinkService {
      * @return 검색 결과 10개 // 페이징
      * @exception DrinkException 유효하지 않은 정렬 방식 입력시 예외 발생
      */
-    public Page<DrinkSearchResponse> searchDrinksByName(Long memberId, Integer page, String orderBy, DrinkSearchCondition drinkSearchCondition) {
+    public Page<DrinkSearchResponse> searchDrinksByName(Integer page, String orderBy, DrinkSearchCondition drinkSearchCondition) {
         /**
          * 정렬 적용
          */
 
         Pageable pageable = PageRequest.of(page, SIZE, SortType.getMatchedSort(orderBy));
 
-        Page<Drink> drinkPage = drinkRepository.search(drinkSearchCondition, pageable);
+        Page<DrinkSearchResponse> drinkPage = drinkRepository.search(drinkSearchCondition, pageable);
 
-        List<DrinkSearchResponse> responseList;
-
-        responseList = drinkPage.getContent().stream()
-                        .map(drink -> new DrinkSearchResponse(
-                            drink.getId(),
-                            getTop1DrinkImgUrl(drink),
-                            drink.getNameKr(),
-                            drink.getNameEn(),
-                            drink.getManufacturer(),
-                            isLiked(drink.getId(), memberId)))
-                        .collect(Collectors.toList());
-
-        return new PageImpl<>(responseList, pageable, drinkPage.getTotalElements());
+        return new PageImpl<>(drinkPage.getContent(), pageable, drinkPage.getTotalElements());
     }
-
-    private String getTop1DrinkImgUrl(Drink drink){
-        List<DrinkImage> images = drink.getImages();
-        if(!images.isEmpty()){
-            return images.get(0).getImageUrl();
-        }
-        return null;
-    }
-    
 
     public GetDrinkResponse getDrinkById(Long beerId, Long memberId) {
         log.info("DrinkService.getDrinkById");
