@@ -12,8 +12,4 @@ public class FavoriteService {
 
     private final FavoriteRepository favoriteRepository;
 
-    public boolean is_liked(Long drinkId, Long memberId) {
-        return favoriteRepository.existsByDrinkIdAndMemberId(drinkId, memberId);
-    }
-
 }
