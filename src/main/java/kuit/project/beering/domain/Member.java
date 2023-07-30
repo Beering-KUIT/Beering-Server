@@ -52,6 +52,9 @@ public class Member extends BaseTimeEntity {
     public void addReview(Review review) {
         this.reviews.add(review);
     }
+    public void addFavorite(Favorite favorite) {
+        this.favorites.add(favorite);
+    }
     public static Member createMember(String username, String password, String nickname) {
         Member member = new Member();
         member.username = username;

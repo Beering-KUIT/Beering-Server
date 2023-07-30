@@ -63,6 +63,9 @@ public class Drink extends BaseTimeEntity{
     public void addReview(Review review) {
         this.reviews.add(review);
     }
+    public void addFavorite(Favorite favorite) {
+        this.favorites.add(favorite);
+    }
 
     // 가상 칼럼
     @Basic(fetch = FetchType.LAZY)
