@@ -1,10 +1,11 @@
-package kuit.project.beering.security.jwt;
+package kuit.project.beering.security.jwt.jwtTokenProvider;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
 import kuit.project.beering.security.auth.AuthMember;
+import kuit.project.beering.security.jwt.JwtInfo;
 import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.exception.CustomJwtException;
 import lombok.extern.slf4j.Slf4j;

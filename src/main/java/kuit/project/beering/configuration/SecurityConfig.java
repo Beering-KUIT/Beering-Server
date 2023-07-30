@@ -2,7 +2,7 @@ package kuit.project.beering.configuration;
 
 import kuit.project.beering.security.filter.JwtAuthenticationFilter;
 import kuit.project.beering.security.filter.JwtExceptionFilter;
-import kuit.project.beering.security.jwt.JwtTokenProvider;
+import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

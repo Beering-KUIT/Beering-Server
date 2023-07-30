@@ -16,7 +16,7 @@ import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.OAuthRepository;
 import kuit.project.beering.repository.RefreshTokenRepository;
 import kuit.project.beering.security.jwt.JwtInfo;
-import kuit.project.beering.security.jwt.JwtTokenProvider;
+import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
 import kuit.project.beering.util.exception.SignupNotCompletedException;
 import lombok.RequiredArgsConstructor;

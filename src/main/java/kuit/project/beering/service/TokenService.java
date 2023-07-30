@@ -7,7 +7,7 @@ import kuit.project.beering.redis.RefreshToken;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.RefreshTokenRepository;
 import kuit.project.beering.security.jwt.JwtInfo;
-import kuit.project.beering.security.jwt.JwtTokenProvider;
+import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
 import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.exception.CustomJwtException;
 import lombok.RequiredArgsConstructor;

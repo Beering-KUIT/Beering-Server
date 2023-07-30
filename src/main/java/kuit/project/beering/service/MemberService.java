@@ -13,7 +13,7 @@ import kuit.project.beering.repository.AgreementJdbcRepository;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.security.jwt.JwtInfo;
-import kuit.project.beering.security.jwt.JwtTokenProvider;
+import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
 import kuit.project.beering.util.exception.DuplicateUsernameException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
