@@ -16,7 +16,7 @@ import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.OAuthRepository;
 import kuit.project.beering.repository.RefreshTokenRepository;
 import kuit.project.beering.security.jwt.JwtInfo;
-import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
+import kuit.project.beering.security.jwt.jwtTokenProvider.BasicJwtTokenProvider;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
 import kuit.project.beering.util.exception.SignupNotCompletedException;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +42,7 @@ public class OAuthService {
     private final MemberRepository memberRepository;
     private final OAuthRepository oauthRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final BasicJwtTokenProvider basicJwtTokenProvider;
 
     @Transactional
     public MemberLoginResponse kakaoOauth(String code) throws JsonProcessingException {
@@ -145,7 +145,7 @@ public class OAuthService {
         // 없으면 닉네임 및 약관 요청 있으면 강제 로그인..
         Member member = memberRepository.findByUsername(kakaoMemberInfo.getEmail())
                 .orElseThrow(() -> {
-                    OAuth oauth = oauthRepository.save(OAuth.createOauth(jwtTokenProvider.parseSub(oauthTokenInfo.getIdToken()),
+                    OAuth oauth = oauthRepository.save(OAuth.createOauth(basicJwtTokenProvider.parseSub(oauthTokenInfo.getIdToken()),
                             OAuthType.KAKAO, oauthTokenInfo.getAccessToken(), oauthTokenInfo.getRefreshToken()));
                     throw new SignupNotCompletedException(oauth.getSub());
                 });

@@ -7,7 +7,7 @@ import kuit.project.beering.redis.RefreshToken;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.RefreshTokenRepository;
 import kuit.project.beering.security.jwt.JwtInfo;
-import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
+import kuit.project.beering.security.jwt.jwtTokenProvider.BasicJwtTokenProvider;
 import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.exception.CustomJwtException;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class TokenService {
 
     private final MemberRepository memberRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final JwtTokenProvider jwtTokenProvider;
+    private final BasicJwtTokenProvider basicJwtTokenProvider;
 
     @Transactional(noRollbackFor = CustomJwtException.class)
     public JwtInfo reissueToken(RefreshTokenRequest request) {
@@ -33,7 +33,7 @@ public class TokenService {
         String memberId = validateRefreshToken(refreshToken);
 
         // 3. 액세스 토큰, 리프레시 토큰 재발급
-        JwtInfo jwtInfo = jwtTokenProvider.createToken(jwtTokenProvider.getAuthentication(refreshToken));
+        JwtInfo jwtInfo = basicJwtTokenProvider.createToken(basicJwtTokenProvider.getAuthentication(refreshToken));
         refreshTokenRepository.save(new RefreshToken(memberId, jwtInfo.getRefreshToken()));
 
         return jwtInfo;
@@ -45,7 +45,7 @@ public class TokenService {
     private String validateRefreshToken(String refreshToken) {
         // 리프레시 토큰 자체 검증
         try {
-            jwtTokenProvider.validateToken(refreshToken);
+            basicJwtTokenProvider.validateToken(refreshToken);
         } catch (CustomJwtException ex) {
             if (ex.getStatus().equals(BaseResponseStatus.EXPIRED_ACCESS_TOKEN)) {
                 throw new CustomJwtException(BaseResponseStatus.EXPIRED_REFRESH_TOKEN);
@@ -55,7 +55,7 @@ public class TokenService {
 
 
         // 리프레시 토큰 2차 검증 - redis 와 비교
-        Long memberId = jwtTokenProvider.parseMemberId(refreshToken);
+        Long memberId = basicJwtTokenProvider.parseMemberId(refreshToken);
 
         RefreshToken redisRefreshToken = refreshTokenRepository
                 .findById(String.valueOf(memberId))

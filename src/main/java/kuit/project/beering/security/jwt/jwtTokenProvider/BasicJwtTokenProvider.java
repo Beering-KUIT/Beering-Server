@@ -25,14 +25,14 @@ import java.util.stream.Collectors;
 
 @Component
 @Slf4j
-public class JwtTokenProvider {
+public class BasicJwtTokenProvider {
 
     @Value("${jwt-expired-in}")
     private long JWT_EXPIRED_IN;
 
     private final Key key;
 
-    public JwtTokenProvider(@Value("${jwt-secret-key}") String secretKey) {
+    public BasicJwtTokenProvider(@Value("${jwt-secret-key}") String secretKey) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
@@ -49,6 +49,7 @@ public class JwtTokenProvider {
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("auth", authorities)
+                .claim("iss", "https://beering.com")
                 .claim("memberId", ((AuthMember) authentication.getPrincipal()).getId())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRED_IN))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -56,6 +57,7 @@ public class JwtTokenProvider {
 
         String refreshToken = Jwts.builder()
                 .claim("auth", authorities)
+                .claim("iss", "https://beering.com")
                 .claim("memberId", ((AuthMember) authentication.getPrincipal()).getId())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRED_IN * 7))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -154,4 +156,13 @@ public class JwtTokenProvider {
         }
     }
 
+    private Claims getUnsignedTokenClaims(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .build()
+                    .parseClaimsJwt(token).getBody();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        }
+    }
 }
