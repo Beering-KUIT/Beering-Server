@@ -1,13 +1,12 @@
 package kuit.project.beering.security.jwt.jwtTokenProvider;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.security.jwt.JwtInfo;
-import kuit.project.beering.util.BaseResponseStatus;
-import kuit.project.beering.util.exception.CustomJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +16,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -25,16 +23,10 @@ import java.util.stream.Collectors;
 
 @Component
 @Slf4j
-public class BasicJwtTokenProvider implements JwtTokenProvider{
-
-    @Value("${jwt-expired-in}")
-    private long JWT_EXPIRED_IN;
-
-    private final Key key;
+public class BasicJwtTokenProvider extends AbstractJwtTokenProvider {
 
     public BasicJwtTokenProvider(@Value("${jwt-secret-key}") String secretKey) {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
+        super(Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey)));
     }
 
     /**
@@ -68,35 +60,6 @@ public class BasicJwtTokenProvider implements JwtTokenProvider{
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
-    }
-
-    /**
-     * @Brief 토큰 검증
-     * @param token
-     * @return
-     */
-    @Override
-    public boolean validateToken(String token) {
-
-        try {
-            Jws<Claims> claims = Jwts.parserBuilder()
-                    .setSigningKey(key).build()
-                    .parseClaimsJws(token);
-            return claims.getBody().getExpiration().after(new Date());
-        } catch (ExpiredJwtException e) {
-            throw new CustomJwtException(BaseResponseStatus.EXPIRED_ACCESS_TOKEN);
-        } catch (UnsupportedJwtException e) {
-            throw new CustomJwtException(BaseResponseStatus.UNSUPPORTED_TOKEN_TYPE);
-        } catch (SignatureException e) {
-            throw new CustomJwtException(BaseResponseStatus.INVALID_SIGNATURE_JWT);
-        } catch (MalformedJwtException e) {
-            throw new CustomJwtException(BaseResponseStatus.MALFORMED_TOKEN_TYPE);
-        } catch (IllegalArgumentException e) {
-            throw new CustomJwtException(BaseResponseStatus.INVALID_TOKEN_TYPE);
-        } catch (JwtException e) {
-            log.error("[JwtTokenProvider.validateAccessToken]", e);
-            throw e;
-        }
     }
 
     /**
@@ -146,28 +109,5 @@ public class BasicJwtTokenProvider implements JwtTokenProvider{
         return authorities;
     }
 
-    /**
-     * @Brief accessToke에서 유저 claims(payload) 파싱
-     * @param token
-     * @return Claims
-     */
-    private Claims parseClaims(String token) {
-        try {
-            return Jwts.parserBuilder().
-                    setSigningKey(key)
-                    .build().parseClaimsJws(token).getBody();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
-        }
-    }
 
-    private Claims getUnsignedTokenClaims(String token) {
-        try {
-            return Jwts.parserBuilder()
-                    .build()
-                    .parseClaimsJwt(token).getBody();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
-        }
-    }
 }
