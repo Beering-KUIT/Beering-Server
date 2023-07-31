@@ -5,6 +5,7 @@ import kuit.project.beering.domain.image.ReviewImage;
 import kuit.project.beering.dto.request.review.ReviewCreateRequestDto;
 import kuit.project.beering.dto.request.selectedOption.SelectedOptionCreateRequestDto;
 import kuit.project.beering.dto.response.review.ReviewDetailReadResponseDto;
+import kuit.project.beering.dto.response.review.ReviewReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewResponseDto;
 import kuit.project.beering.repository.*;
 import kuit.project.beering.util.exception.DrinkException;
@@ -13,6 +14,7 @@ import kuit.project.beering.util.exception.ReviewException;
 import kuit.project.beering.util.s3.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,6 +39,7 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final AwsS3Uploader awsS3Uploader;
     private final ReviewImageRepository reviewImageRepository;
+    private final TabomRepository tabomRepository;
 
     //리뷰 생성
     public ReviewResponseDto save(Long memberId, Long drinkId, ReviewCreateRequestDto requestDto, List<MultipartFile> reviewImages) {
@@ -112,6 +115,33 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 존재하지 않습니다"));
 
-        return new ReviewDetailReadResponseDto(review);
+        log.info("좋아요 관련 쿼리 시작");
+        long upCount = tabomRepository.findCountByIsUPAndReviewId(review.getId()).orElseThrow();
+        long downCount = tabomRepository.findCountByIsDownAndReviewId(review.getId()).orElseThrow();
+        return new ReviewDetailReadResponseDto(review, upCount, downCount);
     }
+
+    @Transactional(readOnly = true)
+    public List<ReviewReadResponseDto> findAllReviewByMemberIdByPage(long memberId, Pageable pageable) {
+
+        List<Review> reviews = reviewRepository.findAllReviewsSliceByMemberIdByCreatedAtDesc(memberId, pageable);
+
+        log.info("좋아요 관련 쿼리 시작");
+        List<Long> upCounts = reviews.stream()
+                .map(r -> tabomRepository.findCountByIsUPAndReviewId(r.getId()).orElseThrow())
+                .collect(Collectors.toList());
+        log.info("싫어요 관련 쿼리 시작");
+        List<Long> downCounts = reviews.stream()
+                .map(r -> tabomRepository.findCountByIsDownAndReviewId(r.getId()).orElseThrow())
+                .collect(Collectors.toList());
+        List<ReviewReadResponseDto> responseDtos = new ArrayList<>();
+        for(int i=0; i<reviews.size(); i++) {
+            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), upCounts.get(i), downCounts.get(i)));
+        }
+//        return reviews.stream()
+//                .map(ReviewReadResponseDto::new)
+//                .collect(Collectors.toList());
+        return responseDtos;
+    }
+
 }
