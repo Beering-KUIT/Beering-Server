@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 @Component
 @Slf4j
-public class BasicJwtTokenProvider {
+public class BasicJwtTokenProvider implements JwtTokenProvider{
 
     @Value("${jwt-expired-in}")
     private long JWT_EXPIRED_IN;
@@ -42,6 +42,7 @@ public class BasicJwtTokenProvider {
      * @param authentication
      * @return JwtInfo - accessToken, refreshToken
      */
+    @Override
     public JwtInfo createToken(Authentication authentication) {
 
         String authorities = parseAuthorities(authentication);
@@ -74,6 +75,7 @@ public class BasicJwtTokenProvider {
      * @param token
      * @return
      */
+    @Override
     public boolean validateToken(String token) {
 
         try {
@@ -102,6 +104,7 @@ public class BasicJwtTokenProvider {
      * @param token
      * @return Authentication
      */
+    @Override
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);
 
@@ -121,10 +124,12 @@ public class BasicJwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(authMember, "", authorities);
     }
 
+    @Override
     public Long parseMemberId(String token) {
         return parseClaims(token).get("memberId", Long.class);
     }
 
+    @Override
     public String parseSub(String token) {
          return parseClaims(token).get("sub", String.class);
     }
