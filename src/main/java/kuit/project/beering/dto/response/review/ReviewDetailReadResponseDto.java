@@ -39,7 +39,7 @@ public class ReviewDetailReadResponseDto {
     private long like;
     private long dislike;
 
-    public ReviewDetailReadResponseDto (Review review) {
+    public ReviewDetailReadResponseDto (Review review, long isUpCount, long isDownCount) {
         this.memberId = review.getMember().getId();
         this.nickName = review.getMember().getNickname();
 //        this.profileImage = review.getMember().getImage().getImageUrl();
@@ -57,8 +57,8 @@ public class ReviewDetailReadResponseDto {
                 .map(SelectedOptionReadResponseDto::new)
                 .collect(Collectors.toList());
 
-        this.like = 0;
-        this.dislike = 0;
+        this.like = isUpCount;
+        this.dislike = isDownCount;
 
     }
 }
