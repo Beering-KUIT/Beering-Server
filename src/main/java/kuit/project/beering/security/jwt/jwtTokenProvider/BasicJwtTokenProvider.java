@@ -16,6 +16,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -37,11 +38,8 @@ public class BasicJwtTokenProvider extends AbstractJwtTokenProvider {
     @Override
     public JwtInfo createToken(Authentication authentication) {
 
-        String authorities = parseAuthorities(authentication);
-
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
-                .claim("auth", authorities)
                 .claim("iss", "https://beering.com")
                 .claim("memberId", ((AuthMember) authentication.getPrincipal()).getId())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRED_IN))
@@ -49,7 +47,6 @@ public class BasicJwtTokenProvider extends AbstractJwtTokenProvider {
                 .compact();
 
         String refreshToken = Jwts.builder()
-                .claim("auth", authorities)
                 .claim("iss", "https://beering.com")
                 .claim("memberId", ((AuthMember) authentication.getPrincipal()).getId())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRED_IN * 7))
@@ -71,12 +68,6 @@ public class BasicJwtTokenProvider extends AbstractJwtTokenProvider {
     public Authentication getAuthentication(String token) {
         Claims claims = parseClaims(token);
 
-        if (claims.get("auth") == null) throw new RuntimeException("권한없음");
-
-        List<SimpleGrantedAuthority> authorities =
-                Arrays.stream(claims.get("auth").toString().split(","))
-                .map(SimpleGrantedAuthority::new).toList();
-
         UserDetails authMember =
                 AuthMember.builder()
                 .id(claims.get("memberId", Long.class))
@@ -84,7 +75,7 @@ public class BasicJwtTokenProvider extends AbstractJwtTokenProvider {
                 .password("")
                 .build();
 
-        return new UsernamePasswordAuthenticationToken(authMember, "", authorities);
+        return new UsernamePasswordAuthenticationToken(authMember, "", new ArrayList<>());
     }
 
     @Override
@@ -95,18 +86,6 @@ public class BasicJwtTokenProvider extends AbstractJwtTokenProvider {
     @Override
     public String parseSub(String token) {
          return parseClaims(token).get("sub", String.class);
-    }
-
-    /**
-     * @Brief Authentication에서 유저 인증 권한 파싱
-     * @param authentication
-     * @return String
-     */
-    private String parseAuthorities(Authentication authentication) {
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-        return authorities;
     }
 
 
