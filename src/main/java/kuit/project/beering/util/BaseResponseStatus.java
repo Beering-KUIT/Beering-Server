@@ -44,6 +44,7 @@ public enum BaseResponseStatus {
     POST_REVIEW_EMPTY_SCORE(false, 2022, "score를 입력해주세요."),
     POST_REVIEW_ALREADY_CREATED(false, 2023, "이미 리뷰를 작성하였습니다."),
     INVALID_REVIEW(false, 2024, "유효하지 않은 리뷰입니다."),
+    NONE_REVIEW(false, 2025, "존재하지 않는 리뷰입니다."),
 
     // RequestParam exception
     EMPTY_REQUEST_PARAMETER(false, 2098, "Request Parameter가 존재하지 않습니다."),
@@ -59,6 +60,9 @@ public enum BaseResponseStatus {
     FAIL_CREATE_FAVORITE(false, 2202, "찜에 실패했습니다."),
     POST_FAVORITE_ALREADY_CREATED(false, 2203, "이미 찜하였습니다."),
 
+
+    // TabomException
+    POST_TABOM_ALREADY_CREATED(false, 2301, "이미 좋아요나 싫어요가 존재합니다."),
 
     /**
      * 3000 : Response 오류
