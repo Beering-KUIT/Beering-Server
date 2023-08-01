@@ -1,6 +1,5 @@
 package kuit.project.beering.repository;
 
-import kuit.project.beering.domain.Drink;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import org.springframework.data.domain.Page;
