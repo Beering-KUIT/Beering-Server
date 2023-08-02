@@ -12,7 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class GetDrinkResponse {
-    Long beerId;
+    Long drinkId;
     String nameKr;
     String nameEn;
     int price;

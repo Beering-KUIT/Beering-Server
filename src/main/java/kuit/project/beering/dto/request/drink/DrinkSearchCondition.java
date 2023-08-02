@@ -11,4 +11,5 @@ public class DrinkSearchCondition {
     String categoryName;
     Integer minPrice;
     Integer maxPrice;
+    Long memberId;
 }

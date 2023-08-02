@@ -5,15 +5,17 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @Builder
 public class DrinkSearchResponse {
-    Long beerId;
-    String imgUrl;
+    Long drinkId;
     String nameKr;
     String nameEn;
     String manufacturer;
+    List<String> imageUrlList;
     Boolean isLiked;
 }

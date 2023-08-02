@@ -28,4 +28,17 @@ public class Tabom extends BaseTimeEntity {
     @JoinColumn(name = "review_id")
     private Review review;
 
+    public Tabom(Member member, Review review, boolean isUp) {
+        super();
+        this.member = member;
+        if(member != null)
+            member.addTabom(this);
+
+        this.review = review;
+        if(review != null)
+            review.addTabom(this);
+
+        this.isUp = isUp;
+        this.status = Status.ACTIVE;
+    }
 }
