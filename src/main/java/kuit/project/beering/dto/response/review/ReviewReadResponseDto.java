@@ -33,11 +33,10 @@ public class ReviewReadResponseDto {
     private long like;
     private long dislike;
 
-    public ReviewReadResponseDto (Review review, long isUpCount, long isDownCount) {
+    public ReviewReadResponseDto (Review review, String profileImageUrl, long isUpCount, long isDownCount) {
         this.memberId = review.getMember().getId();
         this.nickName = review.getMember().getNickname();
-//        this.profileImage = review.getMember().getImage().getImageUrl();
-        this.profileImage = "test image url";
+        this.profileImage = profileImageUrl;
 
         this.reviewId = review.getId();
         this.reviewImageUrls = review.getImages().stream()
