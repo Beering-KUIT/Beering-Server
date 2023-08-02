@@ -6,15 +6,18 @@ import kuit.project.beering.domain.Review;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
 import kuit.project.beering.dto.request.drink.SortType;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
-import kuit.project.beering.dto.response.drink.ReviewPreview;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
+import kuit.project.beering.dto.response.drink.ReviewPreview;
 import kuit.project.beering.repository.DrinkRepository;
 import kuit.project.beering.repository.FavoriteRepository;
 import kuit.project.beering.repository.ReviewRepository;
 import kuit.project.beering.util.exception.DrinkException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -66,7 +69,7 @@ public class DrinkService {
         List<ReviewPreview> reviewPreviews = getReviewPreviews(drinkId);
 
         return GetDrinkResponse.builder()
-                .beerId(drink.getId())
+                .drinkId(drink.getId())
                 .nameKr(drink.getNameKr())
                 .nameEn(drink.getNameEn())
                 .price(drink.getPrice())

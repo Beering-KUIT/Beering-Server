@@ -1,4 +1,4 @@
-package kuit.project.beering.repository;
+package kuit.project.beering.repository.drink;
 
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;

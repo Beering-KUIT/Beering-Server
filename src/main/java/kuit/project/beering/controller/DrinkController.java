@@ -36,12 +36,12 @@ public class DrinkController {
     }
 
 
-    @GetMapping("/{beerId}")
+    @GetMapping("/{drinkId}")
     public BaseResponse<GetDrinkResponse> getDrink(
-            @PathVariable Long beerId,
+            @PathVariable Long drinkId,
             @AuthenticationPrincipal AuthMember member){
 
-        GetDrinkResponse getDrinkResponse = drinkService.getDrinkById(beerId, member.getId());
+        GetDrinkResponse getDrinkResponse = drinkService.getDrinkById(drinkId, member.getId());
         return new BaseResponse<>(getDrinkResponse);
     }
 

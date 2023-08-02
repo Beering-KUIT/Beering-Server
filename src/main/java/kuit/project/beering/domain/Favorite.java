@@ -1,10 +1,7 @@
 package kuit.project.beering.domain;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
@@ -29,4 +26,17 @@ public class Favorite extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "drink_id")
     private Drink drink;
+
+    public Favorite(Member member, Drink drink) {
+        super();
+        this.member = member;
+        if(member != null)
+            member.addFavorite(this);
+
+        this.drink = drink;
+        if(drink != null)
+            drink.addFavorite(this);
+
+        this.status = Status.ACTIVE;
+    }
 }
