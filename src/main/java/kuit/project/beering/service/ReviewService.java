@@ -7,6 +7,7 @@ import kuit.project.beering.dto.request.selectedOption.SelectedOptionCreateReque
 import kuit.project.beering.dto.response.review.ReviewDetailReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewResponseDto;
+import kuit.project.beering.dto.response.review.ReviewSliceResponseDto;
 import kuit.project.beering.repository.*;
 import kuit.project.beering.repository.drink.DrinkRepository;
 import kuit.project.beering.util.exception.DrinkException;
@@ -16,6 +17,7 @@ import kuit.project.beering.util.s3.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -129,9 +131,10 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReviewReadResponseDto> findAllReviewByMemberIdByPage(long memberId, Pageable pageable) {
+    public ReviewSliceResponseDto findAllReviewByMemberIdByPage(long memberId, Pageable pageable) {
 
-        List<Review> reviews = reviewRepository.findAllReviewsSliceByMemberIdByCreatedAtDesc(memberId, pageable);
+        Slice<Review> allReviewsSliceBy = reviewRepository.findAllReviewsSliceByMemberIdByCreatedAtDesc(memberId, pageable);
+        List<Review> reviews = allReviewsSliceBy.getContent();
 
         log.info("좋아요 관련 쿼리 시작");
         List<Long> upCounts = reviews.stream()
@@ -141,15 +144,18 @@ public class ReviewService {
         List<Long> downCounts = reviews.stream()
                 .map(r -> tabomRepository.findCountByIsDownAndReviewId(r.getId()).orElseThrow())
                 .collect(Collectors.toList());
+
         List<ReviewReadResponseDto> responseDtos = new ArrayList<>();
         for(int i=0; i<reviews.size(); i++) {
             String profileImageUrl = memberService.getProfileImageUrl(reviews.get(i).getMember());
             responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
         }
-//        return reviews.stream()
-//                .map(ReviewReadResponseDto::new)
-//                .collect(Collectors.toList());
-        return responseDtos;
+
+        return ReviewSliceResponseDto.builder()
+                .reviews(responseDtos)
+                .page(allReviewsSliceBy.getPageable().getPageNumber())
+                .isLast(allReviewsSliceBy.isLast())
+                .build();
     }
 
 }

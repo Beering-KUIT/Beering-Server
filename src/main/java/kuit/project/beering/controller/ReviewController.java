@@ -4,6 +4,7 @@ import kuit.project.beering.dto.request.review.ReviewCreateRequestDto;
 import kuit.project.beering.dto.response.review.ReviewDetailReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewResponseDto;
+import kuit.project.beering.dto.response.review.ReviewSliceResponseDto;
 import kuit.project.beering.dto.response.reviewOption.ReviewOptionReadResponseDto;
 import kuit.project.beering.service.ReviewService;
 import kuit.project.beering.util.BaseResponse;
@@ -42,12 +43,12 @@ public class ReviewController {
     }
 
     @GetMapping(value = "/members/{memberId}/reviews")
-    public BaseResponse<List<ReviewReadResponseDto>> readReviewByMemberId(@PathVariable Long memberId,
+    public BaseResponse<ReviewSliceResponseDto> readReviewByMemberId(@PathVariable Long memberId,
                                                                           @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                                                           @RequestParam(value = "size", required = false, defaultValue = "4") int size) {
 
         PageRequest pageRequest = PageRequest.of(page, size);
-        List<ReviewReadResponseDto> responseDtos = reviewService.findAllReviewByMemberIdByPage(memberId, pageRequest);
+        ReviewSliceResponseDto responseDtos = reviewService.findAllReviewByMemberIdByPage(memberId, pageRequest);
         return new BaseResponse<>(responseDtos);
     }
 }
