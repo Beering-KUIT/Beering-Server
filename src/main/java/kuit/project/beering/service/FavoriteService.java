@@ -3,7 +3,7 @@ package kuit.project.beering.service;
 import kuit.project.beering.domain.Drink;
 import kuit.project.beering.domain.Favorite;
 import kuit.project.beering.domain.Member;
-import kuit.project.beering.repository.DrinkRepository;
+import kuit.project.beering.repository.drink.DrinkRepository;
 import kuit.project.beering.repository.FavoriteRepository;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.util.exception.DrinkException;
