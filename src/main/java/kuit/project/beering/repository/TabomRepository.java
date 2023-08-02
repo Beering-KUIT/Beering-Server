@@ -10,7 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface TabomRepository extends JpaRepository<Tabom, Long> {
-
     @Query("select count(t) " +
             "from Tabom t " +
             "where t.isUp = true " +
@@ -22,4 +21,5 @@ public interface TabomRepository extends JpaRepository<Tabom, Long> {
             "where t.isUp = false " +
             "and t.review.id = :reviewId ")
     Optional<Long> findCountByIsDownAndReviewId(@Param("reviewId") Long reviewId);
+    boolean existsByReviewIdAndMemberId(Long memberId, Long reviewId);
 }

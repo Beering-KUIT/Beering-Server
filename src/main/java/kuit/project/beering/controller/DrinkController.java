@@ -31,17 +31,17 @@ public class DrinkController {
             @RequestParam(defaultValue = "2147483647", required = false) Integer maxPrice,
             @AuthenticationPrincipal AuthMember member
     ) {
-        Page<DrinkSearchResponse> result = drinkService.searchDrinksByName(member.getId(), page, orderBy, new DrinkSearchCondition(name, name, category, minPrice, maxPrice));
+        Page<DrinkSearchResponse> result = drinkService.searchDrinksByName(page, orderBy, new DrinkSearchCondition(name, name, category, minPrice, maxPrice, member.getId()));
         return new BaseResponse<>(result);
     }
 
 
-    @GetMapping("/{beerId}")
+    @GetMapping("/{drinkId}")
     public BaseResponse<GetDrinkResponse> getDrink(
-            @PathVariable Long beerId,
+            @PathVariable Long drinkId,
             @AuthenticationPrincipal AuthMember member){
 
-        GetDrinkResponse getDrinkResponse = drinkService.getDrinkById(beerId, member.getId());
+        GetDrinkResponse getDrinkResponse = drinkService.getDrinkById(drinkId, member.getId());
         return new BaseResponse<>(getDrinkResponse);
     }
 

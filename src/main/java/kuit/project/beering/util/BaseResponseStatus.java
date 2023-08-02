@@ -44,14 +44,25 @@ public enum BaseResponseStatus {
     POST_REVIEW_EMPTY_SCORE(false, 2022, "score를 입력해주세요."),
     POST_REVIEW_ALREADY_CREATED(false, 2023, "이미 리뷰를 작성하였습니다."),
     INVALID_REVIEW(false, 2024, "유효하지 않은 리뷰입니다."),
+    NONE_REVIEW(false, 2025, "존재하지 않는 리뷰입니다."),
+
+    // RequestParam exception
+    EMPTY_REQUEST_PARAMETER(false, 2098, "Request Parameter가 존재하지 않습니다."),
+    METHOD_ARGUMENT_TYPE_MISMATCH(false, 2099, "Request Parameter의 유형이 불일치합니다."),
 
     // DrinkException
     NONE_DRINK(false, 2101, "해당 주류가 존재하지 않습니다."),
     INVALID_ORDER(false, 2102, "유효하지 않은 정렬방식 입니다."),
 
-    // RequestParam exception
-    EMPTY_REQUEST_PARAMETER(false, 2098, "Request Parameter가 존재하지 않습니다."),
-    METHOD_ARGUMENT_TYPE_MISMATCH(false, 2099, "Request Parameter의 유형이 불일치합니다."),
+
+    // FavoriteException
+    TOKEN_PATH_MISMATCH(false, 2201, "토큰 정보와 pathVariable로 받은 Member 정보가 다릅니다."),
+    FAIL_CREATE_FAVORITE(false, 2202, "찜에 실패했습니다."),
+    POST_FAVORITE_ALREADY_CREATED(false, 2203, "이미 찜하였습니다."),
+
+
+    // TabomException
+    POST_TABOM_ALREADY_CREATED(false, 2301, "이미 좋아요나 싫어요가 존재합니다."),
 
     /**
      * 3000 : Response 오류
@@ -84,7 +95,13 @@ public enum BaseResponseStatus {
     // ReviewException
     UNMATCHED_OPTION_SIZE(false, 6070, "리뷰 옵션의 개수가 올바르지 않습니다."),
     IMAGE_CONVERT_ERROR(false, 5000, "사진이 없거나 변환되지 않았습니다."),
-    IMAGE_INVALID_EXTENSION(false, 5001, "올바른 확장자가 아닙니다.");
+    IMAGE_INVALID_EXTENSION(false, 5001, "올바른 확장자가 아닙니다."),
+
+    /**
+     * 6000 : 보안 이슈
+     */
+    // 보안(리프레시 토큰 탈취) 이슈
+    USING_STOLEN_TOKEN(false, 6000, "토큰이 탈취되었습니다.");
 
     private final boolean isSuccess;
     private final int responseCode;

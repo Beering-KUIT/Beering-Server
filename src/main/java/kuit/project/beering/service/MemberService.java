@@ -3,10 +3,13 @@ package kuit.project.beering.service;
 import kuit.project.beering.domain.image.Image;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.Status;
+import kuit.project.beering.domain.image.MemberImage;
 import kuit.project.beering.dto.AgreementBulkInsertDto;
 import kuit.project.beering.dto.request.member.MemberLoginRequest;
 import kuit.project.beering.dto.request.member.MemberSignupRequest;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
+import kuit.project.beering.redis.RefreshToken;
+import kuit.project.beering.repository.RefreshTokenRepository;
 import kuit.project.beering.repository.AgreementJdbcRepository;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.security.auth.AuthMember;
@@ -32,6 +35,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final AgreementJdbcRepository agreementJdbcRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
     private final JwtTokenProvider jwtTokenProvider;
@@ -41,7 +45,7 @@ public class MemberService {
         /**
          * @Brief 회원부터 저장, username이 중복일 경우에는 예외 발생하고 더이상 진행되지 않고 종료
          */
-        if (memberRepository.existsByUsernameAndStatus(request.getUsername(), Status.ACTIVE))
+        if (memberRepository.existsByUsername(request.getUsername()))
             throw new DuplicateUsernameException();
 
         Member member = memberRepository.saveAndFlush(
@@ -86,6 +90,8 @@ public class MemberService {
         JwtInfo jwtInfo = jwtTokenProvider.createToken(authentication);
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
+        refreshTokenRepository.save(new RefreshToken(String.valueOf(principal.getId()), jwtInfo.getRefreshToken()));
+
         return MemberLoginResponse.builder()
                 .memberId(principal.getId())
                 .jwtInfo(jwtInfo)
@@ -93,7 +99,6 @@ public class MemberService {
     }
 
     public String getProfileImageUrl(Member member) {
-        Image profileImage = member.getImages().get(0);
-        return profileImage != null ? profileImage.getImageUrl() : null;
+        return member.getImages().size() != 0 ? member.getImages().get(0).getImageUrl() : null;
     }
 }

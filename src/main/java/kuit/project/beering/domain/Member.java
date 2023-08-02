@@ -5,6 +5,7 @@ import kuit.project.beering.domain.image.Image;
 import kuit.project.beering.domain.image.MemberImage;
 import kuit.project.beering.domain.image.ReviewImage;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Where(clause = "status = 'ACTIVE'")
 public class Member extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY) @Column(name = "member_id", nullable = false)
@@ -52,6 +54,12 @@ public class Member extends BaseTimeEntity {
     public void addReview(Review review) {
         this.reviews.add(review);
     }
+    public void addFavorite(Favorite favorite) {
+        this.favorites.add(favorite);
+    }
+    public void addTabom(Tabom tabom) {
+        this.taboms.add(tabom);
+    }
     public static Member createMember(String username, String password, String nickname) {
         Member member = new Member();
         member.username = username;
@@ -61,5 +69,9 @@ public class Member extends BaseTimeEntity {
         member.status = Status.ACTIVE;
         member.role = Role.MEMBER;
         return member;
+    }
+
+    public void UpdateStatusToDormant() {
+        this.status = Status.DORMANT;
     }
 }
