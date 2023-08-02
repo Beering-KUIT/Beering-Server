@@ -45,7 +45,7 @@ public class TabomController {
             @AuthenticationPrincipal AuthMember member
     ){
         validateMember(member.getId(), memberId);
-        Slice<GetTabomResponse> result = tabomService.getTabomReview(memberId, PageRequest.of(page, SIZE));
+        Slice<GetTabomResponse> result = tabomService.getTabomReviews(memberId, PageRequest.of(page, SIZE));
 
         return new BaseResponse<>(GetTabomResponsePage.builder()
                 .reviews(result.getContent())
