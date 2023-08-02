@@ -54,8 +54,9 @@ public class JwtTokenProvider {
                 .compact();
 
         String refreshToken = Jwts.builder()
+                .claim("auth", authorities)
                 .claim("memberId", ((AuthMember) authentication.getPrincipal()).getId())
-                .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRED_IN))
+                .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRED_IN * 7))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
@@ -94,12 +95,12 @@ public class JwtTokenProvider {
     }
 
     /**
-     * @Brief accessToken 에서 인증(Authentication) 파싱
-     * @param accessToken
+     * @Brief token 에서 인증(Authentication) 파싱
+     * @param token
      * @return Authentication
      */
-    public Authentication getAuthentication(String accessToken) {
-        Claims claims = parseClaims(accessToken);
+    public Authentication getAuthentication(String token) {
+        Claims claims = parseClaims(token);
 
         if (claims.get("auth") == null) throw new RuntimeException("권한없음");
 
@@ -117,6 +118,10 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(authMember, "", authorities);
     }
 
+    public Long parseMemberId(String token) {
+        return parseClaims(token).get("memberId", Long.class);
+    }
+
     /**
      * @Brief Authentication에서 유저 인증 권한 파싱
      * @param authentication
@@ -131,14 +136,14 @@ public class JwtTokenProvider {
 
     /**
      * @Brief accessToke에서 유저 claims(payload) 파싱
-     * @param accessToken
+     * @param token
      * @return Claims
      */
-    private Claims parseClaims(String accessToken) {
+    private Claims parseClaims(String token) {
         try {
             return Jwts.parserBuilder().
                     setSigningKey(key)
-                    .build().parseClaimsJws(accessToken).getBody();
+                    .build().parseClaimsJws(token).getBody();
         } catch (ExpiredJwtException e) {
             return e.getClaims();
         }
