@@ -3,6 +3,7 @@ package kuit.project.beering.service;
 import kuit.project.beering.domain.Drink;
 import kuit.project.beering.domain.Favorite;
 import kuit.project.beering.domain.Member;
+import kuit.project.beering.dto.response.favorite.GetFavoriteDrinkResponse;
 import kuit.project.beering.repository.drink.DrinkRepository;
 import kuit.project.beering.repository.FavoriteRepository;
 import kuit.project.beering.repository.MemberRepository;
@@ -11,6 +12,9 @@ import kuit.project.beering.util.exception.FavoriteException;
 import kuit.project.beering.util.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,4 +43,10 @@ public class FavoriteService {
         favoriteRepository.save(new Favorite(member, drink));
     }
 
+    public Slice<GetFavoriteDrinkResponse> getFavoriteReviews(Long memberId, Pageable pageable) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(NONE_MEMBER));
+
+        Slice<Drink>
+    }
 }
