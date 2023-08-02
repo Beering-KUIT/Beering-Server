@@ -8,6 +8,7 @@ import kuit.project.beering.dto.response.review.ReviewDetailReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewResponseDto;
 import kuit.project.beering.repository.*;
+import kuit.project.beering.repository.drink.DrinkRepository;
 import kuit.project.beering.util.exception.DrinkException;
 import kuit.project.beering.util.exception.MemberException;
 import kuit.project.beering.util.exception.ReviewException;
