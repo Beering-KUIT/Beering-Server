@@ -41,6 +41,7 @@ public class ReviewService {
     private final AwsS3Uploader awsS3Uploader;
     private final ReviewImageRepository reviewImageRepository;
     private final TabomRepository tabomRepository;
+    private final MemberService memberService;
 
     //리뷰 생성
     public ReviewResponseDto save(Long memberId, Long drinkId, ReviewCreateRequestDto requestDto, List<MultipartFile> reviewImages) {
@@ -53,7 +54,9 @@ public class ReviewService {
 
         Review review = requestDto.toEntity(member, drink);
         reviewRepository.save(review);
-        uploadReviewImages(reviewImages, review);
+        log.info("reviewImages = {}", reviewImages.isEmpty());
+        if(reviewImages.isEmpty())
+            uploadReviewImages(reviewImages, review);
 
         List<SelectedOptionCreateRequestDto> selectedOptionCreateRequestDtos = requestDto.getSelectedOptions().stream()
                 .collect(Collectors.toList());
@@ -116,10 +119,13 @@ public class ReviewService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 존재하지 않습니다"));
 
+        // 멤버 프로필 image 조회
+        String profileImageUrl = memberService.getProfileImageUrl(review.getMember());
+
         log.info("좋아요 관련 쿼리 시작");
         long upCount = tabomRepository.findCountByIsUPAndReviewId(review.getId()).orElseThrow();
         long downCount = tabomRepository.findCountByIsDownAndReviewId(review.getId()).orElseThrow();
-        return new ReviewDetailReadResponseDto(review, upCount, downCount);
+        return new ReviewDetailReadResponseDto(review, profileImageUrl, upCount, downCount);
     }
 
     @Transactional(readOnly = true)
@@ -137,7 +143,8 @@ public class ReviewService {
                 .collect(Collectors.toList());
         List<ReviewReadResponseDto> responseDtos = new ArrayList<>();
         for(int i=0; i<reviews.size(); i++) {
-            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), upCounts.get(i), downCounts.get(i)));
+            String profileImageUrl = memberService.getProfileImageUrl(reviews.get(i).getMember());
+            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
         }
 //        return reviews.stream()
 //                .map(ReviewReadResponseDto::new)
