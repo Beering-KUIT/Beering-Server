@@ -31,7 +31,7 @@ public class DrinkController {
             @RequestParam(defaultValue = "2147483647", required = false) Integer maxPrice,
             @AuthenticationPrincipal AuthMember member
     ) {
-        Page<DrinkSearchResponse> result = drinkService.searchDrinksByName(member.getId(), page, orderBy, new DrinkSearchCondition(name, name, category, minPrice, maxPrice));
+        Page<DrinkSearchResponse> result = drinkService.searchDrinksByName(page, orderBy, new DrinkSearchCondition(name, name, category, minPrice, maxPrice, member.getId()));
         return new BaseResponse<>(result);
     }
 

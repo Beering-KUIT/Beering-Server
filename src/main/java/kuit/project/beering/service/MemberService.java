@@ -3,6 +3,7 @@ package kuit.project.beering.service;
 import kuit.project.beering.domain.image.Image;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.Status;
+import kuit.project.beering.domain.image.MemberImage;
 import kuit.project.beering.dto.AgreementBulkInsertDto;
 import kuit.project.beering.dto.request.member.MemberLoginRequest;
 import kuit.project.beering.dto.request.member.MemberSignupRequest;
@@ -98,7 +99,6 @@ public class MemberService {
     }
 
     public String getProfileImageUrl(Member member) {
-        Image profileImage = member.getImages().get(0);
-        return profileImage != null ? profileImage.getImageUrl() : null;
+        return member.getImages().size() != 0 ? member.getImages().get(0).getImageUrl() : null;
     }
 }
