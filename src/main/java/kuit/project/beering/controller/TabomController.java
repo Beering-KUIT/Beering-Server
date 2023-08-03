@@ -6,6 +6,7 @@ import kuit.project.beering.dto.response.tabom.GetTabomResponsePage;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.TabomService;
 import kuit.project.beering.util.BaseResponse;
+import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.exception.TabomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,15 +28,15 @@ public class TabomController {
     private final int SIZE = 5;
 
     @PostMapping("/members/{memberId}/reviews/{reviewId}/tabom")
-    public BaseResponse<Object> postTabom(
+    public BaseResponse<BaseResponseStatus> postTabom(
             @PathVariable Long memberId,
             @PathVariable Long reviewId,
             @RequestParam boolean isUp,
             @AuthenticationPrincipal AuthMember member
     ) {
         validateMember(member.getId(), memberId);
-        tabomService.addToTabom(memberId, reviewId, isUp);
-        return new BaseResponse<>(new Object());
+        BaseResponseStatus status = tabomService.postTabom(memberId, reviewId, isUp);
+        return new BaseResponse<>(status);
     }
 
     @GetMapping("/members/{memberId}/reviews/tabom")
