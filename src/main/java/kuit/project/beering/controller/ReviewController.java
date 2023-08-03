@@ -2,10 +2,8 @@ package kuit.project.beering.controller;
 
 import kuit.project.beering.dto.request.review.ReviewCreateRequestDto;
 import kuit.project.beering.dto.response.review.ReviewDetailReadResponseDto;
-import kuit.project.beering.dto.response.review.ReviewReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewResponseDto;
 import kuit.project.beering.dto.response.review.ReviewSliceResponseDto;
-import kuit.project.beering.dto.response.reviewOption.ReviewOptionReadResponseDto;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.ReviewService;
 import kuit.project.beering.util.BaseResponse;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Objects;
 
@@ -61,6 +58,16 @@ public class ReviewController {
         validateMember(member.getId(), memberId);
         PageRequest pageRequest = PageRequest.of(page, size);
         ReviewSliceResponseDto responseDtos = reviewService.findAllReviewByMemberIdByPage(memberId, pageRequest);
+        return new BaseResponse<>(responseDtos);
+    }
+
+    @GetMapping(value = "/drinks/{drinkId}/reviews")
+    public BaseResponse<ReviewSliceResponseDto> readReviewByDrinkId(@PathVariable Long drinkId,
+                                                                     @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                                                     @RequestParam(value = "size", required = false, defaultValue = "5") int size) {
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+        ReviewSliceResponseDto responseDtos = reviewService.findAllReviewByDrinkIdByPage(drinkId, pageRequest);
         return new BaseResponse<>(responseDtos);
     }
 
