@@ -14,10 +14,7 @@ import kuit.project.beering.repository.drink.DrinkRepository;
 import kuit.project.beering.util.exception.DrinkException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,16 +42,10 @@ public class DrinkService {
      * @return 검색 결과 10개 // 페이징
      * @exception DrinkException 유효하지 않은 정렬 방식 입력시 예외 발생
      */
-    public Page<DrinkSearchResponse> searchDrinksByName(Integer page, String orderBy, DrinkSearchCondition drinkSearchCondition) {
-        /**
-         * 정렬 적용
-         */
-
+    public Slice<DrinkSearchResponse> searchDrinksByName(Integer page, String orderBy, DrinkSearchCondition drinkSearchCondition) {
         Pageable pageable = PageRequest.of(page, SIZE, SortType.getMatchedSort(orderBy));
 
-        Page<DrinkSearchResponse> drinkPage = drinkRepository.search(drinkSearchCondition, pageable);
-
-        return new PageImpl<>(drinkPage.getContent(), pageable, drinkPage.getTotalElements());
+        return drinkRepository.search(drinkSearchCondition, pageable);
     }
 
     public GetDrinkResponse getDrinkById(Long drinkId, Long memberId) {
