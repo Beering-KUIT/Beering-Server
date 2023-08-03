@@ -4,10 +4,10 @@ import kuit.project.beering.domain.*;
 import kuit.project.beering.domain.image.ReviewImage;
 import kuit.project.beering.dto.request.review.ReviewCreateRequestDto;
 import kuit.project.beering.dto.request.selectedOption.SelectedOptionCreateRequestDto;
+import kuit.project.beering.dto.response.SliceReponse;
 import kuit.project.beering.dto.response.review.ReviewDetailReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewResponseDto;
-import kuit.project.beering.dto.response.review.ReviewSliceResponseDto;
 import kuit.project.beering.repository.*;
 import kuit.project.beering.repository.drink.DrinkRepository;
 import kuit.project.beering.util.exception.DrinkException;
@@ -130,7 +130,7 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public ReviewSliceResponseDto findAllReviewByMemberIdByPage(long memberId, Pageable pageable) {
+    public SliceReponse<ReviewReadResponseDto> findAllReviewByMemberIdByPage(long memberId, Pageable pageable) {
 
         Slice<Review> allReviewsSliceBy = reviewRepository.findAllReviewsSliceByMemberIdByCreatedAtDesc(memberId, pageable);
         List<Review> reviews = allReviewsSliceBy.getContent();
@@ -150,11 +150,8 @@ public class ReviewService {
             responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
         }
 
-        return ReviewSliceResponseDto.builder()
-                .reviews(responseDtos)
-                .page(allReviewsSliceBy.getPageable().getPageNumber())
-                .isLast(allReviewsSliceBy.isLast())
-                .build();
+        return new SliceReponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
+
     }
 
     @Transactional(readOnly = true)
