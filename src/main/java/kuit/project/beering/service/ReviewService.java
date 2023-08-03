@@ -4,7 +4,10 @@ import kuit.project.beering.domain.*;
 import kuit.project.beering.domain.image.ReviewImage;
 import kuit.project.beering.dto.request.review.ReviewCreateRequestDto;
 import kuit.project.beering.dto.request.selectedOption.SelectedOptionCreateRequestDto;
+import kuit.project.beering.dto.response.review.ReviewDetailReadResponseDto;
+import kuit.project.beering.dto.response.review.ReviewReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewResponseDto;
+import kuit.project.beering.dto.response.review.ReviewSliceResponseDto;
 import kuit.project.beering.repository.*;
 import kuit.project.beering.repository.drink.DrinkRepository;
 import kuit.project.beering.util.exception.DrinkException;
@@ -13,6 +16,8 @@ import kuit.project.beering.util.exception.ReviewException;
 import kuit.project.beering.util.s3.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,6 +41,8 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final AwsS3Uploader awsS3Uploader;
     private final ReviewImageRepository reviewImageRepository;
+    private final TabomRepository tabomRepository;
+    private final MemberService memberService;
 
     //리뷰 생성
     public ReviewResponseDto save(Long memberId, Long drinkId, ReviewCreateRequestDto requestDto, List<MultipartFile> reviewImages) {
@@ -48,7 +55,9 @@ public class ReviewService {
 
         Review review = requestDto.toEntity(member, drink);
         reviewRepository.save(review);
-        uploadReviewImages(reviewImages, review);
+        log.info("reviewImages = {}", reviewImages.isEmpty());
+        if(reviewImages.isEmpty())
+            uploadReviewImages(reviewImages, review);
 
         List<SelectedOptionCreateRequestDto> selectedOptionCreateRequestDtos = requestDto.getSelectedOptions().stream()
                 .collect(Collectors.toList());
@@ -103,4 +112,49 @@ public class ReviewService {
                 .review(review)
                 .build());
     }
+
+    // 리뷰 상세 보기
+    public ReviewDetailReadResponseDto readReviewDetail(long reviewId) {
+
+        // todo 예외 처리하기!!
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 존재하지 않습니다"));
+
+        // 멤버 프로필 image 조회
+        String profileImageUrl = memberService.getProfileImageUrl(review.getMember());
+
+        log.info("좋아요 관련 쿼리 시작");
+        long upCount = tabomRepository.findCountByIsUPAndReviewId(review.getId()).orElseThrow();
+        long downCount = tabomRepository.findCountByIsDownAndReviewId(review.getId()).orElseThrow();
+        return new ReviewDetailReadResponseDto(review, profileImageUrl, upCount, downCount);
+    }
+
+    @Transactional(readOnly = true)
+    public ReviewSliceResponseDto findAllReviewByMemberIdByPage(long memberId, Pageable pageable) {
+
+        Slice<Review> allReviewsSliceBy = reviewRepository.findAllReviewsSliceByMemberIdByCreatedAtDesc(memberId, pageable);
+        List<Review> reviews = allReviewsSliceBy.getContent();
+
+        log.info("좋아요 관련 쿼리 시작");
+        List<Long> upCounts = reviews.stream()
+                .map(r -> tabomRepository.findCountByIsUPAndReviewId(r.getId()).orElseThrow())
+                .collect(Collectors.toList());
+        log.info("싫어요 관련 쿼리 시작");
+        List<Long> downCounts = reviews.stream()
+                .map(r -> tabomRepository.findCountByIsDownAndReviewId(r.getId()).orElseThrow())
+                .collect(Collectors.toList());
+
+        List<ReviewReadResponseDto> responseDtos = new ArrayList<>();
+        for(int i=0; i<reviews.size(); i++) {
+            String profileImageUrl = memberService.getProfileImageUrl(reviews.get(i).getMember());
+            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
+        }
+
+        return ReviewSliceResponseDto.builder()
+                .reviews(responseDtos)
+                .page(allReviewsSliceBy.getPageable().getPageNumber())
+                .isLast(allReviewsSliceBy.isLast())
+                .build();
+    }
+
 }
