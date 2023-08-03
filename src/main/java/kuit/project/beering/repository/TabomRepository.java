@@ -7,4 +7,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TabomRepository extends JpaRepository<Tabom, Long> {
     boolean existsByReviewIdAndMemberId(Long memberId, Long reviewId);
+
+    Long countByReviewIdAndIsUp(Long reviewId, boolean isUp);
+
 }

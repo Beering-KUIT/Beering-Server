@@ -8,7 +8,7 @@ import kuit.project.beering.dto.request.drink.SortType;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
 import kuit.project.beering.dto.response.drink.ReviewPreview;
-import kuit.project.beering.repository.DrinkRepository;
+import kuit.project.beering.repository.drink.DrinkRepository;
 import kuit.project.beering.repository.FavoriteRepository;
 import kuit.project.beering.repository.ReviewRepository;
 import kuit.project.beering.util.exception.DrinkException;

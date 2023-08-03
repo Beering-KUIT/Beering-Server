@@ -6,6 +6,7 @@ import kuit.project.beering.dto.request.review.ReviewCreateRequestDto;
 import kuit.project.beering.dto.request.selectedOption.SelectedOptionCreateRequestDto;
 import kuit.project.beering.dto.response.review.ReviewResponseDto;
 import kuit.project.beering.repository.*;
+import kuit.project.beering.repository.drink.DrinkRepository;
 import kuit.project.beering.util.exception.DrinkException;
 import kuit.project.beering.util.exception.MemberException;
 import kuit.project.beering.util.exception.ReviewException;
@@ -17,7 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
