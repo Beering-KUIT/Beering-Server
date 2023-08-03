@@ -1,11 +1,14 @@
 package kuit.project.beering.domain;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 
 @Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Tabom extends BaseTimeEntity {
 
     @Id
@@ -40,5 +43,9 @@ public class Tabom extends BaseTimeEntity {
 
         this.isUp = isUp;
         this.status = Status.ACTIVE;
+    }
+
+    public void update(boolean isUp) {
+        this.isUp = isUp;
     }
 }

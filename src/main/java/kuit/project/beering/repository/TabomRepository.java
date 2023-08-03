@@ -22,4 +22,8 @@ public interface TabomRepository extends JpaRepository<Tabom, Long> {
             "and t.review.id = :reviewId ")
     Optional<Long> findCountByIsDownAndReviewId(@Param("reviewId") Long reviewId);
     boolean existsByReviewIdAndMemberId(Long memberId, Long reviewId);
+
+    Long countByReviewIdAndIsUp(Long reviewId, boolean isUp);
+
+    Tabom findByReviewIdAndMemberId(Long memberId, Long reviewId);
 }

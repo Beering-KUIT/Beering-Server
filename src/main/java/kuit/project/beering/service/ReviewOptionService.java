@@ -5,7 +5,6 @@ import kuit.project.beering.domain.ReviewOption;
 import kuit.project.beering.dto.response.reviewOption.ReviewOptionReadResponseDto;
 import kuit.project.beering.repository.ReviewOptionRepository;
 import kuit.project.beering.repository.drink.DrinkRepository;
-import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.exception.DrinkException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kuit.project.beering.util.BaseResponseStatus.*;
+import static kuit.project.beering.util.BaseResponseStatus.NONE_DRINK;
 
 @Service
 @RequiredArgsConstructor
