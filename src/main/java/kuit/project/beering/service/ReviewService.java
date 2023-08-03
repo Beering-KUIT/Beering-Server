@@ -155,7 +155,7 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public ReviewSliceResponseDto findReviewByPage(Pageable pageable) {
+    public SliceReponse<ReviewReadResponseDto> findReviewByPage(Pageable pageable) {
 
         Slice<Review> allReviewsSliceBy = reviewRepository.findAllReviewsSliceByCreatedAtDesc(pageable);
         List<Review> reviews = allReviewsSliceBy.getContent();
@@ -175,15 +175,11 @@ public class ReviewService {
             responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
         }
 
-        return ReviewSliceResponseDto.builder()
-                .reviews(responseDtos)
-                .page(allReviewsSliceBy.getPageable().getPageNumber())
-                .isLast(allReviewsSliceBy.isLast())
-                .build();
+        return new SliceReponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
     }
 
     @Transactional(readOnly = true)
-    public ReviewSliceResponseDto findAllReviewByDrinkIdByPage(long drinkId, Pageable pageable) {
+    public SliceReponse<ReviewReadResponseDto> findAllReviewByDrinkIdByPage(long drinkId, Pageable pageable) {
 
         Slice<Review> allReviewsSliceBy = reviewRepository.findAllReviewsSliceByDrinkIdByCreatedAtDesc(drinkId, pageable);
         List<Review> reviews = allReviewsSliceBy.getContent();
@@ -203,10 +199,6 @@ public class ReviewService {
             responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
         }
 
-        return ReviewSliceResponseDto.builder()
-                .reviews(responseDtos)
-                .page(allReviewsSliceBy.getPageable().getPageNumber())
-                .isLast(allReviewsSliceBy.isLast())
-                .build();
+        return new SliceReponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
     }
 }
