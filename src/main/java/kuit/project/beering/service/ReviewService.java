@@ -154,4 +154,59 @@ public class ReviewService {
 
     }
 
+    @Transactional(readOnly = true)
+    public ReviewSliceResponseDto findReviewByPage(Pageable pageable) {
+
+        Slice<Review> allReviewsSliceBy = reviewRepository.findAllReviewsSliceByCreatedAtDesc(pageable);
+        List<Review> reviews = allReviewsSliceBy.getContent();
+
+        log.info("좋아요 관련 쿼리 시작");
+        List<Long> upCounts = reviews.stream()
+                .map(r -> tabomRepository.findCountByIsUPAndReviewId(r.getId()).orElseThrow())
+                .collect(Collectors.toList());
+        log.info("싫어요 관련 쿼리 시작");
+        List<Long> downCounts = reviews.stream()
+                .map(r -> tabomRepository.findCountByIsDownAndReviewId(r.getId()).orElseThrow())
+                .collect(Collectors.toList());
+
+        List<ReviewReadResponseDto> responseDtos = new ArrayList<>();
+        for(int i=0; i<reviews.size(); i++) {
+            String profileImageUrl = memberService.getProfileImageUrl(reviews.get(i).getMember());
+            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
+        }
+
+        return ReviewSliceResponseDto.builder()
+                .reviews(responseDtos)
+                .page(allReviewsSliceBy.getPageable().getPageNumber())
+                .isLast(allReviewsSliceBy.isLast())
+                .build();
+    }
+
+    @Transactional(readOnly = true)
+    public ReviewSliceResponseDto findAllReviewByDrinkIdByPage(long drinkId, Pageable pageable) {
+
+        Slice<Review> allReviewsSliceBy = reviewRepository.findAllReviewsSliceByDrinkIdByCreatedAtDesc(drinkId, pageable);
+        List<Review> reviews = allReviewsSliceBy.getContent();
+
+        log.info("좋아요 관련 쿼리 시작");
+        List<Long> upCounts = reviews.stream()
+                .map(r -> tabomRepository.findCountByIsUPAndReviewId(r.getId()).orElseThrow())
+                .collect(Collectors.toList());
+        log.info("싫어요 관련 쿼리 시작");
+        List<Long> downCounts = reviews.stream()
+                .map(r -> tabomRepository.findCountByIsDownAndReviewId(r.getId()).orElseThrow())
+                .collect(Collectors.toList());
+
+        List<ReviewReadResponseDto> responseDtos = new ArrayList<>();
+        for(int i=0; i<reviews.size(); i++) {
+            String profileImageUrl = memberService.getProfileImageUrl(reviews.get(i).getMember());
+            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
+        }
+
+        return ReviewSliceResponseDto.builder()
+                .reviews(responseDtos)
+                .page(allReviewsSliceBy.getPageable().getPageNumber())
+                .isLast(allReviewsSliceBy.isLast())
+                .build();
+    }
 }
