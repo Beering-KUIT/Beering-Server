@@ -44,4 +44,8 @@ public class Tabom extends BaseTimeEntity {
         this.isUp = isUp;
         this.status = Status.ACTIVE;
     }
+
+    public void update(boolean isUp) {
+        this.isUp = isUp;
+    }
 }
