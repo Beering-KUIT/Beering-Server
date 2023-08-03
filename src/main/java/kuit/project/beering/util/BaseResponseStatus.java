@@ -48,21 +48,21 @@ public enum BaseResponseStatus {
 
     // RequestParam exception
     EMPTY_REQUEST_PARAMETER(false, 2098, "Request Parameter가 존재하지 않습니다."),
-    METHOD_ARGUMENT_TYPE_MISMATCH(false, 2099, "Request Parameter의 유형이 불일치합니다."),
+    METHOD_ARGUMENT_TYPE_MISMATCH(false, 2099, "Request Parameter나 Path Variable의 유형이 불일치합니다."),
 
-    // DrinkException
-    NONE_DRINK(false, 2101, "해당 주류가 존재하지 않습니다."),
-    INVALID_ORDER(false, 2102, "유효하지 않은 정렬방식 입니다."),
-
-
-    // FavoriteException
-    TOKEN_PATH_MISMATCH(false, 2201, "토큰 정보와 pathVariable로 받은 Member 정보가 다릅니다."),
-    FAIL_CREATE_FAVORITE(false, 2202, "찜에 실패했습니다."),
-    POST_FAVORITE_ALREADY_CREATED(false, 2203, "이미 찜하였습니다."),
+    // 2100 : DrinkException
+    NONE_DRINK(false, 2100, "해당 주류가 존재하지 않습니다."),
+    INVALID_ORDER(false, 2101, "유효하지 않은 정렬방식 입니다."),
 
 
-    // TabomException
-    POST_TABOM_ALREADY_CREATED(false, 2301, "이미 좋아요나 싫어요가 존재합니다."),
+    // 2200 : FavoriteException
+    TOKEN_PATH_MISMATCH(false, 2200, "토큰 정보와 pathVariable로 받은 Member 정보가 다릅니다."),
+    FAIL_CREATE_FAVORITE(false, 2201, "찜에 실패했습니다."),
+    POST_FAVORITE_ALREADY_CREATED(false, 2202, "이미 찜하였습니다."),
+
+
+    // 2300 : TabomException
+    POST_TABOM_ALREADY_CREATED(false, 2300, "이미 좋아요나 싫어요가 존재합니다."),
 
     /**
      * 3000 : Response 오류
