@@ -64,6 +64,16 @@ public class ReviewController {
         return new BaseResponse<>(responseDtos);
     }
 
+    @GetMapping(value = "/drinks/{drinkId}/reviews")
+    public BaseResponse<ReviewSliceResponseDto> readReviewByDrinkId(@PathVariable Long drinkId,
+                                                                     @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                                                     @RequestParam(value = "size", required = false, defaultValue = "5") int size) {
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+        ReviewSliceResponseDto responseDtos = reviewService.findAllReviewByDrinkIdByPage(drinkId, pageRequest);
+        return new BaseResponse<>(responseDtos);
+    }
+
     @GetMapping(value = "/reviews")
     public BaseResponse<ReviewSliceResponseDto> readReviewByCreatedAtDesc(@RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                                                           @RequestParam(value = "size", required = false, defaultValue = "5") int size) {
