@@ -7,7 +7,6 @@ import org.springframework.data.domain.Slice;
 import java.util.List;
 
 @Getter
-@AllArgsConstructor
 public class SliceReponse<T> {
     List<T> content;
     private int page;
