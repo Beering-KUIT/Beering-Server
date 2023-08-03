@@ -19,4 +19,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "right join fetch Tabom t on t.review.id = r.id " +
             "where t.member.id = ?1 and t.isUp = true")
     Slice<Review> findByMemberIdAndUpTabom(Long memberId, Pageable pageable);
+
+    @Query("select r from Review r " +
+            "order by r.createdAt desc ")
+    Slice<Review> findAllReviewsSliceByCreatedAtDesc(Pageable pageable);
+
 }
