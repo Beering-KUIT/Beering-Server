@@ -10,4 +10,5 @@ public interface TabomRepository extends JpaRepository<Tabom, Long> {
 
     Long countByReviewIdAndIsUp(Long reviewId, boolean isUp);
 
+    Tabom findByReviewIdAndMemberId(Long memberId, Long reviewId);
 }

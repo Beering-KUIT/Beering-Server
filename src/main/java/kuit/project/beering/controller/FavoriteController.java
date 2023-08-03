@@ -5,6 +5,7 @@ import kuit.project.beering.dto.response.favorite.GetFavoriteDrinkResponsePage;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.FavoriteService;
 import kuit.project.beering.util.BaseResponse;
+import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.exception.FavoriteException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,15 +26,15 @@ public class FavoriteController {
     private final int SIZE = 5;
 
     @PostMapping("/members/{memberId}/drinks/{drinkId}/favorites")
-    public BaseResponse<Object> postFavorite(
+    public BaseResponse<BaseResponseStatus> postFavorite(
             @PathVariable Long memberId,
             @PathVariable Long drinkId,
             @AuthenticationPrincipal AuthMember member) {
 
         validateMember(member.getId(), memberId);
-        favoriteService.addToFavorite(memberId, drinkId);
+        BaseResponseStatus status = favoriteService.saveFavorite(memberId, drinkId);
 
-        return new BaseResponse<>(new Object());
+        return new BaseResponse<>(status);
     }
 
     @GetMapping("/members/{memberId}/favorites")
