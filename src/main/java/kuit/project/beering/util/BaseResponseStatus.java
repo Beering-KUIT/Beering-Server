@@ -12,6 +12,11 @@ public enum BaseResponseStatus {
      */
     SUCCESS(true, 1000, "요청에 성공하였습니다."),
 
+    // 1300 : tabom 요청 성공
+    SUCCESS_DELETE_TABOM(true, 1300, "좋아요 / 싫어요를 삭제하였습니다."),
+    SUCCESS_CHANGE_TABOM(true, 1301, "좋아요 / 싫어요로 변경하였습니다."),
+    SUCCESS_ADD_TABOM(true, 1301, "좋아요 / 싫어요를 추가하였습니다."),
+
     /**
      * 2000 : Request 오류
      */
