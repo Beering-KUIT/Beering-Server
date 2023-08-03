@@ -10,9 +10,9 @@ import kuit.project.beering.dto.response.tabom.GetTabomResponse;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.ReviewRepository;
 import kuit.project.beering.repository.TabomRepository;
+import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.exception.MemberException;
 import kuit.project.beering.util.exception.ReviewException;
-import kuit.project.beering.util.exception.TabomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -36,17 +36,31 @@ public class TabomService {
     private final ReviewRepository reviewRepository;
 
     @Transactional
-    public void addToTabom(Long memberId, Long reviewId, boolean isUp) {
+    public BaseResponseStatus postTabom(Long memberId, Long reviewId, boolean isUp) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(NONE_MEMBER));
 
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewException(NONE_REVIEW));
 
-        if(tabomRepository.existsByReviewIdAndMemberId(memberId, reviewId))
-            throw new TabomException(POST_TABOM_ALREADY_CREATED);
+        Tabom tabom = tabomRepository.findByReviewIdAndMemberId(memberId, reviewId);
 
-        tabomRepository.save(new Tabom(member, review, isUp));
+        return saveTabom(isUp, member, review, tabom);
+    }
+
+    private BaseResponseStatus saveTabom(boolean isUp, Member member, Review review, Tabom tabom) {
+        if(tabom == null) {
+            tabomRepository.save(new Tabom(member, review, isUp));
+            return SUCCESS_ADD_TABOM;
+        }
+        else if(tabom.getIsUp().equals(isUp)) {
+            tabomRepository.deleteById(tabom.getId());
+            return SUCCESS_DELETE_TABOM;
+        }
+        else{
+            tabom.update(isUp);
+            return SUCCESS_CHANGE_TABOM;
+        }
     }
 
     public Slice<GetTabomResponse> getTabomReviews(Long memberId, Pageable pageable) {
