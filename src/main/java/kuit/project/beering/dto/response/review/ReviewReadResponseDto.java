@@ -54,8 +54,10 @@ public class ReviewReadResponseDto {
             this.diffFromCurrentTime = ChronoUnit.WEEKS.between(createdAt, now) + "주 전";
         else if(ChronoUnit.DAYS.between(createdAt, now) != 0)
             this.diffFromCurrentTime = ChronoUnit.DAYS.between(createdAt, now) + "일 전";
+        else if(ChronoUnit.HOURS.between(createdAt, now) != 0)
+            this.diffFromCurrentTime = ChronoUnit.HOURS.between(createdAt, now) + "시간 전";
         else
-            this.diffFromCurrentTime = "오늘";
+            this.diffFromCurrentTime = "방금";
 
         this.like = isUpCount;
         this.dislike = isDownCount;
