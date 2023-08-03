@@ -7,12 +7,12 @@ import kuit.project.beering.dto.response.favorite.GetFavoriteDrinkResponse;
 import kuit.project.beering.repository.drink.DrinkRepository;
 import kuit.project.beering.repository.FavoriteRepository;
 import kuit.project.beering.repository.MemberRepository;
+import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.exception.DrinkException;
 import kuit.project.beering.util.exception.FavoriteException;
 import kuit.project.beering.util.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.domain.SliceImpl;
@@ -34,17 +34,23 @@ public class FavoriteService {
     private final MemberRepository memberRepository;
 
     @Transactional
-    public void addToFavorite(Long memberId, Long drinkId) {
+    public BaseResponseStatus saveFavorite(Long memberId, Long drinkId) {
         Drink drink = drinkRepository.findById(drinkId)
                 .orElseThrow(() -> new DrinkException(NONE_DRINK));
 
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(NONE_MEMBER));
 
-        if (favoriteRepository.existsByDrinkIdAndMemberId(drinkId, memberId))
-            throw new FavoriteException(POST_FAVORITE_ALREADY_CREATED);
+        Favorite favorite = favoriteRepository.findByDrinkIdAndMemberId(drinkId, memberId);
 
-        favoriteRepository.save(new Favorite(member, drink));
+        if (favorite == null){
+            favoriteRepository.save(new Favorite(member, drink));
+            return SUCCESS_ADD_FAVORITE;
+        }
+        else{
+            favoriteRepository.deleteById(favorite.getId());
+            return SUCCESS_DELETE_FAVORITE;
+        }
     }
 
     public Slice<GetFavoriteDrinkResponse> getFavoriteReviews(Long memberId, Pageable pageable) {
