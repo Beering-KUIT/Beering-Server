@@ -2,6 +2,7 @@ package kuit.project.beering.controller;
 
 import kuit.project.beering.dto.request.review.ReviewCreateRequestDto;
 import kuit.project.beering.dto.response.SliceReponse;
+import kuit.project.beering.dto.response.review.ReviewDeleteResponseDto;
 import kuit.project.beering.dto.response.review.ReviewDetailReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewResponseDto;
@@ -80,6 +81,15 @@ public class ReviewController {
         PageRequest pageRequest = PageRequest.of(page, size);
         SliceReponse<ReviewReadResponseDto> responseDtos = reviewService.findReviewByPage(pageRequest);
         return new BaseResponse<>(responseDtos);
+    }
+
+    @DeleteMapping(value = "/members/{memberId}/reviews/{reviewId}")
+    public BaseResponse<ReviewDeleteResponseDto> deleteReview(@PathVariable Long memberId,
+                                                              @PathVariable Long reviewId,
+                                                              @AuthenticationPrincipal AuthMember member) {
+        validateMember(member.getId(), memberId);
+        ReviewDeleteResponseDto responseDto = reviewService.deleteReview(reviewId, memberId);
+        return new BaseResponse<>(responseDto);
     }
 
     private void validateMember(Long authId, Long memberId) {
