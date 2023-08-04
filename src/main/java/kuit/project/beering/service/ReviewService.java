@@ -56,7 +56,7 @@ public class ReviewService {
         Review review = requestDto.toEntity(member, drink);
         reviewRepository.save(review);
         log.info("reviewImages = {}", reviewImages.isEmpty());
-        if(reviewImages.isEmpty())
+        if(!reviewImages.isEmpty())
             uploadReviewImages(reviewImages, review);
 
         List<SelectedOptionCreateRequestDto> selectedOptionCreateRequestDtos = requestDto.getSelectedOptions().stream()
@@ -78,6 +78,7 @@ public class ReviewService {
 
         if(selectedOptionCreateRequestDtos.size() != selectedOptions.size())
             throw new ReviewException(UNMATCHED_OPTION_SIZE);
+
         selectedOptionRepository.saveAll(selectedOptions);
 
         log.info("Review created !! memberId={}, drinkId={}", memberId, drinkId);
@@ -116,9 +117,8 @@ public class ReviewService {
     // 리뷰 상세 보기
     public ReviewDetailReadResponseDto readReviewDetail(long reviewId) {
 
-        // todo 예외 처리하기!!
         Review review = reviewRepository.findById(reviewId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 리뷰가 존재하지 않습니다"));
+                .orElseThrow(() -> new ReviewException(NONE_REVIEW));
 
         // 멤버 프로필 image 조회
         String profileImageUrl = memberService.getProfileImageUrl(review.getMember());
