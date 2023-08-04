@@ -55,6 +55,7 @@ public enum BaseResponseStatus {
     INVALID_REVIEW(false, 2404, "유효하지 않은 리뷰입니다."),
     NONE_REVIEW(false, 2405, "존재하지 않는 리뷰입니다."),
     UNMATCHED_OPTION_SIZE(false, 2406, "리뷰 옵션의 개수가 올바르지 않습니다."),
+    INVALID_MEMBER_FOR_DELETE_REVIEW(false, 2407, "리뷰를 삭제할 권한이 없는 멤버입니다."),
 
     // RequestParam exception
     EMPTY_REQUEST_PARAMETER(false, 2098, "Request Parameter가 존재하지 않습니다."),
