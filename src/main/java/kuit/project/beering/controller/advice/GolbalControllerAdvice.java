@@ -1,9 +1,7 @@
 package kuit.project.beering.controller.advice;
 
 import kuit.project.beering.util.BaseResponse;
-import kuit.project.beering.util.exception.DrinkException;
-import kuit.project.beering.util.exception.FavoriteException;
-import kuit.project.beering.util.exception.TabomException;
+import kuit.project.beering.util.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -32,6 +30,18 @@ public class GolbalControllerAdvice {
     @ExceptionHandler(FavoriteException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseResponse<Object> handleFavoriteException(FavoriteException ex) {
+        return new BaseResponse<>(ex.getStatus());
+    }
+
+    @ExceptionHandler(ReviewException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseResponse<Object> handleReviewException(ReviewException ex) {
+        return new BaseResponse<>(ex.getStatus());
+    }
+
+    @ExceptionHandler(AwsException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseResponse<Object> handleAwsException(AwsException ex) {
         return new BaseResponse<>(ex.getStatus());
     }
 
