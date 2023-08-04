@@ -14,7 +14,7 @@ import static kuit.project.beering.util.BaseResponseStatus.METHOD_ARGUMENT_TYPE_
 
 @RestControllerAdvice
 @Slf4j
-public class GolbalControllerAdvice {
+public class GlobalControllerAdvice {
     @ExceptionHandler(DrinkException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseResponse<Object> handleDrinkException(DrinkException ex) {
