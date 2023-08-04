@@ -45,15 +45,16 @@ public enum BaseResponseStatus {
     DUPLICATED_EMAIL(false, 2011, "중복된 이메일입니다."),
     INVALID_CHECKED_PASSWORD(false, 2012, "비밀번호 확인 값이 다릅니다."),
     INVALID_EMAIL_OR_PASSWORD(false, 2013, "이메일 혹은 비밀번호가 잘못되었습니다."),
-    NONE_USER(false, 2014, "존재하지 않는 회원입니다."),
+    NONE_MEMBER(false, 2014, "존재하지 않는 회원입니다."),
     NONE_OAUTH_PROVIDER(false, 2015, "존재하지 않는 소셜로그인 타입입니다."),
 
-    // ReviewException
-    POST_REVIEW_EMPTY_USER(false, 2020, "해당 사용자가 존재하지 않습니다."),
-    POST_REVIEW_EMPTY_SCORE(false, 2022, "score를 입력해주세요."),
-    POST_REVIEW_ALREADY_CREATED(false, 2023, "이미 리뷰를 작성하였습니다."),
-    INVALID_REVIEW(false, 2024, "유효하지 않은 리뷰입니다."),
-    NONE_REVIEW(false, 2025, "존재하지 않는 리뷰입니다."),
+    // 2400 : ReviewException
+    POST_REVIEW_EMPTY_USER(false, 2400, "해당 사용자가 존재하지 않습니다."),
+    POST_REVIEW_EMPTY_SCORE(false, 2402, "score를 입력해주세요."),
+    POST_REVIEW_ALREADY_CREATED(false, 2403, "이미 리뷰를 작성하였습니다."),
+    INVALID_REVIEW(false, 2404, "유효하지 않은 리뷰입니다."),
+    NONE_REVIEW(false, 2405, "존재하지 않는 리뷰입니다."),
+    UNMATCHED_OPTION_SIZE(false, 2406, "리뷰 옵션의 개수가 올바르지 않습니다."),
 
     // RequestParam exception
     EMPTY_REQUEST_PARAMETER(false, 2098, "Request Parameter가 존재하지 않습니다."),
@@ -91,20 +92,8 @@ public enum BaseResponseStatus {
     // AWS S3
     POST_IMAGE_CONVERT_ERROR(false, 5000, "사진이 없거나 변환되지 않았습니다."),
     POST_IMAGE_INVALID_EXTENSION(false, 5001, "올바른 확장자가 아닙니다."),
-
-    /**
-     * 6000 : Request 오
-     */
-    // DrinkException
-    //NONE_DRINK(false, 6050, "해당 주류가 존재하지 않습니다."),
-
-    // MemberException
-    NONE_MEMBER(false, 6060, "해당 유저가 존재하지 않습니다."),
-
-    // ReviewException
-    UNMATCHED_OPTION_SIZE(false, 6070, "리뷰 옵션의 개수가 올바르지 않습니다."),
-    IMAGE_CONVERT_ERROR(false, 5000, "사진이 없거나 변환되지 않았습니다."),
-    IMAGE_INVALID_EXTENSION(false, 5001, "올바른 확장자가 아닙니다."),
+    IMAGE_CONVERT_ERROR(false, 5002, "사진이 없거나 변환되지 않았습니다."),
+    IMAGE_INVALID_EXTENSION(false, 5003, "올바른 확장자가 아닙니다."),
 
     /**
      * 6000 : 보안 이슈
