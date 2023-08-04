@@ -48,13 +48,13 @@ public enum BaseResponseStatus {
     NONE_MEMBER(false, 2014, "존재하지 않는 회원입니다."),
     NONE_OAUTH_PROVIDER(false, 2015, "존재하지 않는 소셜로그인 타입입니다."),
 
-    // 2020 : ReviewException
-    POST_REVIEW_EMPTY_USER(false, 2020, "해당 사용자가 존재하지 않습니다."),
-    POST_REVIEW_EMPTY_SCORE(false, 2022, "score를 입력해주세요."),
-    POST_REVIEW_ALREADY_CREATED(false, 2023, "이미 리뷰를 작성하였습니다."),
-    INVALID_REVIEW(false, 2024, "유효하지 않은 리뷰입니다."),
-    NONE_REVIEW(false, 2025, "존재하지 않는 리뷰입니다."),
-    UNMATCHED_OPTION_SIZE(false, 2026, "리뷰 옵션의 개수가 올바르지 않습니다."),
+    // 2400 : ReviewException
+    POST_REVIEW_EMPTY_USER(false, 2400, "해당 사용자가 존재하지 않습니다."),
+    POST_REVIEW_EMPTY_SCORE(false, 2402, "score를 입력해주세요."),
+    POST_REVIEW_ALREADY_CREATED(false, 2403, "이미 리뷰를 작성하였습니다."),
+    INVALID_REVIEW(false, 2404, "유효하지 않은 리뷰입니다."),
+    NONE_REVIEW(false, 2405, "존재하지 않는 리뷰입니다."),
+    UNMATCHED_OPTION_SIZE(false, 2406, "리뷰 옵션의 개수가 올바르지 않습니다."),
 
     // RequestParam exception
     EMPTY_REQUEST_PARAMETER(false, 2098, "Request Parameter가 존재하지 않습니다."),
