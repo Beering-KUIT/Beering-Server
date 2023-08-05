@@ -1,7 +1,7 @@
 package kuit.project.beering.controller;
 
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
-import kuit.project.beering.dto.response.SliceReponse;
+import kuit.project.beering.dto.response.SliceResponse;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
 import kuit.project.beering.security.auth.AuthMember;
@@ -23,7 +23,7 @@ public class DrinkController {
     private final DrinkService drinkService;
 
     @GetMapping("/search")
-    public BaseResponse<SliceReponse<DrinkSearchResponse>> searchDrinksByName(
+    public BaseResponse<SliceResponse<DrinkSearchResponse>> searchDrinksByName(
             @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0", required = false) Integer page,
             @RequestParam(defaultValue = "name", required = false) String orderBy,
@@ -33,7 +33,7 @@ public class DrinkController {
             @AuthenticationPrincipal AuthMember member
     ) {
         Slice<DrinkSearchResponse> result = drinkService.searchDrinksByName(page, orderBy, new DrinkSearchCondition(name, name, category, minPrice, maxPrice, member.getId()));
-        return new BaseResponse<>(new SliceReponse<>(result));
+        return new BaseResponse<>(new SliceResponse<>(result));
     }
 
 
