@@ -1,7 +1,7 @@
 package kuit.project.beering.controller;
 
 import kuit.project.beering.dto.request.review.ReviewCreateRequestDto;
-import kuit.project.beering.dto.response.SliceReponse;
+import kuit.project.beering.dto.response.SliceResponse;
 import kuit.project.beering.dto.response.review.ReviewDetailReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewResponseDto;
@@ -51,34 +51,34 @@ public class ReviewController {
     }
 
     @GetMapping(value = "/members/{memberId}/reviews")
-    public BaseResponse<SliceReponse<ReviewReadResponseDto>> readReviewByMemberId(@PathVariable Long memberId,
-                                                                                  @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                                                                                  @RequestParam(value = "size", required = false, defaultValue = "5") int size,
-                                                                                  @AuthenticationPrincipal AuthMember member) {
+    public BaseResponse<SliceResponse<ReviewReadResponseDto>> readReviewByMemberId(@PathVariable Long memberId,
+                                                                                   @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                                                                   @RequestParam(value = "size", required = false, defaultValue = "5") int size,
+                                                                                   @AuthenticationPrincipal AuthMember member) {
 
         validateMember(member.getId(), memberId);
         PageRequest pageRequest = PageRequest.of(page, size);
-        SliceReponse<ReviewReadResponseDto> responseDtos = reviewService.findAllReviewByMemberIdByPage(memberId, pageRequest);
+        SliceResponse<ReviewReadResponseDto> responseDtos = reviewService.findAllReviewByMemberIdByPage(memberId, pageRequest);
         return new BaseResponse<>(responseDtos);
     }
 
     @GetMapping(value = "/drinks/{drinkId}/reviews")
-    public BaseResponse<SliceReponse<ReviewReadResponseDto>> readReviewByDrinkId(@PathVariable Long drinkId,
-                                                                     @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                                                                     @RequestParam(value = "size", required = false, defaultValue = "5") int size) {
+    public BaseResponse<SliceResponse<ReviewReadResponseDto>> readReviewByDrinkId(@PathVariable Long drinkId,
+                                                                                  @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                                                                  @RequestParam(value = "size", required = false, defaultValue = "5") int size) {
 
         PageRequest pageRequest = PageRequest.of(page, size);
-        SliceReponse<ReviewReadResponseDto> responseDtos = reviewService.findAllReviewByDrinkIdByPage(drinkId, pageRequest);
+        SliceResponse<ReviewReadResponseDto> responseDtos = reviewService.findAllReviewByDrinkIdByPage(drinkId, pageRequest);
         return new BaseResponse<>(responseDtos);
     }
 
     @GetMapping(value = "/reviews")
-    public BaseResponse<SliceReponse<ReviewReadResponseDto>> readReviewByCreatedAtDesc(@RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                                                                          @RequestParam(value = "size", required = false, defaultValue = "5") int size) {
+    public BaseResponse<SliceResponse<ReviewReadResponseDto>> readReviewByCreatedAtDesc(@RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                                                                        @RequestParam(value = "size", required = false, defaultValue = "5") int size) {
 
         log.info("now = {}", LocalDateTime.now());
         PageRequest pageRequest = PageRequest.of(page, size);
-        SliceReponse<ReviewReadResponseDto> responseDtos = reviewService.findReviewByPage(pageRequest);
+        SliceResponse<ReviewReadResponseDto> responseDtos = reviewService.findReviewByPage(pageRequest);
         return new BaseResponse<>(responseDtos);
     }
 
