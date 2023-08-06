@@ -13,6 +13,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -27,7 +29,7 @@ public class DrinkController {
             @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0", required = false) Integer page,
             @RequestParam(defaultValue = "name", required = false) String orderBy,
-            @RequestParam(required = false) String category,
+            @RequestParam(required = false) List<String> category,
             @RequestParam(defaultValue = "0", required = false) Integer minPrice,
             @RequestParam(defaultValue = "2147483647", required = false) Integer maxPrice,
             @AuthenticationPrincipal AuthMember member
