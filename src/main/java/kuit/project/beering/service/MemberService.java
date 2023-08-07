@@ -13,7 +13,7 @@ import kuit.project.beering.repository.AgreementJdbcRepository;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.security.jwt.JwtInfo;
-import kuit.project.beering.security.jwt.jwtTokenProvider.BasicJwtTokenProvider;
+import kuit.project.beering.security.jwt.jwtTokenProvider.BeeringJwtTokenProvider;
 import kuit.project.beering.util.exception.DuplicateUsernameException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +37,7 @@ public class MemberService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
-    private final BasicJwtTokenProvider basicJwtTokenProvider;
+    private final BeeringJwtTokenProvider beeringJwtTokenProvider;
 
     @Transactional
     public void signup(MemberSignupRequest request) {
@@ -86,7 +86,7 @@ public class MemberService {
         /**
          * @Brief 인증 정보 기반으로 토큰 생성.
          */
-        JwtInfo jwtInfo = basicJwtTokenProvider.createToken(authentication);
+        JwtInfo jwtInfo = beeringJwtTokenProvider.createToken(authentication);
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
         refreshTokenRepository.save(new RefreshToken(String.valueOf(principal.getId()), jwtInfo.getRefreshToken()));
