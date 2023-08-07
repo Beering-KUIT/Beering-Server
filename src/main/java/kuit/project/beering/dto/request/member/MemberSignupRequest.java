@@ -25,7 +25,7 @@ public class MemberSignupRequest {
     @Length(min = 5, max = 20, message = "영문, 숫자, 특수문자 혼합하여 8 ~ 20자리 이내")
     private String password;
 
-    @Pattern(regexp = "[a-zA-Z가-힣]+", message = "영문 또는 한글 1 ~ 10자리 이내")
+    @Pattern(regexp = "[a-zA-Zㄱ-ㅎㅏ-ㅣ가-힣]+", message = "영문 또는 한글 1 ~ 10자리 이내")
     @Length(min = 1, max = 10, message = "영문 또는 한글 1 ~ 10자리 이내")
     private String nickname;
 

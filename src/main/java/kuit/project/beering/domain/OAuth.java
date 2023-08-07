@@ -34,7 +34,7 @@ public class OAuth extends BaseTimeEntity {
         oauth.oauthType = oauthType;
         oauth.accessToken = accessToken;
         oauth.refreshToken = refreshToken;
-        oauth.status = Status.DORMANT;
+        oauth.status = Status.ACTIVE;
         return oauth;
     }
 

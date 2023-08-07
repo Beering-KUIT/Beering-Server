@@ -7,7 +7,9 @@ import kuit.project.beering.domain.image.MemberImage;
 import kuit.project.beering.dto.AgreementBulkInsertDto;
 import kuit.project.beering.dto.request.member.MemberLoginRequest;
 import kuit.project.beering.dto.request.member.MemberSignupRequest;
+import kuit.project.beering.dto.response.member.MemberEmailResponse;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
+import kuit.project.beering.dto.response.member.MemberNicknameResponse;
 import kuit.project.beering.redis.RefreshToken;
 import kuit.project.beering.repository.RefreshTokenRepository;
 import kuit.project.beering.repository.AgreementJdbcRepository;
@@ -15,6 +17,7 @@ import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.security.jwt.JwtInfo;
 import kuit.project.beering.security.jwt.jwtTokenProvider.BeeringJwtTokenProvider;
+import kuit.project.beering.util.exception.DuplicateNicknameException;
 import kuit.project.beering.util.exception.DuplicateUsernameException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,8 +48,8 @@ public class MemberService {
         /**
          * @Brief 회원부터 저장, username이 중복일 경우에는 예외 발생하고 더이상 진행되지 않고 종료
          */
-        if (memberRepository.existsByUsername(request.getUsername()))
-            throw new DuplicateUsernameException();
+        checkEmail(request.getUsername());
+        checkNickname(request.getNickname());
 
         Member member = memberRepository.saveAndFlush(
                 Member.createMember(
@@ -100,5 +103,15 @@ public class MemberService {
 
     public String getProfileImageUrl(Member member) {
         return member.getImages().size() != 0 ? member.getImages().get(0).getImageUrl() : null;
+    }
+
+    public MemberEmailResponse checkEmail(String username) {
+        if (memberRepository.existsByUsername(username)) throw new DuplicateUsernameException();
+        return new MemberEmailResponse(true);
+    }
+
+    public MemberNicknameResponse checkNickname(String nickname) {
+        if (memberRepository.existsByNickname(nickname)) throw new DuplicateNicknameException();
+        return new MemberNicknameResponse(true);
     }
 }
