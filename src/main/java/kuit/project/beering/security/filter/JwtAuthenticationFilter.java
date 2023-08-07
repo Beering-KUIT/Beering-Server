@@ -4,7 +4,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import kuit.project.beering.security.jwt.jwtTokenProvider.BasicJwtTokenProvider;
+import kuit.project.beering.security.jwt.JwtTokenProviderResolver;
+import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,7 +17,7 @@ import java.io.IOException;
 @AllArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final BasicJwtTokenProvider basicJwtTokenProvider;
+    private final JwtTokenProviderResolver jwtTokenProviderResolver;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -26,10 +27,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
          * @Breif 토큰 검증 후 Spring Security Context에 인증 정보 담음
          * @Condition 토큰 값이 존재하고, 검증 되었으면 실행
          */
-        if (token != null && basicJwtTokenProvider.validateToken(token)) {
-            Authentication authentication = basicJwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-        }
+        if (token != null) tokenValidateAndAuthorization(token);
+
         filterChain.doFilter(request,response);
     }
 
@@ -44,5 +43,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         return null;
+    }
+
+    /**
+     * @Brief 토큰 검증하고 인가 처리
+     * @param token
+     */
+    private void tokenValidateAndAuthorization(String token) {
+        JwtTokenProvider jwtTokenProvider = jwtTokenProviderResolver.getProvider(token);
+        if (jwtTokenProvider.validateToken(token)) {
+            Authentication authentication = jwtTokenProvider.getAuthentication(token);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
     }
 }
