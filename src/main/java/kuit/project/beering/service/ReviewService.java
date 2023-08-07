@@ -4,6 +4,7 @@ import kuit.project.beering.domain.*;
 import kuit.project.beering.domain.image.ReviewImage;
 import kuit.project.beering.dto.request.review.ReviewCreateRequestDto;
 import kuit.project.beering.dto.request.selectedOption.SelectedOptionCreateRequestDto;
+import kuit.project.beering.dto.response.review.ReviewDeleteResponseDto;
 import kuit.project.beering.dto.response.SliceResponse;
 import kuit.project.beering.dto.response.review.ReviewDetailReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewReadResponseDto;
@@ -200,5 +201,18 @@ public class ReviewService {
         }
 
         return new SliceResponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
+    }
+
+    public ReviewDeleteResponseDto deleteReview(Long reviewId, Long memberId) {
+
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewException(NONE_REVIEW));
+        if(review.getMember().getId() != memberId)
+            throw new ReviewException(INVALID_MEMBER_FOR_DELETE_REVIEW);
+        review.changeStatus();
+
+        return ReviewDeleteResponseDto.builder()
+                .id(reviewId)
+                .build();
     }
 }

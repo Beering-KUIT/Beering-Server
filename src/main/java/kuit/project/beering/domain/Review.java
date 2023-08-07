@@ -8,6 +8,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Where(clause = "status = 'ACTIVE'")
 public class Review extends BaseTimeEntity {
 
     @Id
@@ -87,5 +89,8 @@ public class Review extends BaseTimeEntity {
     }
     public void clearImages() {
         this.images.clear();
+    }
+    public void changeStatus() {
+        this.status = Status.INACTIVE;
     }
 }
