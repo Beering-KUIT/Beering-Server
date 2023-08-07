@@ -100,6 +100,8 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
 
     private BooleanExpression eqCategory(List<String> categories) {
         BooleanExpression categoryConditions = null;
+        if(categories == null)
+            return null;
         for (String category : categories) {
             BooleanExpression condition = drink.category.name.eq(category);
             if (categoryConditions == null) {
