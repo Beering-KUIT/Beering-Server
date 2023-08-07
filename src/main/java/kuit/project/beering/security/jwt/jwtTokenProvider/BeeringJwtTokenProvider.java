@@ -29,7 +29,7 @@ public class BeeringJwtTokenProvider extends AbstractJwtTokenProvider {
     @Value("${jwt-expired-in}")
     private long JWT_EXPIRED_IN;
 
-    @Value("$jwt-refresh-expired-in}")
+    @Value("${jwt-refresh-expired-in}")
     private long JWT_REFRESH_EXPIRED_IN;
 
     private final Key key;

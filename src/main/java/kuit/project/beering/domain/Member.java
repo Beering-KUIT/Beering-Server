@@ -2,8 +2,10 @@ package kuit.project.beering.domain;
 
 import jakarta.persistence.*;
 import kuit.project.beering.domain.image.MemberImage;
-import kuit.project.beering.domain.image.ReviewImage;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 
 import java.util.ArrayList;
@@ -54,10 +56,6 @@ public class Member extends BaseTimeEntity {
     @JoinColumn(name = "oauth_id")
     private OAuth oauth;
 
-    public void addReview(Review review) {
-        this.reviews.add(review);
-    }
-
     public static Member createMember(String username, String password, String nickname) {
         Member member = new Member();
         member.username = username;
@@ -73,6 +71,15 @@ public class Member extends BaseTimeEntity {
         this.status = Status.DORMANT;
     }
 
+    public void addReview(Review review) {
+        this.reviews.add(review);
+    }
+    public void addFavorite(Favorite favorite) {
+        this.favorites.add(favorite);
+    }
+    public void addTabom(Tabom tabom) {
+        this.taboms.add(tabom);
+    }
     public void createOauthAssociation(OAuth oAuth) {
         this.oauth = oAuth;
     }

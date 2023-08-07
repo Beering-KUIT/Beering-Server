@@ -4,20 +4,26 @@ import kuit.project.beering.domain.*;
 import kuit.project.beering.domain.image.ReviewImage;
 import kuit.project.beering.dto.request.review.ReviewCreateRequestDto;
 import kuit.project.beering.dto.request.selectedOption.SelectedOptionCreateRequestDto;
+import kuit.project.beering.dto.response.review.ReviewDeleteResponseDto;
+import kuit.project.beering.dto.response.SliceResponse;
+import kuit.project.beering.dto.response.review.ReviewDetailReadResponseDto;
+import kuit.project.beering.dto.response.review.ReviewReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewResponseDto;
 import kuit.project.beering.repository.*;
+import kuit.project.beering.repository.drink.DrinkRepository;
 import kuit.project.beering.util.exception.DrinkException;
 import kuit.project.beering.util.exception.MemberException;
 import kuit.project.beering.util.exception.ReviewException;
 import kuit.project.beering.util.s3.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +42,8 @@ public class ReviewService {
     private final MemberRepository memberRepository;
     private final AwsS3Uploader awsS3Uploader;
     private final ReviewImageRepository reviewImageRepository;
+    private final TabomRepository tabomRepository;
+    private final MemberService memberService;
 
     //리뷰 생성
     public ReviewResponseDto save(Long memberId, Long drinkId, ReviewCreateRequestDto requestDto, List<MultipartFile> reviewImages) {
@@ -48,7 +56,9 @@ public class ReviewService {
 
         Review review = requestDto.toEntity(member, drink);
         reviewRepository.save(review);
-        uploadReviewImages(reviewImages, review);
+        log.info("reviewImages = {}", reviewImages.isEmpty());
+        if(!reviewImages.isEmpty())
+            uploadReviewImages(reviewImages, review);
 
         List<SelectedOptionCreateRequestDto> selectedOptionCreateRequestDtos = requestDto.getSelectedOptions().stream()
                 .collect(Collectors.toList());
@@ -69,6 +79,7 @@ public class ReviewService {
 
         if(selectedOptionCreateRequestDtos.size() != selectedOptions.size())
             throw new ReviewException(UNMATCHED_OPTION_SIZE);
+
         selectedOptionRepository.saveAll(selectedOptions);
 
         log.info("Review created !! memberId={}, drinkId={}", memberId, drinkId);
@@ -102,5 +113,106 @@ public class ReviewService {
                 .uploadName(uploadName)
                 .review(review)
                 .build());
+    }
+
+    // 리뷰 상세 보기
+    public ReviewDetailReadResponseDto readReviewDetail(long reviewId) {
+
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewException(NONE_REVIEW));
+
+        // 멤버 프로필 image 조회
+        String profileImageUrl = memberService.getProfileImageUrl(review.getMember());
+
+        log.info("좋아요 관련 쿼리 시작");
+        long upCount = tabomRepository.findCountByIsUPAndReviewId(review.getId()).orElseThrow();
+        long downCount = tabomRepository.findCountByIsDownAndReviewId(review.getId()).orElseThrow();
+        return new ReviewDetailReadResponseDto(review, profileImageUrl, upCount, downCount);
+    }
+
+    @Transactional(readOnly = true)
+    public SliceResponse<ReviewReadResponseDto> findAllReviewByMemberIdByPage(long memberId, Pageable pageable) {
+
+        Slice<Review> allReviewsSliceBy = reviewRepository.findAllReviewsSliceByMemberIdByCreatedAtDesc(memberId, pageable);
+        List<Review> reviews = allReviewsSliceBy.getContent();
+
+        log.info("좋아요 관련 쿼리 시작");
+        List<Long> upCounts = reviews.stream()
+                .map(r -> tabomRepository.findCountByIsUPAndReviewId(r.getId()).orElseThrow())
+                .collect(Collectors.toList());
+        log.info("싫어요 관련 쿼리 시작");
+        List<Long> downCounts = reviews.stream()
+                .map(r -> tabomRepository.findCountByIsDownAndReviewId(r.getId()).orElseThrow())
+                .collect(Collectors.toList());
+
+        List<ReviewReadResponseDto> responseDtos = new ArrayList<>();
+        for(int i=0; i<reviews.size(); i++) {
+            String profileImageUrl = memberService.getProfileImageUrl(reviews.get(i).getMember());
+            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
+        }
+
+        return new SliceResponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
+
+    }
+
+    @Transactional(readOnly = true)
+    public SliceResponse<ReviewReadResponseDto> findReviewByPage(Pageable pageable) {
+
+        Slice<Review> allReviewsSliceBy = reviewRepository.findAllReviewsSliceByCreatedAtDesc(pageable);
+        List<Review> reviews = allReviewsSliceBy.getContent();
+
+        log.info("좋아요 관련 쿼리 시작");
+        List<Long> upCounts = reviews.stream()
+                .map(r -> tabomRepository.findCountByIsUPAndReviewId(r.getId()).orElseThrow())
+                .collect(Collectors.toList());
+        log.info("싫어요 관련 쿼리 시작");
+        List<Long> downCounts = reviews.stream()
+                .map(r -> tabomRepository.findCountByIsDownAndReviewId(r.getId()).orElseThrow())
+                .collect(Collectors.toList());
+
+        List<ReviewReadResponseDto> responseDtos = new ArrayList<>();
+        for(int i=0; i<reviews.size(); i++) {
+            String profileImageUrl = memberService.getProfileImageUrl(reviews.get(i).getMember());
+            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
+        }
+
+        return new SliceResponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
+    }
+
+    @Transactional(readOnly = true)
+    public SliceResponse<ReviewReadResponseDto> findAllReviewByDrinkIdByPage(long drinkId, Pageable pageable) {
+
+        Slice<Review> allReviewsSliceBy = reviewRepository.findAllReviewsSliceByDrinkIdByCreatedAtDesc(drinkId, pageable);
+        List<Review> reviews = allReviewsSliceBy.getContent();
+
+        log.info("좋아요 관련 쿼리 시작");
+        List<Long> upCounts = reviews.stream()
+                .map(r -> tabomRepository.findCountByIsUPAndReviewId(r.getId()).orElseThrow())
+                .collect(Collectors.toList());
+        log.info("싫어요 관련 쿼리 시작");
+        List<Long> downCounts = reviews.stream()
+                .map(r -> tabomRepository.findCountByIsDownAndReviewId(r.getId()).orElseThrow())
+                .collect(Collectors.toList());
+
+        List<ReviewReadResponseDto> responseDtos = new ArrayList<>();
+        for(int i=0; i<reviews.size(); i++) {
+            String profileImageUrl = memberService.getProfileImageUrl(reviews.get(i).getMember());
+            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
+        }
+
+        return new SliceResponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
+    }
+
+    public ReviewDeleteResponseDto deleteReview(Long reviewId, Long memberId) {
+
+        Review review = reviewRepository.findById(reviewId)
+                .orElseThrow(() -> new ReviewException(NONE_REVIEW));
+        if(review.getMember().getId() != memberId)
+            throw new ReviewException(INVALID_MEMBER_FOR_DELETE_REVIEW);
+        review.changeStatus();
+
+        return ReviewDeleteResponseDto.builder()
+                .id(reviewId)
+                .build();
     }
 }

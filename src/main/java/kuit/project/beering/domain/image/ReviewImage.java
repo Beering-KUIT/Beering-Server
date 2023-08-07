@@ -2,11 +2,15 @@ package kuit.project.beering.domain.image;
 
 import jakarta.persistence.*;
 import kuit.project.beering.domain.Review;
-import kuit.project.beering.domain.image.Image;
+import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 @Entity
 @DiscriminatorValue("review")
+@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReviewImage extends Image {
 
     @ManyToOne(fetch = FetchType.LAZY)

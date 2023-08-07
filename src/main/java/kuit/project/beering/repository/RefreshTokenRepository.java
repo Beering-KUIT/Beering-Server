@@ -15,7 +15,7 @@ public class RefreshTokenRepository {
 
     private final RedisTemplate<String, Object> redisTemplate;
 
-    @Value("$jwt-refresh-expired-in}")
+    @Value("${jwt-refresh-expired-in}")
     private long JWT_REFRESH_EXPIRED_IN;
 
     /**

@@ -1,21 +1,18 @@
-package kuit.project.beering.dto.response.drink;
+package kuit.project.beering.dto.response.favorite;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @Builder
-public class DrinkSearchResponse {
+public class GetFavoriteDrinkResponse {
     Long drinkId;
     String nameKr;
     String nameEn;
     String manufacturer;
-    List<String> imageUrlList;
-    Boolean isLiked;
+    String primaryImageUrl;
 }
