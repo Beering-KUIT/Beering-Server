@@ -16,6 +16,9 @@ public class OAuthHelperResolver {
         oauthHelperMap.put(OAuthType.KAKAO, oauthHelper);
     }
 
+    /**
+     * @Brief OAuthType 에 맞는 helper 반환
+     */
     public OAuthHelper getOauthHelper(OAuthType oauthType) {
         return oauthHelperMap.get(oauthType);
     }

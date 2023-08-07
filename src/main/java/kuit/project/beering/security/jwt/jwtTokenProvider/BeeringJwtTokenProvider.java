@@ -58,7 +58,6 @@ public class BeeringJwtTokenProvider extends AbstractJwtTokenProvider {
         } catch (SignatureException e) {
             throw new CustomJwtException(BaseResponseStatus.INVALID_SIGNATURE_JWT);
         } catch (MalformedJwtException e) {
-            log.error("비어링토큰프로바이더 밸리데잍트토큰");
             throw new CustomJwtException(BaseResponseStatus.MALFORMED_TOKEN_TYPE);
         } catch (IllegalArgumentException e) {
             throw new CustomJwtException(BaseResponseStatus.INVALID_TOKEN_TYPE);
@@ -115,6 +114,10 @@ public class BeeringJwtTokenProvider extends AbstractJwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(authMember, "", new ArrayList<>());
     }
 
+    /**
+     * @Brief 리프레시 토큰 검증
+     * @return memberId
+     */
     @Override
     public String validateRefreshToken(String refreshToken) {
         // 리프레시 토큰 자체 검증

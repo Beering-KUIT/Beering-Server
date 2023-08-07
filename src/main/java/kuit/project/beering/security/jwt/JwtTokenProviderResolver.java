@@ -29,6 +29,9 @@ public class JwtTokenProviderResolver {
         this.oauthRepository = oauthRepository;
     }
 
+    /**
+     * @Brief 토큰에 맞는 tokenProvider 반환
+     */
     public JwtTokenProvider getProvider(String token) {
         if (isJwt(token)) return providerMap.get(parseIssuer(token));
 

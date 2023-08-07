@@ -39,6 +39,9 @@ public abstract class AbstractOAuthHelper implements OAuthHelper {
         this.oauthClient = oauthClient;
     }
 
+    /**
+     * @Brief 토큰 검증+
+     */
     @Override
     public boolean validateToken(String token) {
 
@@ -49,12 +52,18 @@ public abstract class AbstractOAuthHelper implements OAuthHelper {
                 oauthClient.getOIDCOpenKeys());
     }
 
+    /**
+     * @Brief 토큰 재발행
+     */
     @Override
     public OAuthTokenInfo reissueToken(String refreshToken) {
 
         return oauthClient.reissueToken(oauthProperties.getRestapiKey(), refreshToken, oauthProperties.getClientSecret());
     }
 
+    /**
+     * @Brief 토큰 발행 (로그인 시)
+     */
     @Override
     public OAuthTokenInfo createToken(String code) {
         return oauthClient.getToken(
@@ -69,6 +78,9 @@ public abstract class AbstractOAuthHelper implements OAuthHelper {
         return oauthProperties.getOAuthType();
     }
 
+    /**
+     * @Brief oauth 계정 정보 요청
+     */
     @Override
     public OAuthMemberInfo getAccount(String accessToken) {
         return oauthClient.getOAuthAccount("Bearer " + accessToken);
@@ -77,7 +89,7 @@ public abstract class AbstractOAuthHelper implements OAuthHelper {
     private boolean isAvailable(
             String token, String iss, String aud, OIDCPublicKeysResponse oidcPublicKeysResponse) {
 
-        // 여기서 기타 필드 검증
+        // 기타 필드 검증
         String kid = getKidFromUnsignedIdToken(token, iss, aud);
 
         OIDCPublicKey oidcPublicKey =
@@ -86,10 +98,13 @@ public abstract class AbstractOAuthHelper implements OAuthHelper {
                         .findFirst()
                         .orElseThrow();
 
-        // 여기서 서명 검증
+        // 서명 검증
         return signKey(token, oidcPublicKey.getN(), oidcPublicKey.getE());
     }
 
+    /**
+     * @Brief 공개 키 서명
+     */
     private boolean signKey(String token, String modulus, String exponent) {
 
         try {
@@ -104,7 +119,6 @@ public abstract class AbstractOAuthHelper implements OAuthHelper {
         } catch (SignatureException e) {
             throw new CustomJwtException(BaseResponseStatus.INVALID_SIGNATURE_JWT);
         } catch (MalformedJwtException e) {
-            log.error("AbstractOAuthHelper.signKey");
             throw new CustomJwtException(BaseResponseStatus.MALFORMED_TOKEN_TYPE);
         } catch (JwtException e) {
             log.error("[JwtTokenProvider.validateAccessToken]", e);
@@ -116,10 +130,13 @@ public abstract class AbstractOAuthHelper implements OAuthHelper {
     }
 
     private String getKidFromUnsignedIdToken(String token, String iss, String aud) {
-        return (String) getUnsignedTokenClaims(token, iss, aud).getHeader().get("kid");
+        return (String) getValidatedFieldToken(token, iss, aud).getHeader().get("kid");
     }
 
-    private Jwt<Header, Claims> getUnsignedTokenClaims(String token, String iss, String aud) {
+    /**
+     * @Brief 토큰 필드 검증
+     */
+    private Jwt<Header, Claims> getValidatedFieldToken(String token, String iss, String aud) {
 
         try {
             return Jwts.parserBuilder()

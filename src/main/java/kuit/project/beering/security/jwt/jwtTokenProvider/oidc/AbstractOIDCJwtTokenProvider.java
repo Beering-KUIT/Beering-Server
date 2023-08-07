@@ -35,14 +35,15 @@ public abstract class AbstractOIDCJwtTokenProvider extends AbstractJwtTokenProvi
         this.oauthRepository = oauthRepository;
     }
 
+    /**
+     * @Brief 토큰 검증
+     */
     @Override
     public boolean validateToken(String token) {
         return oauthHelper.validateToken(token);
     }
 
     /**
-     * @param token
-     * @return Authentication
      * @Brief token 에서 인증(Authentication) 파싱
      */
     @Override
@@ -61,6 +62,9 @@ public abstract class AbstractOIDCJwtTokenProvider extends AbstractJwtTokenProvi
         return new UsernamePasswordAuthenticationToken(authMember, "", new ArrayList<>());
     }
 
+    /**
+     * @Brief 리프레시 토큰 검증
+     */
     @Override
     public String validateRefreshToken(String refreshToken) {
         return String.valueOf(
@@ -69,6 +73,9 @@ public abstract class AbstractOIDCJwtTokenProvider extends AbstractJwtTokenProvi
                 .orElseThrow(IllegalArgumentException::new).getId());
     }
 
+    /**
+     * @Brief 토큰 재발행
+     */
     @Override
     @Transactional
     public JwtInfo reissueJwtToken(String refreshToken) {

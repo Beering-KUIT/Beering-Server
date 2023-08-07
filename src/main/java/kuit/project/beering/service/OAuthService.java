@@ -21,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -37,14 +39,14 @@ public class OAuthService {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         OAuthTokenInfo oauthTokenInfo = oAuthHelper.createToken(code);
 
-        // 2. 토큰으로 카카오 API 호출
+        // 2. 토큰으로 oauth account API 호출
         OAuthMemberInfo OAuthMemberInfo = oAuthHelper.getAccount(oauthTokenInfo.getAccessToken());
 
-        // 3. 카카오ID로 회원가입 처리
-        Member kakaoMember = registerKakaoUserIfNeed(OAuthMemberInfo, oauthTokenInfo, oAuthHelper.getOauthType());
+        // 3. oauth_id 로 회원가입 처리
+        Member oauthMember = registerKakaoUserIfNeed(OAuthMemberInfo, oauthTokenInfo, oAuthHelper.getOauthType());
 
         return MemberLoginResponse.builder()
-                .memberId(kakaoMember.getId())
+                .memberId(oauthMember.getId())
                 .jwtInfo(JwtInfo.builder()
                         .accessToken(oauthTokenInfo.getIdToken())
                         .refreshToken(oauthTokenInfo.getRefreshToken())
@@ -63,16 +65,19 @@ public class OAuthService {
         String email = oauthAccountInfo.getEmail();
         String nickname = oauthAccountInfo.getNickname();
 
-        memberService.signup(new MemberSignupRequest(email, "!oauthpassword321", nickname, request.getAgreements()));
+        // 회원가입 처리
+        memberService.signup(new MemberSignupRequest(email, UUID.randomUUID().toString(), nickname, request.getAgreements()));
         Member member = memberRepository.findByUsername(email).orElseThrow(EntityNotFoundException::new);
         member.createOauthAssociation(oauth);
 
+        // 토큰 발행
         OAuthTokenInfo oauthTokenInfo = oauthHelper.reissueToken(oauth.getRefreshToken());
 
         String idToken = oauthTokenInfo.getIdToken();
         String accessToken = oauthTokenInfo.getAccessToken();
         String refreshToken = oauthTokenInfo.getRefreshToken();
 
+        // 값 변경
         oauth.tokenReissue(accessToken, refreshToken);
 
         refreshTokenRepository.save(new RefreshToken(String.valueOf(member.getId()), refreshToken));
