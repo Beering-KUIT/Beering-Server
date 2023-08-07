@@ -14,6 +14,8 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     boolean existsByUsername(String username);
 
+    boolean existsByNickname(String nickname);
+
     @Query("SELECT m FROM Member m JOIN FETCH m.oauth o WHERE o.sub = :sub AND o.oauthType = :type")
     Optional<Member> findByOAuthSubAndOAuthType(@Param("sub") String sub, @Param("type") OAuthType type);
 
