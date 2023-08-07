@@ -3,6 +3,8 @@ package kuit.project.beering.service;
 import kuit.project.beering.domain.Drink;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.Review;
+import kuit.project.beering.domain.image.DrinkImage;
+import kuit.project.beering.domain.image.Image;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
 import kuit.project.beering.dto.request.drink.SortType;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
@@ -14,7 +16,9 @@ import kuit.project.beering.repository.drink.DrinkRepository;
 import kuit.project.beering.util.exception.DrinkException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -71,6 +75,7 @@ public class DrinkService {
                 .reviewCount(drink.getCountOfReview())
                 .isLiked(is_liked)
                 .reviewPreviews(reviewPreviews)
+                .drinkImageUrlList(getDrinkImages(drink.getImages()))
                 .build();
     }
 
@@ -93,4 +98,9 @@ public class DrinkService {
         return memberService.getProfileImageUrl(member);
     }
 
+    private List<String> getDrinkImages(List<DrinkImage> images) {
+        return images.stream()
+                .map(Image::getImageUrl)
+                .collect(Collectors.toList());
+    }
 }
