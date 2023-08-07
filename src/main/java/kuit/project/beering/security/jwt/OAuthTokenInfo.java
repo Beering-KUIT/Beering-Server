@@ -1,15 +1,19 @@
 package kuit.project.beering.security.jwt;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.*;
 
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Setter
 public class OAuthTokenInfo {
 
+    @JsonProperty("access_token")
     private String accessToken;
+    @JsonProperty("refresh_token")
     private String refreshToken;
+    @JsonProperty("id_token")
     private String idToken;
 }

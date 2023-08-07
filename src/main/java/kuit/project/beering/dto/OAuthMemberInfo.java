@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class KakaoMemberInfo {
+public class OAuthMemberInfo {
 
     private Long id;
     private String email;
