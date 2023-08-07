@@ -23,4 +23,5 @@ public class GetDrinkResponse {
     int reviewCount;
     boolean isLiked;
     List<ReviewPreview> reviewPreviews;
+    List<String> drinkImageUrlList;
 }
