@@ -1,8 +1,8 @@
 package kuit.project.beering.controller;
 
 
+import kuit.project.beering.dto.response.SliceResponse;
 import kuit.project.beering.dto.response.tabom.GetTabomResponse;
-import kuit.project.beering.dto.response.tabom.GetTabomResponsePage;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.TabomService;
 import kuit.project.beering.util.BaseResponse;
@@ -40,7 +40,7 @@ public class TabomController {
     }
 
     @GetMapping("/members/{memberId}/reviews/tabom")
-    public BaseResponse<GetTabomResponsePage> getTabomReview(
+    public BaseResponse<SliceResponse<GetTabomResponse>> getTabomReview(
             @PathVariable Long memberId,
             @RequestParam(required = false, defaultValue = "0") int page,
             @AuthenticationPrincipal AuthMember member
@@ -48,11 +48,7 @@ public class TabomController {
         validateMember(member.getId(), memberId);
         Slice<GetTabomResponse> result = tabomService.getTabomReviews(memberId, PageRequest.of(page, SIZE));
 
-        return new BaseResponse<>(GetTabomResponsePage.builder()
-                .reviews(result.getContent())
-                .page(result.getNumber())
-                .isLast(result.isLast())
-                .build());
+        return new BaseResponse<>(new SliceResponse<>(result));
     }
 
 
