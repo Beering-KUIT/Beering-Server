@@ -4,8 +4,8 @@ import kuit.project.beering.domain.*;
 import kuit.project.beering.domain.image.ReviewImage;
 import kuit.project.beering.dto.request.review.ReviewCreateRequestDto;
 import kuit.project.beering.dto.request.selectedOption.SelectedOptionCreateRequestDto;
-import kuit.project.beering.dto.response.SliceReponse;
 import kuit.project.beering.dto.response.review.ReviewDeleteResponseDto;
+import kuit.project.beering.dto.response.SliceResponse;
 import kuit.project.beering.dto.response.review.ReviewDetailReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewReadResponseDto;
 import kuit.project.beering.dto.response.review.ReviewResponseDto;
@@ -131,7 +131,7 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public SliceReponse<ReviewReadResponseDto> findAllReviewByMemberIdByPage(long memberId, Pageable pageable) {
+    public SliceResponse<ReviewReadResponseDto> findAllReviewByMemberIdByPage(long memberId, Pageable pageable) {
 
         Slice<Review> allReviewsSliceBy = reviewRepository.findAllReviewsSliceByMemberIdByCreatedAtDesc(memberId, pageable);
         List<Review> reviews = allReviewsSliceBy.getContent();
@@ -151,12 +151,12 @@ public class ReviewService {
             responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
         }
 
-        return new SliceReponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
+        return new SliceResponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
 
     }
 
     @Transactional(readOnly = true)
-    public SliceReponse<ReviewReadResponseDto> findReviewByPage(Pageable pageable) {
+    public SliceResponse<ReviewReadResponseDto> findReviewByPage(Pageable pageable) {
 
         Slice<Review> allReviewsSliceBy = reviewRepository.findAllReviewsSliceByCreatedAtDesc(pageable);
         List<Review> reviews = allReviewsSliceBy.getContent();
@@ -176,11 +176,11 @@ public class ReviewService {
             responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
         }
 
-        return new SliceReponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
+        return new SliceResponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
     }
 
     @Transactional(readOnly = true)
-    public SliceReponse<ReviewReadResponseDto> findAllReviewByDrinkIdByPage(long drinkId, Pageable pageable) {
+    public SliceResponse<ReviewReadResponseDto> findAllReviewByDrinkIdByPage(long drinkId, Pageable pageable) {
 
         Slice<Review> allReviewsSliceBy = reviewRepository.findAllReviewsSliceByDrinkIdByCreatedAtDesc(drinkId, pageable);
         List<Review> reviews = allReviewsSliceBy.getContent();
@@ -200,7 +200,7 @@ public class ReviewService {
             responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
         }
 
-        return new SliceReponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
+        return new SliceResponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
     }
 
     public ReviewDeleteResponseDto deleteReview(Long reviewId, Long memberId) {

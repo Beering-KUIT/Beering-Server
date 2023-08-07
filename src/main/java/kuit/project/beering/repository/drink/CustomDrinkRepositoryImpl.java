@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import kuit.project.beering.domain.QDrink;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +47,7 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
                                 .from(drink)
                                 .where(eqName(condition.getNameKr(), condition.getNameEn()),
                                         drink.price.between(condition.getMinPrice(), condition.getMaxPrice()),
-                                        eqCategory(condition.getCategoryName()))
+                                        eqCategory(condition.getCategories()))
                                 .orderBy(drinkSort(pageable))
                                 .offset(pageable.getOffset())
                                 .limit(pageable.getPageSize() + 1)
@@ -97,10 +98,19 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
     }
 
 
-    private BooleanExpression eqCategory(String categoryName) {
-        if(!StringUtils.hasText(categoryName))
+    private BooleanExpression eqCategory(List<String> categories) {
+        BooleanExpression categoryConditions = null;
+        if(categories == null)
             return null;
-        return drink.category.name.eq(categoryName);
+        for (String category : categories) {
+            BooleanExpression condition = drink.category.name.eq(category);
+            if (categoryConditions == null) {
+                categoryConditions = condition;
+            } else {
+                categoryConditions = categoryConditions.or(condition);
+            }
+        }
+        return categoryConditions;
     }
 
     public BooleanExpression eqName(String nameKr, String nameEn){
