@@ -47,6 +47,7 @@ public enum BaseResponseStatus {
     INVALID_EMAIL_OR_PASSWORD(false, 2013, "이메일 혹은 비밀번호가 잘못되었습니다."),
     NONE_MEMBER(false, 2014, "존재하지 않는 회원입니다."),
     NONE_OAUTH_PROVIDER(false, 2015, "존재하지 않는 소셜로그인 타입입니다."),
+    OAUTH_LOGIN_FAILED(false, 2016, "로그인이 취소되었습니다."),
 
     // 2400 : ReviewException
     POST_REVIEW_EMPTY_USER(false, 2400, "해당 사용자가 존재하지 않습니다."),
