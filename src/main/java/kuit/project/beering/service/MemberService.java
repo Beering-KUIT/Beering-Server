@@ -49,6 +49,7 @@ public class MemberService {
          * @Brief 회원부터 저장, username이 중복일 경우에는 예외 발생하고 더이상 진행되지 않고 종료
          */
         checkEmail(request.getUsername());
+        checkNickname(request.getNickname());
 
         Member member = memberRepository.saveAndFlush(
                 Member.createMember(
@@ -109,4 +110,8 @@ public class MemberService {
         return new MemberEmailResponse(true);
     }
 
+    public MemberNicknameResponse checkNickname(String nickname) {
+        if (memberRepository.existsByNickname(nickname)) throw new DuplicateNicknameException();
+        return new MemberNicknameResponse(true);
+    }
 }
