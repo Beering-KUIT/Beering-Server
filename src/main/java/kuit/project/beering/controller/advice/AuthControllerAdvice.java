@@ -50,7 +50,7 @@ public class AuthControllerAdvice {
      */
     @ExceptionHandler(UsernameNotFoundException.class)
     public BaseResponse<Object> usernameNotFound(UsernameNotFoundException ex) {
-        return new BaseResponse<>(BaseResponseStatus.NONE_USER);
+        return new BaseResponse<>(BaseResponseStatus.NONE_MEMBER);
     }
 
     /**
@@ -74,6 +74,6 @@ public class AuthControllerAdvice {
      */
     @ExceptionHandler(EntityNotFoundException.class)
     public BaseResponse<Object> handleEntityNotFound(EntityNotFoundException ex) {
-        return new BaseResponse<>(BaseResponseStatus.NONE_USER);
+        return new BaseResponse<>(BaseResponseStatus.NONE_MEMBER);
     }
 }
