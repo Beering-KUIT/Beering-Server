@@ -1,12 +1,13 @@
 package kuit.project.beering.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import kuit.project.beering.domain.AgreementName;
+import kuit.project.beering.domain.OAuthType;
 import kuit.project.beering.dto.request.auth.KakaoLoginRequest;
 import kuit.project.beering.dto.request.auth.OAuthSignupRequest;
 import kuit.project.beering.dto.request.member.AgreementRequest;
 import kuit.project.beering.dto.response.SignupNotCompletedResponse;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
+import kuit.project.beering.security.auth.oauth.helper.OAuthHelperResolver;
 import kuit.project.beering.service.OAuthService;
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.BaseResponseStatus;
@@ -31,28 +32,28 @@ import java.util.List;
 public class OAuthController {
 
     private final OAuthService oauthService;
+    private final OAuthHelperResolver oauthHelperResolver;
 
     @GetMapping("/kakao/callback")
-    public BaseResponse<MemberLoginResponse> kakaoOauth(@ModelAttribute KakaoLoginRequest kakaoLoginRequest) throws JsonProcessingException {
+    public BaseResponse<MemberLoginResponse> kakaoOauth(@ModelAttribute KakaoLoginRequest kakaoLoginRequest) {
 
         if (kakaoLoginRequest.getError() != null) return new BaseResponse<>(BaseResponseStatus.OAUTH_LOGIN_FAILED);
 
-        MemberLoginResponse memberLoginResponse = oauthService.kakaoOauth(kakaoLoginRequest.getCode());
+        MemberLoginResponse memberLoginResponse = oauthService.oauth(kakaoLoginRequest.getCode(), oauthHelperResolver.getOauthHelper(OAuthType.KAKAO));
 
         return new BaseResponse<>(memberLoginResponse);
-
     }
 
     @PostMapping("/signup")
     public BaseResponse<Object> signup(@RequestBody @Validated OAuthSignupRequest request,
-                                       BindingResult bindingResult) throws JsonProcessingException {
+                                       BindingResult bindingResult) {
 
         validateAgreement(request, bindingResult);
 
         if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
         if (bindingResult.hasGlobalErrors()) throw new AgreementValidationException(bindingResult);
 
-        MemberLoginResponse response = oauthService.signup(request);
+        MemberLoginResponse response = oauthService.signup(request, oauthHelperResolver.getOauthHelper(request.getOAuthType()));
 
         return new BaseResponse<>(response);
     }
