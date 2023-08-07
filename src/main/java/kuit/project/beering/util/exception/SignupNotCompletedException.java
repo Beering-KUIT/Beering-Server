@@ -1,5 +1,6 @@
 package kuit.project.beering.util.exception;
 
+import kuit.project.beering.domain.OAuthType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -8,5 +9,5 @@ import lombok.Getter;
 public class SignupNotCompletedException extends RuntimeException {
 
     private final String sub;
-
+    private final OAuthType oauthType;
 }
