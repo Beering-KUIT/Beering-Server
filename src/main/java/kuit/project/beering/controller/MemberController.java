@@ -34,4 +34,14 @@ public class MemberController {
         return new BaseResponse<>(memberEmailResponse);
     }
 
+
+    @GetMapping("/validate/nickname")
+    public BaseResponse<MemberNicknameResponse> checkNickname(@Validated @RequestBody MemberNicknameRequest memberEmailRequest, BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
+
+        MemberNicknameResponse memberEmailResponse = memberService.checkNickname(memberEmailRequest.getNickname());
+
+        return new BaseResponse<>(memberEmailResponse);
+    }
+
 }
