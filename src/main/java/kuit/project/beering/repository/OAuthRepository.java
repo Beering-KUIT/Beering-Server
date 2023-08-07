@@ -8,4 +8,6 @@ import java.util.Optional;
 public interface OAuthRepository extends JpaRepository<OAuth, Long> {
 
     Optional<OAuth> findBySub(String sub);
+
+    Optional<OAuth> findByRefreshToken(String refreshToken);
 }
