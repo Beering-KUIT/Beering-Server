@@ -15,27 +15,10 @@ import static kuit.project.beering.util.BaseResponseStatus.METHOD_ARGUMENT_TYPE_
 @RestControllerAdvice
 @Slf4j
 public class GlobalControllerAdvice {
-    @ExceptionHandler(DrinkException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse<Object> handleDrinkException(DrinkException ex) {
-        return new BaseResponse<>(ex.getStatus());
-    }
 
-    @ExceptionHandler(TabomException.class)
+    @ExceptionHandler(DomainException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse<Object> handleTabomException(TabomException ex) {
-        return new BaseResponse<>(ex.getStatus());
-    }
-
-    @ExceptionHandler(FavoriteException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse<Object> handleFavoriteException(FavoriteException ex) {
-        return new BaseResponse<>(ex.getStatus());
-    }
-
-    @ExceptionHandler(ReviewException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse<Object> handleReviewException(ReviewException ex) {
+    public BaseResponse<Object> handleDomainException(DomainException ex) {
         return new BaseResponse<>(ex.getStatus());
     }
 
