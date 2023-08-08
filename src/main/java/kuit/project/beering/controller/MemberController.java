@@ -30,7 +30,7 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/validate/email")
+    @GetMapping("/validate/username")
     public BaseResponse<MemberEmailResponse> checkEmail(@Validated @RequestBody MemberEmailRequest memberEmailRequest, BindingResult bindingResult) {
 
         if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
