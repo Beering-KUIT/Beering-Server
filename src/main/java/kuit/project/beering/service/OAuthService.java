@@ -14,8 +14,9 @@ import kuit.project.beering.repository.OAuthRepository;
 import kuit.project.beering.repository.RefreshTokenRepository;
 import kuit.project.beering.security.auth.oauth.helper.OAuthHelper;
 import kuit.project.beering.security.jwt.JwtInfo;
+import kuit.project.beering.security.jwt.JwtTokenProviderResolver;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
-import kuit.project.beering.security.jwt.jwtTokenProvider.oidc.KakaoJwtTokenProvider;
+import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
 import kuit.project.beering.util.exception.SignupNotCompletedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -32,7 +33,7 @@ public class OAuthService {
     private final MemberRepository memberRepository;
     private final OAuthRepository oauthRepository;
     private final RefreshTokenRepository refreshTokenRepository;
-    private final KakaoJwtTokenProvider kakaoJwtTokenProvider;
+    private final JwtTokenProviderResolver jwtTokenProviderResolver;
 
     @Transactional
     public MemberLoginResponse oauth(String code, OAuthHelper oAuthHelper) {
@@ -90,11 +91,12 @@ public class OAuthService {
 
     // 3. sub 로 회원가입 처리
     private Member registerKakaoUserIfNeed(OAuthMemberInfo OAuthMemberInfo, OAuthTokenInfo oauthTokenInfo, OAuthType oauthType) {
+        JwtTokenProvider tokenProvider = jwtTokenProviderResolver.getProvider(oauthTokenInfo.getIdToken());
         // DB 에 중복된 email이 있는지 확인
         // 없으면 닉네임 및 약관 요청 있으면 강제 로그인..
         Member member = memberRepository.findByUsername(OAuthMemberInfo.getEmail())
                 .orElseThrow(() -> {
-                    OAuth oauth = oauthRepository.save(OAuth.createOauth(kakaoJwtTokenProvider.parseSub(oauthTokenInfo.getIdToken()),
+                    OAuth oauth = oauthRepository.save(OAuth.createOauth(tokenProvider.parseSub(oauthTokenInfo.getIdToken()),
                             OAuthType.KAKAO, oauthTokenInfo.getAccessToken(), oauthTokenInfo.getRefreshToken()));
                     throw new SignupNotCompletedException(oauth.getSub(), oauthType);
                 });
