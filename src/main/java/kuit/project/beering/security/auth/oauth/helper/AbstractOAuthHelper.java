@@ -3,7 +3,7 @@ package kuit.project.beering.security.auth.oauth.helper;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import kuit.project.beering.domain.OAuthType;
-import kuit.project.beering.dto.OAuthMemberInfo;
+import kuit.project.beering.dto.common.OAuthMemberInfo;
 import kuit.project.beering.redis.OIDCPublicKey;
 import kuit.project.beering.redis.OIDCPublicKeysResponse;
 import kuit.project.beering.repository.MemberRepository;

@@ -1,7 +1,7 @@
 package kuit.project.beering.security.auth.oauth.helper;
 
 import kuit.project.beering.domain.OAuthType;
-import kuit.project.beering.dto.OAuthMemberInfo;
+import kuit.project.beering.dto.common.OAuthMemberInfo;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
 
 public interface OAuthHelper {

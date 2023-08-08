@@ -4,7 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.Status;
 import kuit.project.beering.domain.image.MemberImage;
-import kuit.project.beering.dto.AgreementBulkInsertDto;
+import kuit.project.beering.dto.common.AgreementBulkInsertDto;
 import kuit.project.beering.dto.request.member.MemberLoginRequest;
 import kuit.project.beering.dto.request.member.MemberSignupRequest;
 import kuit.project.beering.dto.response.member.MemberEmailResponse;
@@ -32,6 +32,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -144,7 +145,14 @@ public class MemberService {
     private void uploadMemberImage(MultipartFile multipartFile, Member member) {
 
         String uploadName = multipartFile.getOriginalFilename();
+
         String url = awsS3Uploader.upload(multipartFile, "member");
+
+        if (StringUtils.hasText(getProfileImageUrl(member))) {
+            awsS3Uploader.deleteImage(getProfileImageUrl(member));
+            member.getImages().get(0).updateUrlAndUploadName(uploadName, url);
+            return;
+        }
 
         imageRepository.save(new MemberImage(member, url, uploadName));
     }
