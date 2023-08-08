@@ -43,7 +43,7 @@ public class TabomService {
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewException(NONE_REVIEW));
 
-        Tabom tabom = tabomRepository.findByReviewIdAndMemberId(memberId, reviewId);
+        Tabom tabom = tabomRepository.findByReviewIdAndMemberId(reviewId, memberId);
 
         return saveTabom(isUp, member, review, tabom);
     }
