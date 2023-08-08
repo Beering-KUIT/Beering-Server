@@ -4,7 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.OAuth;
 import kuit.project.beering.domain.OAuthType;
-import kuit.project.beering.dto.OAuthMemberInfo;
+import kuit.project.beering.dto.common.OAuthMemberInfo;
 import kuit.project.beering.dto.request.auth.OAuthSignupRequest;
 import kuit.project.beering.dto.request.member.MemberSignupRequest;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;

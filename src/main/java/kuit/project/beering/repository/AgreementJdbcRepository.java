@@ -1,6 +1,6 @@
 package kuit.project.beering.repository;
 
-import kuit.project.beering.dto.AgreementBulkInsertDto;
+import kuit.project.beering.dto.common.AgreementBulkInsertDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.namedparam.BeanPropertySqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;

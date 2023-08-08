@@ -4,7 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.Status;
 import kuit.project.beering.domain.image.MemberImage;
-import kuit.project.beering.dto.AgreementBulkInsertDto;
+import kuit.project.beering.dto.common.AgreementBulkInsertDto;
 import kuit.project.beering.dto.request.member.MemberLoginRequest;
 import kuit.project.beering.dto.request.member.MemberSignupRequest;
 import kuit.project.beering.dto.response.member.MemberEmailResponse;

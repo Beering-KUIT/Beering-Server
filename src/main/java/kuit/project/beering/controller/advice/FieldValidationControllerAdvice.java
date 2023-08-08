@@ -2,8 +2,8 @@ package kuit.project.beering.controller.advice;
 
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.BaseResponseStatus;
-import kuit.project.beering.util.FieldErrorsDto;
-import kuit.project.beering.util.FieldValidationError;
+import kuit.project.beering.dto.common.FieldErrorsDto;
+import kuit.project.beering.dto.common.FieldValidationError;
 import kuit.project.beering.util.exception.FieldValidationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;

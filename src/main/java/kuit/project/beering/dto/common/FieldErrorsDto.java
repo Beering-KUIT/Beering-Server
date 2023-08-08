@@ -1,4 +1,4 @@
-package kuit.project.beering.util;
+package kuit.project.beering.dto.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
