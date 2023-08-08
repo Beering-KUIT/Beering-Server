@@ -49,6 +49,14 @@ public class MemberController {
         return new BaseResponse<>(memberEmailResponse);
     }
 
+    @GetMapping("/me")
+    public BaseResponse<Object> getMyInfo(@AuthenticationPrincipal AuthMember authMember) {
+
+        MemberInfoResponse memberInfoResponse = memberService.getMemberInfo(authMember.getId());
+
+        return new BaseResponse<>(memberInfoResponse);
+    }
+
     @PostMapping("/{memberId}/images")
     public BaseResponse<Object> uploadProfileImage(@RequestParam("file") MultipartFile multipartFile,
                                                    @PathVariable Long memberId, @AuthenticationPrincipal AuthMember authMember) {
