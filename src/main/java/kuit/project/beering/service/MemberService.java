@@ -1,12 +1,9 @@
 package kuit.project.beering.service;
 
 import jakarta.persistence.EntityNotFoundException;
-import kuit.project.beering.domain.Review;
-import kuit.project.beering.domain.image.Image;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.Status;
 import kuit.project.beering.domain.image.MemberImage;
-import kuit.project.beering.domain.image.ReviewImage;
 import kuit.project.beering.dto.AgreementBulkInsertDto;
 import kuit.project.beering.dto.request.member.MemberLoginRequest;
 import kuit.project.beering.dto.request.member.MemberSignupRequest;
@@ -15,10 +12,10 @@ import kuit.project.beering.dto.response.member.MemberInfoResponse;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
 import kuit.project.beering.dto.response.member.MemberNicknameResponse;
 import kuit.project.beering.redis.RefreshToken;
-import kuit.project.beering.repository.ImageRepository;
-import kuit.project.beering.repository.RefreshTokenRepository;
 import kuit.project.beering.repository.AgreementJdbcRepository;
+import kuit.project.beering.repository.ImageRepository;
 import kuit.project.beering.repository.MemberRepository;
+import kuit.project.beering.repository.RefreshTokenRepository;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.security.jwt.JwtInfo;
 import kuit.project.beering.security.jwt.jwtTokenProvider.BeeringJwtTokenProvider;
@@ -37,9 +34,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -135,6 +130,15 @@ public class MemberService {
 
         if(!multipartFile.isEmpty())
             uploadMemberImage(multipartFile, member);
+    }
+
+    public MemberInfoResponse getMemberInfo(Long id) {
+        return memberRepository.findById(id).map(member ->
+                        MemberInfoResponse.builder()
+                                .username(member.getUsername())
+                                .nickname(member.getNickname())
+                                .url(getProfileImageUrl(member)).build())
+                .orElseThrow(() -> new MemberException(BaseResponseStatus.NONE_MEMBER));
     }
 
     private void uploadMemberImage(MultipartFile multipartFile, Member member) {
