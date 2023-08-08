@@ -58,7 +58,7 @@ public class MemberController {
     }
 
     @PostMapping("/{memberId}/images")
-    public BaseResponse<Object> uploadProfileImage(@RequestParam("file") MultipartFile multipartFile,
+    public BaseResponse<Object> uploadProfileImage(@RequestParam("profile_image") MultipartFile multipartFile,
                                                    @PathVariable Long memberId, @AuthenticationPrincipal AuthMember authMember) {
         validateMember(authMember.getId(), memberId);
 
