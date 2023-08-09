@@ -102,7 +102,7 @@ public abstract class AbstractOIDCJwtTokenProvider extends AbstractJwtTokenProvi
     }
 
     public String parseSub(String token) {
-        return jwtParser.parseClaimsField(token, "sub", String.class);
+        return parseClaimsField(token, "sub", String.class);
     }
 
 }
