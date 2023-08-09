@@ -21,4 +21,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
     @Query("SELECT m FROM Member m JOIN FETCH m.oauth o WHERE o.refreshToken = :refreshToken AND o.oauthType = :type")
     Optional<Member> findByOauthRefreshTokenAndOauthType(@Param("refreshToken") String splitRefreshToken, @Param("type") OAuthType oauthType);
+
+    @Query("SELECT m FROM Member m WHERE m.oauth.id = :oauthId")
+    Optional<Member> findByOauthId(@Param("oauthId") Long oauthId);
 }

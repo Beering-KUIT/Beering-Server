@@ -36,35 +36,30 @@ public class OAuthService {
     private final JwtTokenProviderResolver jwtTokenProviderResolver;
 
     @Transactional
-    public MemberLoginResponse oauth(String code, OAuthHelper oAuthHelper) {
+    public MemberLoginResponse restapiLogin(String code, OAuthHelper oAuthHelper) {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         OAuthTokenInfo oauthTokenInfo = oAuthHelper.createToken(code);
 
-        // 2. 토큰으로 oauth account API 호출
-        OAuthMemberInfo OAuthMemberInfo = oAuthHelper.getAccount(oauthTokenInfo.getAccessToken());
+        // 2. token의 sub로 OAuth 조회, 없으면 첫 로그인이므로 회원가입 마저 진행
+        return checkAlreadySignup(oauthTokenInfo, oAuthHelper.getOauthType());
+    }
 
-        // 3. oauth_id 로 회원가입 처리
-        Member oauthMember = registerKakaoUserIfNeed(OAuthMemberInfo, oauthTokenInfo, oAuthHelper.getOauthType());
-
-        return MemberLoginResponse.builder()
-                .memberId(oauthMember.getId())
-                .jwtInfo(JwtInfo.builder()
-                        .accessToken(oauthTokenInfo.getIdToken())
-                        .refreshToken(oauthTokenInfo.getRefreshToken())
-                        .build())
-                .build();
+    @Transactional
+    public MemberLoginResponse sdkLogin(OAuthTokenInfo oauthTokenInfo, OAuthHelper oauthHelper) {
+        // token의 sub로 OAuth 조회, 없으면 첫 로그인이므로 회원가입 마저 진행
+        return checkAlreadySignup(oauthTokenInfo, oauthHelper.getOauthType());
     }
 
     @Transactional
     public MemberLoginResponse signup(OAuthSignupRequest request, OAuthHelper oauthHelper) {
 
-        OAuth oauth = oauthRepository.findBySub(request.getSub())
+        OAuth oauth = oauthRepository.findBySubAndOauthType(request.getSub(), request.getOAuthType())
                 .orElseThrow(EntityNotFoundException::new);
 
         OAuthMemberInfo oauthAccountInfo = oauthHelper.getAccount(oauth.getAccessToken());
 
         String email = oauthAccountInfo.getEmail();
-        String nickname = oauthAccountInfo.getNickname();
+        String nickname = request.getNickname();
 
         // 회원가입 처리
         memberService.signup(new MemberSignupRequest(email, UUID.randomUUID().toString(), nickname, request.getAgreements()));
@@ -89,21 +84,28 @@ public class OAuthService {
                 .build();
     }
 
-    // 3. sub 로 회원가입 처리
-    private Member registerKakaoUserIfNeed(OAuthMemberInfo OAuthMemberInfo, OAuthTokenInfo oauthTokenInfo, OAuthType oauthType) {
+    private MemberLoginResponse checkAlreadySignup(OAuthTokenInfo oauthTokenInfo, OAuthType oauthType) {
         JwtTokenProvider tokenProvider = jwtTokenProviderResolver.getProvider(oauthTokenInfo.getIdToken());
-        // DB 에 중복된 email이 있는지 확인
-        // 없으면 닉네임 및 약관 요청 있으면 강제 로그인..
-        Member member = memberRepository.findByUsername(OAuthMemberInfo.getEmail())
+        String sub = tokenProvider.parseSub(oauthTokenInfo.getIdToken());
+
+        OAuth oauth = oauthRepository.findBySubAndOauthType(sub, oauthType)
                 .orElseThrow(() -> {
-                    OAuth oauth = oauthRepository.save(OAuth.createOauth(tokenProvider.parseSub(oauthTokenInfo.getIdToken()),
-                            OAuthType.KAKAO, oauthTokenInfo.getAccessToken(), oauthTokenInfo.getRefreshToken()));
-                    throw new SignupNotCompletedException(oauth.getSub(), oauthType);
+                    oauthRepository.save(OAuth.createOauth(sub, oauthType, oauthTokenInfo.getAccessToken(), oauthTokenInfo.getRefreshToken()));
+                    throw new SignupNotCompletedException(sub, oauthType);
                 });
+
+        Member member = memberRepository.findByOauthId(oauth.getId()).orElseThrow(
+                () -> new SignupNotCompletedException(sub, oauth.getOauthType()));
 
         refreshTokenRepository.save(new RefreshToken(String.valueOf(member.getId()), oauthTokenInfo.getRefreshToken()));
 
-        return member;
+        return MemberLoginResponse.builder()
+                .memberId(member.getId())
+                .jwtInfo(JwtInfo.builder()
+                        .accessToken(oauthTokenInfo.getIdToken())
+                        .refreshToken(oauthTokenInfo.getRefreshToken())
+                        .build())
+                .build();
     }
 
 }

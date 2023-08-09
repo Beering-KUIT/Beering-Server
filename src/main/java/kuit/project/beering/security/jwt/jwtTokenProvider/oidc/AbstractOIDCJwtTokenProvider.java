@@ -82,9 +82,7 @@ public abstract class AbstractOIDCJwtTokenProvider extends AbstractJwtTokenProvi
 
         OAuthTokenInfo oauthTokenInfo = oauthHelper.reissueToken(refreshToken);
 
-        oauthTokenInfo.setRefreshToken(oauthTokenInfo.getRefreshToken());
-
-        oauthRepository.findBySub(parseSub(oauthTokenInfo.getIdToken()))
+        oauthRepository.findBySubAndOauthType(parseSub(oauthTokenInfo.getIdToken()), oauthHelper.getOauthType())
                 .orElseThrow(IllegalArgumentException::new)
                 .tokenReissue(oauthTokenInfo.getAccessToken(), oauthTokenInfo.getRefreshToken());
 

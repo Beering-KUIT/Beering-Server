@@ -7,7 +7,10 @@ import kuit.project.beering.dto.request.auth.OAuthSignupRequest;
 import kuit.project.beering.dto.request.member.AgreementRequest;
 import kuit.project.beering.dto.response.SignupNotCompletedResponse;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
+import kuit.project.beering.security.auth.oauth.helper.OAuthHelper;
 import kuit.project.beering.security.auth.oauth.helper.OAuthHelperResolver;
+import kuit.project.beering.security.jwt.JwtTokenProviderResolver;
+import kuit.project.beering.security.jwt.OAuthTokenInfo;
 import kuit.project.beering.service.OAuthService;
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.BaseResponseStatus;
@@ -23,7 +26,9 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -33,13 +38,33 @@ public class OAuthController {
 
     private final OAuthService oauthService;
     private final OAuthHelperResolver oauthHelperResolver;
+    private final JwtTokenProviderResolver jwtTokenProviderResolver;
+
+    private static Map<String, OAuthType> isserTypeMap = new HashMap<>();
+
+    static {
+        isserTypeMap.put("https://kauth.kakao.com", OAuthType.KAKAO);
+    }
 
     @GetMapping("/kakao/callback")
-    public BaseResponse<MemberLoginResponse> kakaoOauth(@ModelAttribute OAuthCodeRequest OAuthCodeRequest) {
+    public BaseResponse<MemberLoginResponse> restapiLogin(@ModelAttribute OAuthCodeRequest OAuthCodeRequest) {
 
         if (OAuthCodeRequest.getError() != null) return new BaseResponse<>(BaseResponseStatus.OAUTH_LOGIN_FAILED);
 
-        MemberLoginResponse memberLoginResponse = oauthService.oauth(OAuthCodeRequest.getCode(), oauthHelperResolver.getOauthHelper(OAuthType.KAKAO));
+        MemberLoginResponse memberLoginResponse = oauthService.restapiLogin(OAuthCodeRequest.getCode(), oauthHelperResolver.getOauthHelper(OAuthType.KAKAO));
+
+        return new BaseResponse<>(memberLoginResponse);
+    }
+
+    @PostMapping("/sdk")
+    public BaseResponse<MemberLoginResponse> sdkLogin(@RequestBody OAuthTokenInfo oauthTokenInfo) {
+        String idToken = oauthTokenInfo.getIdToken();
+
+        String issuer = jwtTokenProviderResolver.getProvider(idToken).parseIssuer(idToken);
+
+        OAuthHelper oauthHelper = oauthHelperResolver.getOauthHelper(isserTypeMap.get(issuer));
+
+        MemberLoginResponse memberLoginResponse = oauthService.sdkLogin(oauthTokenInfo, oauthHelper);
 
         return new BaseResponse<>(memberLoginResponse);
     }
@@ -60,7 +85,7 @@ public class OAuthController {
 
     @ExceptionHandler(SignupNotCompletedException.class)
     public BaseResponse<SignupNotCompletedResponse> loginNotCompleted(SignupNotCompletedException ex) {
-        return new BaseResponse<>(SignupNotCompletedResponse.builder()
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS_CONTINUE_SIGNUP, SignupNotCompletedResponse.builder()
                 .isLoginCompleted(false)
                 .sub(ex.getSub()).build());
     }
