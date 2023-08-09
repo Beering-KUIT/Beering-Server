@@ -9,6 +9,7 @@ import kuit.project.beering.redis.OIDCPublicKeysResponse;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.OAuthRepository;
 import kuit.project.beering.security.auth.oauth.client.OAuthClient;
+import kuit.project.beering.security.auth.oauth.client.OAuthInfoClient;
 import kuit.project.beering.security.auth.oauth.properties.OAuthProperties;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
 import kuit.project.beering.util.BaseResponseStatus;
@@ -31,12 +32,19 @@ public abstract class AbstractOAuthClientService implements OAuthClientService {
     protected final OAuthRepository oauthRepository;
     protected final OAuthProperties oauthProperties;
     protected final OAuthClient oauthClient;
+    protected final OAuthInfoClient oauthInfoClient;
 
-    public AbstractOAuthClientService(MemberRepository memberRepository, OAuthRepository oauthRepository, OAuthProperties oauthProperties, OAuthClient oauthClient) {
+    public AbstractOAuthClientService(
+            MemberRepository memberRepository,
+            OAuthRepository oauthRepository,
+            OAuthProperties oauthProperties,
+            OAuthClient oauthClient,
+            OAuthInfoClient oauthInfoClient) {
         this.memberRepository = memberRepository;
         this.oauthRepository = oauthRepository;
         this.oauthProperties = oauthProperties;
         this.oauthClient = oauthClient;
+        this.oauthInfoClient = oauthInfoClient;
     }
 
     /**
@@ -83,7 +91,7 @@ public abstract class AbstractOAuthClientService implements OAuthClientService {
      */
     @Override
     public OAuthMemberInfo getAccount(String accessToken) {
-        return oauthClient.getOAuthAccount("Bearer " + accessToken);
+        return oauthInfoClient.getOAuthAccount("Bearer " + accessToken);
     }
 
     private boolean isAvailable(
