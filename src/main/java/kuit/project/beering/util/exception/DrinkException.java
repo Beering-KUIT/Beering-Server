@@ -2,18 +2,15 @@ package kuit.project.beering.util.exception;
 
 import kuit.project.beering.util.BaseResponseStatus;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
-public class DrinkException extends RuntimeException {
-    private final BaseResponseStatus status;
+@Slf4j
+public class DrinkException extends DomainException {
 
     public DrinkException(BaseResponseStatus status) {
-        super(status.getResponseMessage());
-        this.status = status;
+        super(status);
+        log.info("{} - message : {}", this.getClass().getSimpleName(), status.getResponseMessage());
     }
 
-    public DrinkException(BaseResponseStatus status, String message) {
-        super(message);
-        this.status = status;
-    }
 }
