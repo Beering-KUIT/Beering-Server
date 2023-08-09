@@ -9,5 +9,4 @@ public class OAuthMemberInfo {
 
     private Long id;
     private String email;
-    private String nickname;
 }
