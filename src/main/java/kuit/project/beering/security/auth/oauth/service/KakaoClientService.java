@@ -10,10 +10,10 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-@Qualifier("kakaoOauthHelper")
-public class KakaoOAuthClientService extends AbstractOAuthClientService {
+@Qualifier("kakaoClientService")
+public class KakaoClientService extends AbstractOAuthClientService {
 
-    public KakaoOAuthClientService(
+    public KakaoClientService(
             MemberRepository memberRepository,
             OAuthRepository oauthRepository,
             @Qualifier("KakaoOauthProperties") OAuthProperties oauthProperties,

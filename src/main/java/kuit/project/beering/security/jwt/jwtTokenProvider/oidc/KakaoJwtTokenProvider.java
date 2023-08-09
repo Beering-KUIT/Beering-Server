@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class KakaoJwtTokenProvider extends AbstractOIDCJwtTokenProvider {
 
     public KakaoJwtTokenProvider(
-            @Qualifier("kakaoOauthHelper") OAuthClientService oAuthClientService,
+            @Qualifier("kakaoClientService") OAuthClientService oAuthClientService,
             MemberRepository memberRepository,
             OAuthRepository oauthRepository,
             JwtParser jwtParser) {
