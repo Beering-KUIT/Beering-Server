@@ -57,7 +57,13 @@ public class ReviewService {
         Review review = requestDto.toEntity(member, drink);
         reviewRepository.save(review);
         log.info("reviewImages = {}", reviewImages.isEmpty());
-        if(!reviewImages.isEmpty())
+
+        List<MultipartFile> images = reviewImages.stream()
+                .filter(m -> !m.isEmpty())
+                .collect(Collectors.toList());
+        log.info("images = {}", images.isEmpty());
+        log.info("images = {}", images.size());
+        if(!images.isEmpty())
             uploadReviewImages(reviewImages, review);
 
         List<SelectedOptionCreateRequestDto> selectedOptionCreateRequestDtos = requestDto.getSelectedOptions().stream()
@@ -116,7 +122,7 @@ public class ReviewService {
     }
 
     // 리뷰 상세 보기
-    public ReviewDetailReadResponseDto readReviewDetail(long reviewId) {
+    public ReviewDetailReadResponseDto readReviewDetail(long memberId, long reviewId) {
 
         Review review = reviewRepository.findById(reviewId)
                 .orElseThrow(() -> new ReviewException(NONE_REVIEW));
@@ -124,10 +130,22 @@ public class ReviewService {
         // 멤버 프로필 image 조회
         String profileImageUrl = memberService.getProfileImageUrl(review.getMember());
 
+        // 멤버의 리뷰에 대한 따봉 유무 조회
+        Boolean isTabomed;
+        String tabomed;
+        if(memberId == 0) {
+            isTabomed = null;
+            tabomed = "null";
+        }
+        else {
+            isTabomed = tabomRepository.existsByMemberIdAndReviewIdAndIsUp(memberId, reviewId, true);
+            tabomed = isTabomed.toString();
+        }
+
         log.info("좋아요 관련 쿼리 시작");
         long upCount = tabomRepository.findCountByIsUPAndReviewId(review.getId()).orElseThrow();
         long downCount = tabomRepository.findCountByIsDownAndReviewId(review.getId()).orElseThrow();
-        return new ReviewDetailReadResponseDto(review, profileImageUrl, upCount, downCount);
+        return new ReviewDetailReadResponseDto(review, profileImageUrl, upCount, downCount, tabomed);
     }
 
     @Transactional(readOnly = true)
@@ -135,6 +153,24 @@ public class ReviewService {
 
         Slice<Review> allReviewsSliceBy = reviewRepository.findAllReviewsSliceByMemberIdByCreatedAtDesc(memberId, pageable);
         List<Review> reviews = allReviewsSliceBy.getContent();
+        List<String> tabomed = new ArrayList<>();
+        List<Boolean> isExist = reviews.stream()
+                .map(r -> tabomRepository.existsByMemberIdAndReviewId(memberId, r.getId()))
+                .collect(Collectors.toList());
+        List<Boolean> isTabomed = reviews.stream()
+                .map(r -> tabomRepository.existsByMemberIdAndReviewIdAndIsUp(memberId, r.getId(), true))
+                .collect(Collectors.toList());
+        for(int i=0; i<reviews.size(); i++) {
+            log.info("isExist = {}", isExist.get(i));
+            log.info("isTabomed = {}", isTabomed.get(i));
+            if(isExist.get(i) && isTabomed.get(i))
+                tabomed.add("true");
+            else if(!(isExist.get(i)))
+                tabomed.add("null");
+            else
+                tabomed.add("false");
+        }
+
 
         log.info("좋아요 관련 쿼리 시작");
         List<Long> upCounts = reviews.stream()
@@ -148,7 +184,7 @@ public class ReviewService {
         List<ReviewReadResponseDto> responseDtos = new ArrayList<>();
         for(int i=0; i<reviews.size(); i++) {
             String profileImageUrl = memberService.getProfileImageUrl(reviews.get(i).getMember());
-            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
+            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i), tabomed.get(i)));
         }
 
         return new SliceResponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
@@ -156,10 +192,27 @@ public class ReviewService {
     }
 
     @Transactional(readOnly = true)
-    public SliceResponse<ReviewReadResponseDto> findReviewByPage(Pageable pageable) {
+    public SliceResponse<ReviewReadResponseDto> findReviewByPage(long memberId, Pageable pageable) {
 
         Slice<Review> allReviewsSliceBy = reviewRepository.findAllReviewsSliceByCreatedAtDesc(pageable);
         List<Review> reviews = allReviewsSliceBy.getContent();
+        List<String> tabomed = new ArrayList<>();
+        List<Boolean> isExist = reviews.stream()
+                .map(r -> tabomRepository.existsByMemberIdAndReviewId(memberId, r.getId()))
+                .collect(Collectors.toList());
+        List<Boolean> isTabomed = reviews.stream()
+                .map(r -> tabomRepository.existsByMemberIdAndReviewIdAndIsUp(memberId, r.getId(), true))
+                .collect(Collectors.toList());
+        for(int i=0; i<reviews.size(); i++) {
+            log.info("isExist = {}", isExist.get(i));
+            log.info("isTabomed = {}", isTabomed.get(i));
+            if(isExist.get(i) && isTabomed.get(i))
+                tabomed.add("true");
+            else if(!(isExist.get(i)))
+                tabomed.add("null");
+            else
+                tabomed.add("false");
+        }
 
         log.info("좋아요 관련 쿼리 시작");
         List<Long> upCounts = reviews.stream()
@@ -173,17 +226,34 @@ public class ReviewService {
         List<ReviewReadResponseDto> responseDtos = new ArrayList<>();
         for(int i=0; i<reviews.size(); i++) {
             String profileImageUrl = memberService.getProfileImageUrl(reviews.get(i).getMember());
-            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
+            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i), tabomed.get(i)));
         }
 
         return new SliceResponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
     }
 
     @Transactional(readOnly = true)
-    public SliceResponse<ReviewReadResponseDto> findAllReviewByDrinkIdByPage(long drinkId, Pageable pageable) {
+    public SliceResponse<ReviewReadResponseDto> findAllReviewByDrinkIdByPage(long drinkId, long memberId, Pageable pageable) {
 
         Slice<Review> allReviewsSliceBy = reviewRepository.findAllReviewsSliceByDrinkIdByCreatedAtDesc(drinkId, pageable);
         List<Review> reviews = allReviewsSliceBy.getContent();
+        List<String> tabomed = new ArrayList<>();
+        List<Boolean> isExist = reviews.stream()
+                .map(r -> tabomRepository.existsByMemberIdAndReviewId(memberId, r.getId()))
+                .collect(Collectors.toList());
+        List<Boolean> isTabomed = reviews.stream()
+                .map(r -> tabomRepository.existsByMemberIdAndReviewIdAndIsUp(memberId, r.getId(), true))
+                .collect(Collectors.toList());
+        for(int i=0; i<reviews.size(); i++) {
+            log.info("isExist = {}", isExist.get(i));
+            log.info("isTabomed = {}", isTabomed.get(i));
+            if(isExist.get(i) && isTabomed.get(i))
+                tabomed.add("true");
+            else if(!(isExist.get(i)))
+                tabomed.add("null");
+            else
+                tabomed.add("false");
+        }
 
         log.info("좋아요 관련 쿼리 시작");
         List<Long> upCounts = reviews.stream()
@@ -197,7 +267,7 @@ public class ReviewService {
         List<ReviewReadResponseDto> responseDtos = new ArrayList<>();
         for(int i=0; i<reviews.size(); i++) {
             String profileImageUrl = memberService.getProfileImageUrl(reviews.get(i).getMember());
-            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i)));
+            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i), tabomed.get(i)));
         }
 
         return new SliceResponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
