@@ -20,6 +20,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -52,6 +53,7 @@ public class DrinkService {
         return drinkRepository.search(drinkSearchCondition, pageable);
     }
 
+    @Transactional
     public GetDrinkResponse getDrinkById(Long drinkId, Long memberId) {
         log.info("DrinkService.getDrinkById");
         Drink drink = drinkRepository.findById(drinkId)
