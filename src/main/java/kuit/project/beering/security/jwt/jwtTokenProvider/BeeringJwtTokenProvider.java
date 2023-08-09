@@ -139,7 +139,7 @@ public class BeeringJwtTokenProvider extends AbstractJwtTokenProvider {
     }
 
     public String parseSub(String token) {
-        return String.valueOf(jwtParser.parseClaimsField(token, "sub", Long.class));
+        return String.valueOf(parseClaimsField(token, "sub", Long.class));
     }
 
 }

@@ -2,12 +2,14 @@ package kuit.project.beering.util.exception;
 
 import kuit.project.beering.util.BaseResponseStatus;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
-public class MemberException extends RuntimeException {
-    private final BaseResponseStatus status;
+@Slf4j
+public class MemberException extends DomainException {
 
     public MemberException(BaseResponseStatus status) {
-        this.status = status;
+        super(status);
+        log.info("{} - message : {}", this.getClass().getSimpleName(), status.getResponseMessage());
     }
 }

@@ -2,18 +2,14 @@ package kuit.project.beering.util.exception;
 
 import kuit.project.beering.util.BaseResponseStatus;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
-public class FavoriteException extends RuntimeException {
-    private final BaseResponseStatus status;
+@Slf4j
+public class FavoriteException extends DomainException {
 
     public FavoriteException(BaseResponseStatus status) {
-        super(status.getResponseMessage());
-        this.status = status;
-    }
-
-    public FavoriteException(BaseResponseStatus status, String message) {
-        super(message);
-        this.status = status;
+        super(status);
+        log.info("{} - message : {}", this.getClass().getSimpleName(), status.getResponseMessage());
     }
 }

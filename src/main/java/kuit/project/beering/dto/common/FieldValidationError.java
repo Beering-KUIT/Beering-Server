@@ -1,12 +1,9 @@
-package kuit.project.beering.util;
+package kuit.project.beering.dto.common;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
-@Getter
 @AllArgsConstructor
-@Builder
+@Getter
 public class FieldValidationError {
 
     private String fieldName;

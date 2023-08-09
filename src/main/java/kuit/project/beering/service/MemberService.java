@@ -1,24 +1,29 @@
 package kuit.project.beering.service;
 
-import kuit.project.beering.domain.image.Image;
+import jakarta.persistence.EntityNotFoundException;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.Status;
 import kuit.project.beering.domain.image.MemberImage;
-import kuit.project.beering.dto.AgreementBulkInsertDto;
+import kuit.project.beering.dto.common.AgreementBulkInsertDto;
 import kuit.project.beering.dto.request.member.MemberLoginRequest;
 import kuit.project.beering.dto.request.member.MemberSignupRequest;
 import kuit.project.beering.dto.response.member.MemberEmailResponse;
+import kuit.project.beering.dto.response.member.MemberInfoResponse;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
 import kuit.project.beering.dto.response.member.MemberNicknameResponse;
 import kuit.project.beering.redis.RefreshToken;
-import kuit.project.beering.repository.RefreshTokenRepository;
 import kuit.project.beering.repository.AgreementJdbcRepository;
+import kuit.project.beering.repository.ImageRepository;
 import kuit.project.beering.repository.MemberRepository;
+import kuit.project.beering.repository.RefreshTokenRepository;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.security.jwt.JwtInfo;
 import kuit.project.beering.security.jwt.jwtTokenProvider.BeeringJwtTokenProvider;
+import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.exception.DuplicateNicknameException;
 import kuit.project.beering.util.exception.DuplicateUsernameException;
+import kuit.project.beering.util.exception.MemberException;
+import kuit.project.beering.util.s3.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -27,6 +32,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -39,9 +46,11 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final AgreementJdbcRepository agreementJdbcRepository;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final ImageRepository imageRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
     private final BeeringJwtTokenProvider beeringJwtTokenProvider;
+    private final AwsS3Uploader awsS3Uploader;
 
     @Transactional
     public void signup(MemberSignupRequest request) {
@@ -113,5 +122,38 @@ public class MemberService {
     public MemberNicknameResponse checkNickname(String nickname) {
         if (memberRepository.existsByNickname(nickname)) throw new DuplicateNicknameException();
         return new MemberNicknameResponse(true);
+    }
+
+    @Transactional
+    public void uploadImage(MultipartFile multipartFile, Long memberId) {
+
+        Member member = memberRepository.findById(memberId).orElseThrow(EntityNotFoundException::new);
+
+        if(!multipartFile.isEmpty())
+            uploadMemberImage(multipartFile, member);
+    }
+
+    public MemberInfoResponse getMemberInfo(Long id) {
+        return memberRepository.findById(id).map(member ->
+                        MemberInfoResponse.builder()
+                                .username(member.getUsername())
+                                .nickname(member.getNickname())
+                                .url(getProfileImageUrl(member)).build())
+                .orElseThrow(() -> new MemberException(BaseResponseStatus.NONE_MEMBER));
+    }
+
+    private void uploadMemberImage(MultipartFile multipartFile, Member member) {
+
+        String uploadName = multipartFile.getOriginalFilename();
+
+        String url = awsS3Uploader.upload(multipartFile, "member");
+
+        if (StringUtils.hasText(getProfileImageUrl(member))) {
+            awsS3Uploader.deleteImage(getProfileImageUrl(member));
+            member.getImages().get(0).updateUrlAndUploadName(url, uploadName);
+            return;
+        }
+
+        imageRepository.save(new MemberImage(member, url, uploadName));
     }
 }

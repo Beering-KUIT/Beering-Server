@@ -1,6 +1,6 @@
 package kuit.project.beering.security.auth.oauth.client;
 
-import kuit.project.beering.dto.OAuthMemberInfo;
+import kuit.project.beering.dto.common.OAuthMemberInfo;
 import kuit.project.beering.redis.OIDCPublicKeysResponse;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
 import org.springframework.beans.factory.annotation.Qualifier;
