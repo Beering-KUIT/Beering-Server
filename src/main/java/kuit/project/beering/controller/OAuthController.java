@@ -2,7 +2,7 @@ package kuit.project.beering.controller;
 
 import kuit.project.beering.domain.AgreementName;
 import kuit.project.beering.domain.OAuthType;
-import kuit.project.beering.dto.request.auth.KakaoLoginRequest;
+import kuit.project.beering.dto.request.auth.OAuthCodeRequest;
 import kuit.project.beering.dto.request.auth.OAuthSignupRequest;
 import kuit.project.beering.dto.request.member.AgreementRequest;
 import kuit.project.beering.dto.response.SignupNotCompletedResponse;
@@ -35,11 +35,11 @@ public class OAuthController {
     private final OAuthHelperResolver oauthHelperResolver;
 
     @GetMapping("/kakao/callback")
-    public BaseResponse<MemberLoginResponse> kakaoOauth(@ModelAttribute KakaoLoginRequest kakaoLoginRequest) {
+    public BaseResponse<MemberLoginResponse> kakaoOauth(@ModelAttribute OAuthCodeRequest OAuthCodeRequest) {
 
-        if (kakaoLoginRequest.getError() != null) return new BaseResponse<>(BaseResponseStatus.OAUTH_LOGIN_FAILED);
+        if (OAuthCodeRequest.getError() != null) return new BaseResponse<>(BaseResponseStatus.OAUTH_LOGIN_FAILED);
 
-        MemberLoginResponse memberLoginResponse = oauthService.oauth(kakaoLoginRequest.getCode(), oauthHelperResolver.getOauthHelper(OAuthType.KAKAO));
+        MemberLoginResponse memberLoginResponse = oauthService.oauth(OAuthCodeRequest.getCode(), oauthHelperResolver.getOauthHelper(OAuthType.KAKAO));
 
         return new BaseResponse<>(memberLoginResponse);
     }
