@@ -28,6 +28,12 @@ public class GlobalControllerAdvice {
         return new BaseResponse<>(ex.getStatus());
     }
 
+    @ExceptionHandler(MemberException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseResponse<Object> handleMemberException(MemberException ex) {
+        return new BaseResponse<>(ex.getStatus());
+    }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public BaseResponse<?> handleTypeMismatchException(MethodArgumentTypeMismatchException ex) {
         // TODO : String으로 반환할지 JSON으로 반환할지 고민

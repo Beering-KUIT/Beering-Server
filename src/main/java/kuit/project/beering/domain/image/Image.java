@@ -26,10 +26,14 @@ public class Image extends BaseTimeEntity {
     @Column(nullable = false)
     private Status status;
 
-
     public Image (String imageUrl, String uploadName) {
         this.imageUrl = imageUrl;
         this.uploadName = uploadName;
         this.status = Status.ACTIVE;
+    }
+
+    public void updateUrlAndUploadName(String url, String uploadName) {
+        this.imageUrl = url;
+        this.uploadName = uploadName;
     }
 }

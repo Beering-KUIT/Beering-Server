@@ -4,7 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import kuit.project.beering.controller.AuthController;
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.BaseResponseStatus;
-import kuit.project.beering.util.ObjectValidationError;
+import kuit.project.beering.dto.common.ObjectValidationError;
 import kuit.project.beering.util.exception.AgreementValidationException;
 import kuit.project.beering.util.exception.CustomJwtException;
 import kuit.project.beering.util.exception.DuplicateUsernameException;
