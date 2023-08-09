@@ -9,9 +9,13 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor
 public abstract class AbstractJwtTokenProvider implements JwtTokenProvider{
 
-    protected final JwtParser jwtParser;
+    private final JwtParser jwtParser;
 
     protected Claims parseUnsignedClaims(String token) {
         return jwtParser.parseUnsignedClaims(token);
+    }
+
+    protected <T> T parseClaimsField(String token, String fieldName, Class<T> tClass) {
+        return jwtParser.parseClaimsField(token, fieldName, tClass);
     }
 }

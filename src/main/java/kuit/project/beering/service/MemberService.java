@@ -150,7 +150,7 @@ public class MemberService {
 
         if (StringUtils.hasText(getProfileImageUrl(member))) {
             awsS3Uploader.deleteImage(getProfileImageUrl(member));
-            member.getImages().get(0).updateUrlAndUploadName(uploadName, url);
+            member.getImages().get(0).updateUrlAndUploadName(url, uploadName);
             return;
         }
 
