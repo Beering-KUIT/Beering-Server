@@ -1,4 +1,4 @@
-package kuit.project.beering.security.auth.oauth.helper;
+package kuit.project.beering.security.auth.oauth.service;
 
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.OAuthRepository;
@@ -11,9 +11,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @Qualifier("kakaoOauthHelper")
-public class KakaoOAuthHelper extends AbstractOAuthHelper {
+public class KakaoOAuthClientService extends AbstractOAuthClientService {
 
-    public KakaoOAuthHelper(
+    public KakaoOAuthClientService(
             MemberRepository memberRepository,
             OAuthRepository oauthRepository,
             @Qualifier("KakaoOauthProperties") OAuthProperties oauthProperties,

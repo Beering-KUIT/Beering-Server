@@ -7,8 +7,8 @@ import kuit.project.beering.dto.request.auth.OAuthSignupRequest;
 import kuit.project.beering.dto.request.member.AgreementRequest;
 import kuit.project.beering.dto.response.SignupNotCompletedResponse;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
-import kuit.project.beering.security.auth.oauth.helper.OAuthHelper;
-import kuit.project.beering.security.auth.oauth.helper.OAuthHelperResolver;
+import kuit.project.beering.security.auth.oauth.service.OAuthClientService;
+import kuit.project.beering.security.auth.oauth.service.OAuthClientServiceResolver;
 import kuit.project.beering.security.jwt.JwtTokenProviderResolver;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
 import kuit.project.beering.service.OAuthService;
@@ -37,7 +37,7 @@ import java.util.Map;
 public class OAuthController {
 
     private final OAuthService oauthService;
-    private final OAuthHelperResolver oauthHelperResolver;
+    private final OAuthClientServiceResolver oauthClientServiceResolver;
     private final JwtTokenProviderResolver jwtTokenProviderResolver;
 
     private static Map<String, OAuthType> isserTypeMap = new HashMap<>();
@@ -51,7 +51,7 @@ public class OAuthController {
 
         if (OAuthCodeRequest.getError() != null) return new BaseResponse<>(BaseResponseStatus.OAUTH_LOGIN_FAILED);
 
-        MemberLoginResponse memberLoginResponse = oauthService.restapiLogin(OAuthCodeRequest.getCode(), oauthHelperResolver.getOauthHelper(OAuthType.KAKAO));
+        MemberLoginResponse memberLoginResponse = oauthService.restapiLogin(OAuthCodeRequest.getCode(), oauthClientServiceResolver.getOauthHelper(OAuthType.KAKAO));
 
         return new BaseResponse<>(memberLoginResponse);
     }
@@ -62,9 +62,9 @@ public class OAuthController {
 
         String issuer = jwtTokenProviderResolver.getProvider(idToken).parseIssuer(idToken);
 
-        OAuthHelper oauthHelper = oauthHelperResolver.getOauthHelper(isserTypeMap.get(issuer));
+        OAuthClientService oauthClientService = oauthClientServiceResolver.getOauthHelper(isserTypeMap.get(issuer));
 
-        MemberLoginResponse memberLoginResponse = oauthService.sdkLogin(oauthTokenInfo, oauthHelper);
+        MemberLoginResponse memberLoginResponse = oauthService.sdkLogin(oauthTokenInfo, oauthClientService);
 
         return new BaseResponse<>(memberLoginResponse);
     }
@@ -78,7 +78,7 @@ public class OAuthController {
         if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
         if (bindingResult.hasGlobalErrors()) throw new AgreementValidationException(bindingResult);
 
-        MemberLoginResponse response = oauthService.signup(request, oauthHelperResolver.getOauthHelper(request.getOAuthType()));
+        MemberLoginResponse response = oauthService.signup(request, oauthClientServiceResolver.getOauthHelper(request.getOAuthType()));
 
         return new BaseResponse<>(response);
     }

@@ -1,4 +1,4 @@
-package kuit.project.beering.security.auth.oauth.helper;
+package kuit.project.beering.security.auth.oauth.service;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
@@ -25,14 +25,14 @@ import java.util.Base64;
 import java.util.Date;
 
 @Slf4j
-public abstract class AbstractOAuthHelper implements OAuthHelper {
+public abstract class AbstractOAuthClientService implements OAuthClientService {
 
     protected final MemberRepository memberRepository;
     protected final OAuthRepository oauthRepository;
     protected final OAuthProperties oauthProperties;
     protected final OAuthClient oauthClient;
 
-    public AbstractOAuthHelper(MemberRepository memberRepository, OAuthRepository oauthRepository, OAuthProperties oauthProperties, OAuthClient oauthClient) {
+    public AbstractOAuthClientService(MemberRepository memberRepository, OAuthRepository oauthRepository, OAuthProperties oauthProperties, OAuthClient oauthClient) {
         this.memberRepository = memberRepository;
         this.oauthRepository = oauthRepository;
         this.oauthProperties = oauthProperties;

@@ -2,7 +2,7 @@ package kuit.project.beering.security.jwt.jwtTokenProvider.oidc;
 
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.OAuthRepository;
-import kuit.project.beering.security.auth.oauth.helper.OAuthHelper;
+import kuit.project.beering.security.auth.oauth.service.OAuthClientService;
 import kuit.project.beering.security.jwt.JwtParser;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -12,11 +12,11 @@ import org.springframework.stereotype.Component;
 public class KakaoJwtTokenProvider extends AbstractOIDCJwtTokenProvider {
 
     public KakaoJwtTokenProvider(
-            @Qualifier("kakaoOauthHelper") OAuthHelper oAuthHelper,
+            @Qualifier("kakaoOauthHelper") OAuthClientService oAuthClientService,
             MemberRepository memberRepository,
             OAuthRepository oauthRepository,
             JwtParser jwtParser) {
-        super(oAuthHelper, jwtParser, memberRepository, oauthRepository);
+        super(oAuthClientService, jwtParser, memberRepository, oauthRepository);
     }
 
 }

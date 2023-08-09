@@ -12,7 +12,7 @@ import kuit.project.beering.redis.RefreshToken;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.OAuthRepository;
 import kuit.project.beering.repository.RefreshTokenRepository;
-import kuit.project.beering.security.auth.oauth.helper.OAuthHelper;
+import kuit.project.beering.security.auth.oauth.service.OAuthClientService;
 import kuit.project.beering.security.jwt.JwtInfo;
 import kuit.project.beering.security.jwt.JwtTokenProviderResolver;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
@@ -36,27 +36,27 @@ public class OAuthService {
     private final JwtTokenProviderResolver jwtTokenProviderResolver;
 
     @Transactional
-    public MemberLoginResponse restapiLogin(String code, OAuthHelper oAuthHelper) {
+    public MemberLoginResponse restapiLogin(String code, OAuthClientService oAuthClientService) {
         // 1. "인가 코드"로 "액세스 토큰" 요청
-        OAuthTokenInfo oauthTokenInfo = oAuthHelper.createToken(code);
+        OAuthTokenInfo oauthTokenInfo = oAuthClientService.createToken(code);
 
         // 2. token의 sub로 OAuth 조회, 없으면 첫 로그인이므로 회원가입 마저 진행
-        return checkAlreadySignup(oauthTokenInfo, oAuthHelper.getOauthType());
+        return checkAlreadySignup(oauthTokenInfo, oAuthClientService.getOauthType());
     }
 
     @Transactional
-    public MemberLoginResponse sdkLogin(OAuthTokenInfo oauthTokenInfo, OAuthHelper oauthHelper) {
+    public MemberLoginResponse sdkLogin(OAuthTokenInfo oauthTokenInfo, OAuthClientService oauthClientService) {
         // token의 sub로 OAuth 조회, 없으면 첫 로그인이므로 회원가입 마저 진행
-        return checkAlreadySignup(oauthTokenInfo, oauthHelper.getOauthType());
+        return checkAlreadySignup(oauthTokenInfo, oauthClientService.getOauthType());
     }
 
     @Transactional
-    public MemberLoginResponse signup(OAuthSignupRequest request, OAuthHelper oauthHelper) {
+    public MemberLoginResponse signup(OAuthSignupRequest request, OAuthClientService oauthClientService) {
 
         OAuth oauth = oauthRepository.findBySubAndOauthType(request.getSub(), request.getOAuthType())
                 .orElseThrow(EntityNotFoundException::new);
 
-        OAuthMemberInfo oauthAccountInfo = oauthHelper.getAccount(oauth.getAccessToken());
+        OAuthMemberInfo oauthAccountInfo = oauthClientService.getAccount(oauth.getAccessToken());
 
         String email = oauthAccountInfo.getEmail();
         String nickname = request.getNickname();
@@ -67,7 +67,7 @@ public class OAuthService {
         member.createOauthAssociation(oauth);
 
         // 토큰 발행
-        OAuthTokenInfo oauthTokenInfo = oauthHelper.reissueToken(oauth.getRefreshToken());
+        OAuthTokenInfo oauthTokenInfo = oauthClientService.reissueToken(oauth.getRefreshToken());
 
         String idToken = oauthTokenInfo.getIdToken();
         String accessToken = oauthTokenInfo.getAccessToken();
