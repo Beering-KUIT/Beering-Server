@@ -59,7 +59,7 @@ public class OAuthService {
         OAuthMemberInfo oauthAccountInfo = oauthHelper.getAccount(oauth.getAccessToken());
 
         String email = oauthAccountInfo.getEmail();
-        String nickname = oauthAccountInfo.getNickname();
+        String nickname = request.getNickname();
 
         // 회원가입 처리
         memberService.signup(new MemberSignupRequest(email, UUID.randomUUID().toString(), nickname, request.getAgreements()));

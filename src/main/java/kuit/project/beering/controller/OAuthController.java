@@ -85,7 +85,7 @@ public class OAuthController {
 
     @ExceptionHandler(SignupNotCompletedException.class)
     public BaseResponse<SignupNotCompletedResponse> loginNotCompleted(SignupNotCompletedException ex) {
-        return new BaseResponse<>(SignupNotCompletedResponse.builder()
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS_CONTINUE_SIGNUP, SignupNotCompletedResponse.builder()
                 .isLoginCompleted(false)
                 .sub(ex.getSub()).build());
     }
