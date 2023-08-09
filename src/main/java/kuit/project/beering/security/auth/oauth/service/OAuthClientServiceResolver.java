@@ -10,17 +10,17 @@ import java.util.Map;
 @Component
 public class OAuthClientServiceResolver {
 
-    private final Map<OAuthType, OAuthClientService> oauthHelperMap = new HashMap<>();
+    private final Map<OAuthType, OAuthClientService> oauthClientServiceMap = new HashMap<>();
 
-    public OAuthClientServiceResolver(@Qualifier("kakaoOauthHelper") OAuthClientService oauthClientService) {
-        oauthHelperMap.put(OAuthType.KAKAO, oauthClientService);
+    public OAuthClientServiceResolver(@Qualifier("kakaoClientService") OAuthClientService oauthClientService) {
+        oauthClientServiceMap.put(OAuthType.KAKAO, oauthClientService);
     }
 
     /**
      * @Brief OAuthType 에 맞는 helper 반환
      */
-    public OAuthClientService getOauthHelper(OAuthType oauthType) {
-        return oauthHelperMap.get(oauthType);
+    public OAuthClientService getOauthClientService(OAuthType oauthType) {
+        return oauthClientServiceMap.get(oauthType);
     }
 
 }

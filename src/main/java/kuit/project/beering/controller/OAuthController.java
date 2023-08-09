@@ -51,7 +51,7 @@ public class OAuthController {
 
         if (OAuthCodeRequest.getError() != null) return new BaseResponse<>(BaseResponseStatus.OAUTH_LOGIN_FAILED);
 
-        MemberLoginResponse memberLoginResponse = oauthService.restapiLogin(OAuthCodeRequest.getCode(), oauthClientServiceResolver.getOauthHelper(OAuthType.KAKAO));
+        MemberLoginResponse memberLoginResponse = oauthService.restapiLogin(OAuthCodeRequest.getCode(), oauthClientServiceResolver.getOauthClientService(OAuthType.KAKAO));
 
         return new BaseResponse<>(memberLoginResponse);
     }
@@ -62,7 +62,7 @@ public class OAuthController {
 
         String issuer = jwtTokenProviderResolver.getProvider(idToken).parseIssuer(idToken);
 
-        OAuthClientService oauthClientService = oauthClientServiceResolver.getOauthHelper(isserTypeMap.get(issuer));
+        OAuthClientService oauthClientService = oauthClientServiceResolver.getOauthClientService(isserTypeMap.get(issuer));
 
         MemberLoginResponse memberLoginResponse = oauthService.sdkLogin(oauthTokenInfo, oauthClientService);
 
@@ -78,7 +78,7 @@ public class OAuthController {
         if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
         if (bindingResult.hasGlobalErrors()) throw new AgreementValidationException(bindingResult);
 
-        MemberLoginResponse response = oauthService.signup(request, oauthClientServiceResolver.getOauthHelper(request.getOAuthType()));
+        MemberLoginResponse response = oauthService.signup(request, oauthClientServiceResolver.getOauthClientService(request.getOAuthType()));
 
         return new BaseResponse<>(response);
     }
