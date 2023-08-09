@@ -4,7 +4,7 @@ import kuit.project.beering.domain.Member;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.OAuthRepository;
 import kuit.project.beering.security.auth.AuthMember;
-import kuit.project.beering.security.auth.oauth.helper.OAuthHelper;
+import kuit.project.beering.security.auth.oauth.service.OAuthClientService;
 import kuit.project.beering.security.jwt.JwtInfo;
 import kuit.project.beering.security.jwt.JwtParser;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
@@ -20,17 +20,17 @@ import java.util.ArrayList;
 @Slf4j
 public abstract class AbstractOIDCJwtTokenProvider extends AbstractJwtTokenProvider {
 
-    protected final OAuthHelper oauthHelper;
+    protected final OAuthClientService oauthClientService;
     protected final MemberRepository memberRepository;
     private final OAuthRepository oauthRepository;
 
     public AbstractOIDCJwtTokenProvider(
-            OAuthHelper oauthHelper,
+            OAuthClientService oauthClientService,
             JwtParser jwtParser,
             MemberRepository memberRepository,
             OAuthRepository oauthRepository) {
         super(jwtParser);
-        this.oauthHelper = oauthHelper;
+        this.oauthClientService = oauthClientService;
         this.memberRepository = memberRepository;
         this.oauthRepository = oauthRepository;
     }
@@ -40,7 +40,7 @@ public abstract class AbstractOIDCJwtTokenProvider extends AbstractJwtTokenProvi
      */
     @Override
     public boolean validateToken(String token) {
-        return oauthHelper.validateToken(token);
+        return oauthClientService.validateToken(token);
     }
 
     /**
@@ -49,7 +49,7 @@ public abstract class AbstractOIDCJwtTokenProvider extends AbstractJwtTokenProvi
     @Override
     public Authentication getAuthentication(String token) {
 
-        Member member = memberRepository.findByOAuthSubAndOAuthType(parseSub(token), oauthHelper.getOauthType())
+        Member member = memberRepository.findByOAuthSubAndOAuthType(parseSub(token), oauthClientService.getOauthType())
                 .orElseThrow(IllegalArgumentException::new);
 
         UserDetails authMember =
@@ -69,7 +69,7 @@ public abstract class AbstractOIDCJwtTokenProvider extends AbstractJwtTokenProvi
     public String validateRefreshToken(String refreshToken) {
         return String.valueOf(
                 memberRepository.findByOauthRefreshTokenAndOauthType(
-                        refreshToken, oauthHelper.getOauthType())
+                        refreshToken, oauthClientService.getOauthType())
                 .orElseThrow(IllegalArgumentException::new).getId());
     }
 
@@ -80,9 +80,9 @@ public abstract class AbstractOIDCJwtTokenProvider extends AbstractJwtTokenProvi
     @Transactional
     public JwtInfo reissueJwtToken(String refreshToken) {
 
-        OAuthTokenInfo oauthTokenInfo = oauthHelper.reissueToken(refreshToken);
+        OAuthTokenInfo oauthTokenInfo = oauthClientService.reissueToken(refreshToken);
 
-        oauthRepository.findBySubAndOauthType(parseSub(oauthTokenInfo.getIdToken()), oauthHelper.getOauthType())
+        oauthRepository.findBySubAndOauthType(parseSub(oauthTokenInfo.getIdToken()), oauthClientService.getOauthType())
                 .orElseThrow(IllegalArgumentException::new)
                 .tokenReissue(oauthTokenInfo.getAccessToken(), oauthTokenInfo.getRefreshToken());
 
@@ -96,7 +96,7 @@ public abstract class AbstractOIDCJwtTokenProvider extends AbstractJwtTokenProvi
      * @Brief 로그인 시 발급
      */
     public OAuthTokenInfo createToken(String code) {
-        return oauthHelper.createToken(code);
+        return oauthClientService.createToken(code);
     }
 
     public String parseSub(String token) {
