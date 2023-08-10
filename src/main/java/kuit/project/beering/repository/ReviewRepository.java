@@ -9,7 +9,12 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 public interface ReviewRepository extends JpaRepository<Review, Long> {
-    List<Review> findTop5ByDrinkIdOrderByCreatedAtDesc(Long beerId);
+    @Query("select r from Review r " +
+            "left join fetch r.member m " +
+            "where r.drink.id = :drinkId " +
+            "order by (select count(t) from r.taboms t where t.isUp = true) desc " +
+            "limit 5")
+    List<Review> findTop5ByDrinkIdOrderByTabomsDesc(@Param("drinkId") Long drinkId);
 
     @Query("select r from Review r " +
             "where r.member.id = :memberId " +
