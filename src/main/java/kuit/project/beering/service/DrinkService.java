@@ -4,6 +4,7 @@ import kuit.project.beering.domain.Drink;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.Review;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
+import kuit.project.beering.dto.request.drink.SearchDrinkRequest;
 import kuit.project.beering.dto.request.drink.SortType;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
@@ -40,20 +41,20 @@ public class DrinkService {
 
     private final int SIZE = 10;
 
-    /**
-     * 주류 검색 메소드 <br>
-     * <br>
-     * @param page 페이지 번호
-     * @param orderBy 정렬 : 이름순, 리뷰많은순, 최저가순, 평점순
-     * @param drinkSearchCondition 필터 : 이름, 카테고리이름, 하한선, 상한선
-     * @return 검색 결과 10개 // 페이징
-     * @exception DrinkException 유효하지 않은 정렬 방식 입력시 예외 발생
-     */
-    public Slice<DrinkSearchResponse> searchDrinksByName(Integer page, String orderBy, DrinkSearchCondition drinkSearchCondition) {
-        Pageable pageable = PageRequest.of(page, SIZE, SortType.getMatchedSort(orderBy));
-
-        return drinkRepository.search(drinkSearchCondition, pageable);
-    }
+//    /**
+//     * 주류 검색 메소드 <br>
+//     * <br>
+//     * @param page 페이지 번호
+//     * @param orderBy 정렬 : 이름순, 리뷰많은순, 최저가순, 평점순
+//     * @param drinkSearchCondition 필터 : 이름, 카테고리이름, 하한선, 상한선
+//     * @return 검색 결과 10개 // 페이징
+//     * @exception DrinkException 유효하지 않은 정렬 방식 입력시 예외 발생
+//     */
+//    public Slice<DrinkSearchResponse> searchDrinksByName(Integer page, String orderBy, DrinkSearchCondition drinkSearchCondition) {
+//        Pageable pageable = PageRequest.of(page, SIZE, SortType.getMatchedSort(orderBy));
+//
+//        return drinkRepository.search(drinkSearchCondition, pageable);
+//    }
 
     @Transactional
     public GetDrinkResponse getDrinkById(Long drinkId, Long memberId) {
@@ -94,4 +95,13 @@ public class DrinkService {
         return memberService.getProfileImageUrl(member);
     }
 
+
+    public Slice<DrinkSearchResponse> searchDrinksByName(SearchDrinkRequest request, Long memberId) {
+        Pageable pageable = PageRequest.of(request.getPage(), SIZE, SortType.getMatchedSort(request.getOrderBy()));
+
+        DrinkSearchCondition drinkSearchCondition = new DrinkSearchCondition(
+                request.getName(), request.getName(), request.getCategory(), request.getMinPrice(), request.getMaxPrice(), memberId);
+
+        return drinkRepository.search(drinkSearchCondition, pageable);
+    }
 }
