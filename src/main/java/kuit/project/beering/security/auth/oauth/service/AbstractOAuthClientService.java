@@ -1,4 +1,4 @@
-package kuit.project.beering.security.auth.oauth.helper;
+package kuit.project.beering.security.auth.oauth.service;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
@@ -9,6 +9,7 @@ import kuit.project.beering.redis.OIDCPublicKeysResponse;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.OAuthRepository;
 import kuit.project.beering.security.auth.oauth.client.OAuthClient;
+import kuit.project.beering.security.auth.oauth.client.OAuthInfoClient;
 import kuit.project.beering.security.auth.oauth.properties.OAuthProperties;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
 import kuit.project.beering.util.BaseResponseStatus;
@@ -25,18 +26,25 @@ import java.util.Base64;
 import java.util.Date;
 
 @Slf4j
-public abstract class AbstractOAuthHelper implements OAuthHelper {
+public abstract class AbstractOAuthClientService implements OAuthClientService {
 
     protected final MemberRepository memberRepository;
     protected final OAuthRepository oauthRepository;
     protected final OAuthProperties oauthProperties;
     protected final OAuthClient oauthClient;
+    protected final OAuthInfoClient oauthInfoClient;
 
-    public AbstractOAuthHelper(MemberRepository memberRepository, OAuthRepository oauthRepository, OAuthProperties oauthProperties, OAuthClient oauthClient) {
+    public AbstractOAuthClientService(
+            MemberRepository memberRepository,
+            OAuthRepository oauthRepository,
+            OAuthProperties oauthProperties,
+            OAuthClient oauthClient,
+            OAuthInfoClient oauthInfoClient) {
         this.memberRepository = memberRepository;
         this.oauthRepository = oauthRepository;
         this.oauthProperties = oauthProperties;
         this.oauthClient = oauthClient;
+        this.oauthInfoClient = oauthInfoClient;
     }
 
     /**
@@ -83,7 +91,7 @@ public abstract class AbstractOAuthHelper implements OAuthHelper {
      */
     @Override
     public OAuthMemberInfo getAccount(String accessToken) {
-        return oauthClient.getOAuthAccount("Bearer " + accessToken);
+        return oauthInfoClient.getOAuthAccount("Bearer " + accessToken);
     }
 
     private boolean isAvailable(
