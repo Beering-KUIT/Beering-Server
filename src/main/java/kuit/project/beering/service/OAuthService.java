@@ -53,7 +53,7 @@ public class OAuthService {
     @Transactional
     public MemberLoginResponse signup(OAuthSignupRequest request, OAuthClientService oauthClientService) {
 
-        OAuth oauth = oauthRepository.findBySubAndOauthType(request.getSub(), request.getOAuthType())
+        OAuth oauth = oauthRepository.findBySubAndOauthType(request.getSub(), request.getOauthType())
                 .orElseThrow(EntityNotFoundException::new);
 
         OAuthMemberInfo oauthAccountInfo = oauthClientService.getAccount(oauth.getAccessToken());

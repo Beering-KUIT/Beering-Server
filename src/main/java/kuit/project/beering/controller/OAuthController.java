@@ -78,7 +78,7 @@ public class OAuthController {
         if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
         if (bindingResult.hasGlobalErrors()) throw new AgreementValidationException(bindingResult);
 
-        MemberLoginResponse response = oauthService.signup(request, oauthClientServiceResolver.getOauthClientService(request.getOAuthType()));
+        MemberLoginResponse response = oauthService.signup(request, oauthClientServiceResolver.getOauthClientService(request.getOauthType()));
 
         return new BaseResponse<>(response);
     }
