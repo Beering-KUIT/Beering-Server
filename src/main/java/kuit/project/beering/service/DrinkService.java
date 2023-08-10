@@ -3,12 +3,11 @@ package kuit.project.beering.service;
 import kuit.project.beering.domain.Drink;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.Review;
-import kuit.project.beering.domain.image.DrinkImage;
-import kuit.project.beering.domain.image.Image;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
 import kuit.project.beering.dto.request.drink.SortType;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
+import kuit.project.beering.dto.response.drink.GetDrinkResponseBuilder;
 import kuit.project.beering.dto.response.drink.ReviewPreview;
 import kuit.project.beering.repository.FavoriteRepository;
 import kuit.project.beering.repository.ReviewRepository;
@@ -65,25 +64,16 @@ public class DrinkService {
         // 리뷰 프리뷰 배열
         List<ReviewPreview> reviewPreviews = getReviewPreviews(drinkId);
 
-        return GetDrinkResponse.builder()
-                .drinkId(drink.getId())
-                .nameKr(drink.getNameKr())
-                .nameEn(drink.getNameEn())
-                .price(drink.getPrice())
-                .alcohol(drink.getAlcohol())
-                .description(drink.getDescription())
-                .manufacturer(drink.getManufacturer())
-                .totalRating(drink.getAvgRating())
-                .reviewCount(drink.getCountOfReview())
-                .isLiked(is_liked)
-                .reviewPreviews(reviewPreviews)
-                .drinkImageUrlList(getDrinkImages(drink.getImages()))
-                .build();
+        return new GetDrinkResponseBuilder()
+                .setDrink(drink)
+                .setIsLiked(is_liked)
+                .setReviewPreviews(reviewPreviews)
+                .buildResponse();
     }
 
     private List<ReviewPreview> getReviewPreviews(Long drinkId) {
         // TODO : 생성순 -> 좋아요순으로 정렬하면 더 좋을 듯.
-        List<Review> reviews = reviewRepository.findTop5ByDrinkIdOrderByCreatedAtDesc(drinkId);
+        List<Review> reviews = reviewRepository.findTop5ByDrinkIdOrderByTabomsDesc(drinkId);
         return reviews.stream()
                 .map(review -> new ReviewPreview(
                         getProfileImageUrl(review),
@@ -100,9 +90,4 @@ public class DrinkService {
         return memberService.getProfileImageUrl(member);
     }
 
-    private List<String> getDrinkImages(List<DrinkImage> images) {
-        return images.stream()
-                .map(Image::getImageUrl)
-                .collect(Collectors.toList());
-    }
 }
