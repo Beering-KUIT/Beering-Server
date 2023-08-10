@@ -19,9 +19,9 @@ public class KakaoClientService extends AbstractOAuthClientService {
             OAuthRepository oauthRepository,
             @Qualifier("KakaoOauthProperties") OAuthProperties oauthProperties,
             @Qualifier("kakaoTokenClient") OAuthTokenClient oauthTokenClient,
-            @Qualifier("kakaoApiClient") OAuthApiClient oauthInfoClient) {
+            @Qualifier("kakaoApiClient") OAuthApiClient oauthApiClient) {
 
-        super(memberRepository, oauthRepository, oauthProperties, oauthTokenClient, oauthInfoClient);
+        super(memberRepository, oauthRepository, oauthProperties, oauthTokenClient, oauthApiClient);
     }
 
 }

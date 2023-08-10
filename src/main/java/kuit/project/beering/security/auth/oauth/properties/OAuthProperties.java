@@ -6,7 +6,9 @@ public interface OAuthProperties {
 
     OAuthType getOAuthType();
 
-    String getBaseUrl();
+    String getAuthUrl();
+
+    String getApiUrl();
 
     String getRedirectUrl();
 

@@ -55,7 +55,7 @@ public abstract class AbstractOAuthClientService implements OAuthClientService {
 
         return isAvailable(
                 token,
-                oauthProperties.getBaseUrl(),
+                oauthProperties.getAuthUrl(),
                 oauthProperties.getRestapiKey(),
                 oauthTokenClient.getOIDCOpenKeys());
     }

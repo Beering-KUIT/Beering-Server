@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 @Qualifier("kakaoApiClient")
 @FeignClient(
         name = "kakaoApiClient",
-        url = "${kakao.api-url}"
+        url = "${secret.oauth.kakao.api-url}"
 )
 public interface KakaoApiClient extends OAuthApiClient {
 
