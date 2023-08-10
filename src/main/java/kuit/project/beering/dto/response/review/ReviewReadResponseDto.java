@@ -2,6 +2,7 @@ package kuit.project.beering.dto.response.review;
 
 import kuit.project.beering.domain.Review;
 import kuit.project.beering.domain.image.Image;
+import kuit.project.beering.util.ConvertCreatedDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -44,22 +45,7 @@ public class ReviewReadResponseDto {
                 .map(Image::getImageUrl)
                 .collect(Collectors.toList());
         this.content = review.getContent();
-
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime  createdAt = review.getCreatedAt();
-        if(ChronoUnit.YEARS.between(createdAt, now) != 0)
-            this.diffFromCurrentTime = ChronoUnit.YEARS.between(createdAt, now) + "년 전";
-        else if(ChronoUnit.MONTHS.between(createdAt, now) != 0)
-            this.diffFromCurrentTime = ChronoUnit.MONTHS.between(createdAt, now) + "달 전";
-        else if(ChronoUnit.WEEKS.between(createdAt, now) != 0)
-            this.diffFromCurrentTime = ChronoUnit.WEEKS.between(createdAt, now) + "주 전";
-        else if(ChronoUnit.DAYS.between(createdAt, now) != 0)
-            this.diffFromCurrentTime = ChronoUnit.DAYS.between(createdAt, now) + "일 전";
-        else if(ChronoUnit.HOURS.between(createdAt, now) != 0)
-            this.diffFromCurrentTime = ChronoUnit.HOURS.between(createdAt, now) + "시간 전";
-        else
-            this.diffFromCurrentTime = "방금";
-
+        this.diffFromCurrentTime = ConvertCreatedDate.setCreatedDate(review.getCreatedAt());
         this.like = isUpCount;
         this.dislike = isDownCount;
         this.isTabomed = isTabomed;
