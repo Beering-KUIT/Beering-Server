@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Qualifier("kakaoOauthClient")
 @FeignClient(
         name = "KakaoOauthClient",
-        url = "https://kauth.kakao.com")
+        url = "${kakao.auth-url}")
 public interface KakaoOauthClient extends OAuthClient {
 
     /**
