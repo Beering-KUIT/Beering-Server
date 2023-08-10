@@ -6,10 +6,8 @@ import kuit.project.beering.domain.OAuthType;
 import kuit.project.beering.dto.common.OAuthMemberInfo;
 import kuit.project.beering.redis.OIDCPublicKey;
 import kuit.project.beering.redis.OIDCPublicKeysResponse;
-import kuit.project.beering.repository.MemberRepository;
-import kuit.project.beering.repository.OAuthRepository;
-import kuit.project.beering.security.auth.oauth.client.OAuthTokenClient;
 import kuit.project.beering.security.auth.oauth.client.OAuthApiClient;
+import kuit.project.beering.security.auth.oauth.client.OAuthTokenClient;
 import kuit.project.beering.security.auth.oauth.properties.OAuthProperties;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
 import kuit.project.beering.util.BaseResponseStatus;
@@ -28,20 +26,14 @@ import java.util.Date;
 @Slf4j
 public abstract class AbstractOAuthClientService implements OAuthClientService {
 
-    protected final MemberRepository memberRepository;
-    protected final OAuthRepository oauthRepository;
-    protected final OAuthProperties oauthProperties;
-    protected final OAuthTokenClient oauthTokenClient;
-    protected final OAuthApiClient oauthInfoClient;
+    private final OAuthProperties oauthProperties;
+    private final OAuthTokenClient oauthTokenClient;
+    private final OAuthApiClient oauthInfoClient;
 
     public AbstractOAuthClientService(
-            MemberRepository memberRepository,
-            OAuthRepository oauthRepository,
             OAuthProperties oauthProperties,
             OAuthTokenClient oauthTokenClient,
             OAuthApiClient oauthInfoClient) {
-        this.memberRepository = memberRepository;
-        this.oauthRepository = oauthRepository;
         this.oauthProperties = oauthProperties;
         this.oauthTokenClient = oauthTokenClient;
         this.oauthInfoClient = oauthInfoClient;
