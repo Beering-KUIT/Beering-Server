@@ -1,4 +1,4 @@
-package kuit.project.beering.util.exception;
+package kuit.project.beering.util.exception.validation;
 
 import kuit.project.beering.util.exception.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;

@@ -8,7 +8,7 @@ import kuit.project.beering.dto.response.member.MemberNicknameResponse;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.MemberService;
 import kuit.project.beering.util.BaseResponse;
-import kuit.project.beering.util.exception.FieldValidationException;
+import kuit.project.beering.util.exception.validation.FieldValidationException;
 import kuit.project.beering.util.exception.MemberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
