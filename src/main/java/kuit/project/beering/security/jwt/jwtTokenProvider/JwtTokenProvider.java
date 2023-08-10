@@ -13,5 +13,7 @@ public interface JwtTokenProvider {
 
     String parseSub(String token);
 
+    String parseIssuer(String token);
+
     String validateRefreshToken(String refreshToken);
 }

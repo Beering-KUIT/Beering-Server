@@ -40,14 +40,22 @@ public class ReviewController {
             @AuthenticationPrincipal AuthMember member) {
 
         validateMember(member.getId(), memberId);
+        log.info("reviewImages = {}", reviewImages.isEmpty());
+        log.info("reviewImages.size() = {}", reviewImages.size());
         ReviewResponseDto responseDto = reviewService.save(memberId, drinkId, requestDto, reviewImages);
         return new BaseResponse<>(responseDto);
     }
 
     @GetMapping(value = "/reviews/{reviewId}")
-    public BaseResponse<ReviewDetailReadResponseDto> readReviewDetail(@PathVariable Long reviewId) {
+    public BaseResponse<ReviewDetailReadResponseDto> readReviewDetail(@PathVariable Long reviewId,
+                                                                      @AuthenticationPrincipal AuthMember member) {
 
-        ReviewDetailReadResponseDto responseDto = reviewService.readReviewDetail(reviewId);
+        long memberId;
+        if(member != null)
+            memberId = member.getId();
+        else
+            memberId = 0;
+        ReviewDetailReadResponseDto responseDto = reviewService.readReviewDetail(memberId, reviewId);
         return new BaseResponse<>(responseDto);
     }
 
@@ -66,20 +74,33 @@ public class ReviewController {
     @GetMapping(value = "/drinks/{drinkId}/reviews")
     public BaseResponse<SliceResponse<ReviewReadResponseDto>> readReviewByDrinkId(@PathVariable Long drinkId,
                                                                                   @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                                                                                  @RequestParam(value = "size", required = false, defaultValue = "5") int size) {
+                                                                                  @RequestParam(value = "size", required = false, defaultValue = "5") int size,
+                                                                                  @AuthenticationPrincipal AuthMember member) {
+        long memberId;
+        if(member != null)
+            memberId = member.getId();
+        else
+            memberId = 0;
 
         PageRequest pageRequest = PageRequest.of(page, size);
-        SliceResponse<ReviewReadResponseDto> responseDtos = reviewService.findAllReviewByDrinkIdByPage(drinkId, pageRequest);
+        SliceResponse<ReviewReadResponseDto> responseDtos = reviewService.findAllReviewByDrinkIdByPage(drinkId, memberId, pageRequest);
         return new BaseResponse<>(responseDtos);
     }
 
     @GetMapping(value = "/reviews")
     public BaseResponse<SliceResponse<ReviewReadResponseDto>> readReviewByCreatedAtDesc(@RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                                                                                        @RequestParam(value = "size", required = false, defaultValue = "5") int size) {
+                                                                                        @RequestParam(value = "size", required = false, defaultValue = "5") int size,
+                                                                                        @AuthenticationPrincipal AuthMember member) {
+
+        long memberId;
+        if(member != null)
+            memberId = member.getId();
+        else
+            memberId = 0;
 
         log.info("now = {}", LocalDateTime.now());
         PageRequest pageRequest = PageRequest.of(page, size);
-        SliceResponse<ReviewReadResponseDto> responseDtos = reviewService.findReviewByPage(pageRequest);
+        SliceResponse<ReviewReadResponseDto> responseDtos = reviewService.findReviewByPage(memberId, pageRequest);
         return new BaseResponse<>(responseDtos);
     }
 

@@ -12,7 +12,10 @@ public enum BaseResponseStatus {
      */
     SUCCESS(true, 1000, "요청에 성공하였습니다."),
 
-    // 1100 : favorite 요청 성공 (주류 찜)
+    // 1100 : 회원가입 마저 진행
+    SUCCESS_CONTINUE_SIGNUP(true, 1100, "회원가입을 마저 진행해주세요."),
+
+    // 1200 : favorite 요청 성공 (주류 찜)
     SUCCESS_DELETE_FAVORITE(true, 1200, "찜을 취소하였습니다."),
     SUCCESS_ADD_FAVORITE(true, 1201, "찜하였습니다."),
 
