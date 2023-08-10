@@ -7,7 +7,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import kuit.project.beering.domain.QDrink;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +44,7 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
                                         )
                                 ))
                                 .from(drink)
-                                .where(eqName(condition.getNameKr(), condition.getNameEn()),
+                                .where(containName(condition.getNameKr(), condition.getNameEn()),
                                         drink.price.between(condition.getMinPrice(), condition.getMaxPrice()),
                                         eqCategory(condition.getCategories()))
                                 .orderBy(drinkSort(pageable))
@@ -113,10 +112,11 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
         return categoryConditions;
     }
 
-    public BooleanExpression eqName(String nameKr, String nameEn){
+    public BooleanExpression containName(String nameKr, String nameEn){
+
         if (!StringUtils.hasText(nameKr))
             return null;
-        return drink.nameKr.eq(nameKr).or(drink.nameEn.eq(nameEn));
+        return drink.nameKr.contains(nameKr).or(drink.nameEn.contains(nameEn));
     }
 
 }
