@@ -1,11 +1,18 @@
 package kuit.project.beering.util.exception;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import kuit.project.beering.util.exception.validation.ValidationException;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.validation.BindingResult;
 
-@AllArgsConstructor
-@Getter
-public class AgreementValidationException extends RuntimeException {
-    private BindingResult bindingResult;
+@Slf4j
+public class AgreementValidationException extends ValidationException {
+
+    public AgreementValidationException(BindingResult bindingResult) {
+        super(bindingResult);
+        log.info("{} - message : {}", this.getClass().getSimpleName(),
+                bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage));
+
+    }
+
 }
