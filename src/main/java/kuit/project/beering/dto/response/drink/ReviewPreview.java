@@ -15,6 +15,6 @@ public class ReviewPreview {
     String profileImageUrl;
     String nickname;
     String content;
-    LocalDateTime createdAt;
+    String createdAt;
     float totalRating;
 }

@@ -12,6 +12,7 @@ import kuit.project.beering.dto.response.drink.ReviewPreview;
 import kuit.project.beering.repository.FavoriteRepository;
 import kuit.project.beering.repository.ReviewRepository;
 import kuit.project.beering.repository.drink.DrinkRepository;
+import kuit.project.beering.util.ConvertCreatedDate;
 import kuit.project.beering.util.exception.DrinkException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,11 +82,12 @@ public class DrinkService {
                         getProfileImageUrl(review),
                         review.getMember().getNickname(),
                         review.getContent(),
-                        review.getCreatedAt(),
+                        ConvertCreatedDate.setCreatedDate(review.getCreatedAt()),
                         review.getTotalRating())
                 )
                 .collect(Collectors.toList());
     }
+
 
     private String getProfileImageUrl(Review review){
         Member member = review.getMember();

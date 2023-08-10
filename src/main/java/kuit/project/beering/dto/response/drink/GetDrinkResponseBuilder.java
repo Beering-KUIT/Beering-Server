@@ -4,7 +4,6 @@ import kuit.project.beering.domain.Drink;
 import kuit.project.beering.domain.image.DrinkImage;
 import kuit.project.beering.domain.image.Image;
 import kuit.project.beering.dto.response.ResponseBuilder;
-import lombok.Setter;
 
 import java.util.List;
 import java.util.stream.Collectors;
