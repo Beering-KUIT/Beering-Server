@@ -50,7 +50,7 @@ public class ReviewDetailReadResponseDto {
                 .map(Image::getImageUrl)
                 .collect(Collectors.toList());
         this.content = review.getContent();
-        this.createdAt = review.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일"));
+        this.createdAt = review.getDrink().getNameEn() + " · " +review.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일"));
         this.totalRating = review.getTotalRating();
 
         this.selectedOptions = review.getSelectedOptions().stream()

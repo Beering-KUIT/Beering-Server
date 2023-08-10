@@ -45,7 +45,7 @@ public class ReviewReadResponseDto {
                 .map(Image::getImageUrl)
                 .collect(Collectors.toList());
         this.content = review.getContent();
-        this.diffFromCurrentTime = ConvertCreatedDate.setCreatedDate(review.getCreatedAt());
+        this.diffFromCurrentTime = review.getDrink().getNameEn() + " · " + ConvertCreatedDate.setCreatedDate(review.getCreatedAt());
         this.like = isUpCount;
         this.dislike = isDownCount;
         this.isTabomed = isTabomed;
