@@ -28,7 +28,7 @@ public class OAuthSignupRequest {
     private String sub;
 
     @NotNull
-    private OAuthType oAuthType;
+    private OAuthType oauthType;
 
     private List<AgreementRequest> agreements = new ArrayList<>();
 }

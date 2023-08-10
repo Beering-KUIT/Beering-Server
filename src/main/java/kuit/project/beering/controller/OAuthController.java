@@ -78,7 +78,7 @@ public class OAuthController {
         if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
         if (bindingResult.hasGlobalErrors()) throw new AgreementValidationException(bindingResult);
 
-        MemberLoginResponse response = oauthService.signup(request, oauthClientServiceResolver.getOauthClientService(request.getOAuthType()));
+        MemberLoginResponse response = oauthService.signup(request, oauthClientServiceResolver.getOauthClientService(request.getOauthType()));
 
         return new BaseResponse<>(response);
     }
@@ -87,7 +87,8 @@ public class OAuthController {
     public BaseResponse<SignupNotCompletedResponse> loginNotCompleted(SignupNotCompletedException ex) {
         return new BaseResponse<>(BaseResponseStatus.SUCCESS_CONTINUE_SIGNUP, SignupNotCompletedResponse.builder()
                 .isLoginCompleted(false)
-                .sub(ex.getSub()).build());
+                .sub(ex.getSub())
+                .oauthType(ex.getOauthType()).build());
     }
 
 

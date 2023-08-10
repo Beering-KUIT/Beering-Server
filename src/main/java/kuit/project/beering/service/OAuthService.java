@@ -35,7 +35,7 @@ public class OAuthService {
     private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProviderResolver jwtTokenProviderResolver;
 
-    @Transactional
+    @Transactional(noRollbackFor = SignupNotCompletedException.class)
     public MemberLoginResponse restapiLogin(String code, OAuthClientService oAuthClientService) {
         // 1. "인가 코드"로 "액세스 토큰" 요청
         OAuthTokenInfo oauthTokenInfo = oAuthClientService.createToken(code);
@@ -44,7 +44,7 @@ public class OAuthService {
         return checkAlreadySignup(oauthTokenInfo, oAuthClientService.getOauthType());
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = SignupNotCompletedException.class)
     public MemberLoginResponse sdkLogin(OAuthTokenInfo oauthTokenInfo, OAuthClientService oauthClientService) {
         // token의 sub로 OAuth 조회, 없으면 첫 로그인이므로 회원가입 마저 진행
         return checkAlreadySignup(oauthTokenInfo, oauthClientService.getOauthType());
@@ -53,7 +53,7 @@ public class OAuthService {
     @Transactional
     public MemberLoginResponse signup(OAuthSignupRequest request, OAuthClientService oauthClientService) {
 
-        OAuth oauth = oauthRepository.findBySubAndOauthType(request.getSub(), request.getOAuthType())
+        OAuth oauth = oauthRepository.findBySubAndOauthType(request.getSub(), request.getOauthType())
                 .orElseThrow(EntityNotFoundException::new);
 
         OAuthMemberInfo oauthAccountInfo = oauthClientService.getAccount(oauth.getAccessToken());
