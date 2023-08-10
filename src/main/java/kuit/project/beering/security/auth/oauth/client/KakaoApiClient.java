@@ -8,12 +8,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 
 @Component
-@Qualifier("kakaoInfoClient")
+@Qualifier("kakaoApiClient")
 @FeignClient(
-        name = "kakaoInfoClient",
+        name = "kakaoApiClient",
         url = "${kakao.api-url}"
 )
-public interface KakaoInfoClient extends OAuthInfoClient{
+public interface KakaoApiClient extends OAuthApiClient {
 
     /**
      * @Brief oauth 계정 요청

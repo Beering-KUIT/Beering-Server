@@ -2,8 +2,8 @@ package kuit.project.beering.security.auth.oauth.service;
 
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.OAuthRepository;
-import kuit.project.beering.security.auth.oauth.client.OAuthClient;
-import kuit.project.beering.security.auth.oauth.client.OAuthInfoClient;
+import kuit.project.beering.security.auth.oauth.client.OAuthTokenClient;
+import kuit.project.beering.security.auth.oauth.client.OAuthApiClient;
 import kuit.project.beering.security.auth.oauth.properties.OAuthProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,10 +18,10 @@ public class KakaoClientService extends AbstractOAuthClientService {
             MemberRepository memberRepository,
             OAuthRepository oauthRepository,
             @Qualifier("KakaoOauthProperties") OAuthProperties oauthProperties,
-            @Qualifier("kakaoOauthClient") OAuthClient oauthClient,
-            @Qualifier("kakaoInfoClient") OAuthInfoClient oauthInfoClient) {
+            @Qualifier("kakaoTokenClient") OAuthTokenClient oauthTokenClient,
+            @Qualifier("kakaoApiClient") OAuthApiClient oauthInfoClient) {
 
-        super(memberRepository, oauthRepository, oauthProperties, oauthClient, oauthInfoClient);
+        super(memberRepository, oauthRepository, oauthProperties, oauthTokenClient, oauthInfoClient);
     }
 
 }

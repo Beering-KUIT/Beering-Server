@@ -3,7 +3,7 @@ package kuit.project.beering.security.auth.oauth.client;
 import kuit.project.beering.redis.OIDCPublicKeysResponse;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
 
-public interface OAuthClient {
+public interface OAuthTokenClient {
 
     OIDCPublicKeysResponse getOIDCOpenKeys();
 
