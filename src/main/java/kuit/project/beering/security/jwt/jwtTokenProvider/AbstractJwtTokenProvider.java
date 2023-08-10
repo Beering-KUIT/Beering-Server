@@ -18,4 +18,9 @@ public abstract class AbstractJwtTokenProvider implements JwtTokenProvider{
     protected <T> T parseClaimsField(String token, String fieldName, Class<T> tClass) {
         return jwtParser.parseClaimsField(token, fieldName, tClass);
     }
+
+    @Override
+    public String parseIssuer(String token) {
+        return jwtParser.parseClaimsField(token, "iss", String.class);
+    }
 }

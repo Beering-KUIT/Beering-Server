@@ -33,8 +33,9 @@ public class ReviewReadResponseDto {
     // 따봉 관련
     private long like;
     private long dislike;
+    private String isTabomed;
 
-    public ReviewReadResponseDto (Review review, String profileImageUrl, long isUpCount, long isDownCount) {
+    public ReviewReadResponseDto (Review review, String profileImageUrl, long isUpCount, long isDownCount, String isTabomed) {
         this.memberId = review.getMember().getId();
         this.nickName = review.getMember().getNickname();
         this.profileImage = profileImageUrl;
@@ -47,5 +48,6 @@ public class ReviewReadResponseDto {
         this.diffFromCurrentTime = ConvertCreatedDate.setCreatedDate(review.getCreatedAt());
         this.like = isUpCount;
         this.dislike = isDownCount;
+        this.isTabomed = isTabomed;
     }
 }
