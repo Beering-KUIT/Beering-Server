@@ -13,7 +13,7 @@ import kuit.project.beering.dto.response.drink.ReviewPreview;
 import kuit.project.beering.repository.FavoriteRepository;
 import kuit.project.beering.repository.ReviewRepository;
 import kuit.project.beering.repository.drink.DrinkRepository;
-import kuit.project.beering.util.exception.DrinkException;
+import kuit.project.beering.util.exception.domain.DrinkException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;

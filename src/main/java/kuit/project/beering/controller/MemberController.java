@@ -9,7 +9,7 @@ import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.MemberService;
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.exception.validation.FieldValidationException;
-import kuit.project.beering.util.exception.MemberException;
+import kuit.project.beering.util.exception.domain.MemberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

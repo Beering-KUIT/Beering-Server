@@ -22,7 +22,7 @@ import kuit.project.beering.security.jwt.jwtTokenProvider.BeeringJwtTokenProvide
 import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.exception.DuplicateNicknameException;
 import kuit.project.beering.util.exception.DuplicateUsernameException;
-import kuit.project.beering.util.exception.MemberException;
+import kuit.project.beering.util.exception.domain.MemberException;
 import kuit.project.beering.util.s3.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
