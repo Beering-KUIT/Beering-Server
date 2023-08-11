@@ -4,7 +4,7 @@ import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.dto.common.FieldErrorsDto;
 import kuit.project.beering.dto.common.FieldValidationError;
-import kuit.project.beering.util.exception.FieldValidationException;
+import kuit.project.beering.util.exception.validation.FieldValidationException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestController;

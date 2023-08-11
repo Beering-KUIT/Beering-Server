@@ -2,6 +2,7 @@ package kuit.project.beering.controller.advice;
 
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.exception.*;
+import kuit.project.beering.util.exception.domain.DomainException;
 import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import org.springframework.http.HttpStatus;
@@ -25,12 +26,6 @@ public class GlobalControllerAdvice {
     @ExceptionHandler(AwsException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseResponse<Object> handleAwsException(AwsException ex) {
-        return new BaseResponse<>(ex.getStatus());
-    }
-
-    @ExceptionHandler(MemberException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseResponse<Object> handleMemberException(MemberException ex) {
         return new BaseResponse<>(ex.getStatus());
     }
 
