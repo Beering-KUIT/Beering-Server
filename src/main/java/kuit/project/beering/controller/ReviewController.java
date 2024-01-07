@@ -9,7 +9,7 @@ import kuit.project.beering.dto.response.review.ReviewResponseDto;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.ReviewService;
 import kuit.project.beering.util.BaseResponse;
-import kuit.project.beering.util.exception.FavoriteException;
+import kuit.project.beering.util.exception.domain.FavoriteException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;

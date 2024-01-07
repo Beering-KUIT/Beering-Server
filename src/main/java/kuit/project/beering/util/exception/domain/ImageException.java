@@ -1,4 +1,4 @@
-package kuit.project.beering.util.exception;
+package kuit.project.beering.util.exception.domain;
 
 import kuit.project.beering.util.BaseResponseStatus;
 import lombok.Getter;

@@ -1,6 +1,5 @@
 package kuit.project.beering.controller;
 
-import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
 import kuit.project.beering.dto.request.drink.SearchDrinkRequest;
 import kuit.project.beering.dto.response.SliceResponse;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
@@ -8,17 +7,11 @@ import kuit.project.beering.dto.response.drink.GetDrinkResponse;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.DrinkService;
 import kuit.project.beering.util.BaseResponse;
-import kuit.project.beering.util.exception.FavoriteException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Objects;
-
-import static kuit.project.beering.util.BaseResponseStatus.TOKEN_PATH_MISMATCH;
 
 
 @RestController

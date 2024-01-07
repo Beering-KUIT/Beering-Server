@@ -6,10 +6,8 @@ import kuit.project.beering.domain.OAuthType;
 import kuit.project.beering.dto.common.OAuthMemberInfo;
 import kuit.project.beering.redis.OIDCPublicKey;
 import kuit.project.beering.redis.OIDCPublicKeysResponse;
-import kuit.project.beering.repository.MemberRepository;
-import kuit.project.beering.repository.OAuthRepository;
-import kuit.project.beering.security.auth.oauth.client.OAuthClient;
-import kuit.project.beering.security.auth.oauth.client.OAuthInfoClient;
+import kuit.project.beering.security.auth.oauth.client.OAuthApiClient;
+import kuit.project.beering.security.auth.oauth.client.OAuthTokenClient;
 import kuit.project.beering.security.auth.oauth.properties.OAuthProperties;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
 import kuit.project.beering.util.BaseResponseStatus;
@@ -28,22 +26,16 @@ import java.util.Date;
 @Slf4j
 public abstract class AbstractOAuthClientService implements OAuthClientService {
 
-    protected final MemberRepository memberRepository;
-    protected final OAuthRepository oauthRepository;
-    protected final OAuthProperties oauthProperties;
-    protected final OAuthClient oauthClient;
-    protected final OAuthInfoClient oauthInfoClient;
+    private final OAuthProperties oauthProperties;
+    private final OAuthTokenClient oauthTokenClient;
+    private final OAuthApiClient oauthInfoClient;
 
     public AbstractOAuthClientService(
-            MemberRepository memberRepository,
-            OAuthRepository oauthRepository,
             OAuthProperties oauthProperties,
-            OAuthClient oauthClient,
-            OAuthInfoClient oauthInfoClient) {
-        this.memberRepository = memberRepository;
-        this.oauthRepository = oauthRepository;
+            OAuthTokenClient oauthTokenClient,
+            OAuthApiClient oauthInfoClient) {
         this.oauthProperties = oauthProperties;
-        this.oauthClient = oauthClient;
+        this.oauthTokenClient = oauthTokenClient;
         this.oauthInfoClient = oauthInfoClient;
     }
 
@@ -55,9 +47,9 @@ public abstract class AbstractOAuthClientService implements OAuthClientService {
 
         return isAvailable(
                 token,
-                oauthProperties.getBaseUrl(),
+                oauthProperties.getAuthUrl(),
                 oauthProperties.getRestapiKey(),
-                oauthClient.getOIDCOpenKeys());
+                oauthTokenClient.getOIDCOpenKeys());
     }
 
     /**
@@ -66,7 +58,7 @@ public abstract class AbstractOAuthClientService implements OAuthClientService {
     @Override
     public OAuthTokenInfo reissueToken(String refreshToken) {
 
-        return oauthClient.reissueToken(oauthProperties.getRestapiKey(), refreshToken, oauthProperties.getClientSecret());
+        return oauthTokenClient.reissueToken(oauthProperties.getRestapiKey(), refreshToken, oauthProperties.getClientSecret());
     }
 
     /**
@@ -74,7 +66,7 @@ public abstract class AbstractOAuthClientService implements OAuthClientService {
      */
     @Override
     public OAuthTokenInfo createToken(String code) {
-        return oauthClient.getToken(
+        return oauthTokenClient.getToken(
                 oauthProperties.getRestapiKey(),
                 oauthProperties.getRedirectUrl(),
                 code,

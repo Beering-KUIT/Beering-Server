@@ -7,7 +7,7 @@ import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.TabomService;
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.BaseResponseStatus;
-import kuit.project.beering.util.exception.TabomException;
+import kuit.project.beering.util.exception.domain.TabomException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;

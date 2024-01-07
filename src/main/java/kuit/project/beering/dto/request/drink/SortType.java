@@ -1,6 +1,6 @@
 package kuit.project.beering.dto.request.drink;
 
-import kuit.project.beering.util.exception.DrinkException;
+import kuit.project.beering.util.exception.domain.DrinkException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Sort;

@@ -11,11 +11,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 @Component
-@Qualifier("kakaoOauthClient")
+@Qualifier("kakaoTokenClient")
 @FeignClient(
-        name = "KakaoOauthClient",
-        url = "https://kauth.kakao.com")
-public interface KakaoOauthClient extends OAuthClient {
+        name = "KakaoTokenClient",
+        url = "${secret.oauth.kakao.token-url}")
+public interface KakaoTokenClient extends OAuthTokenClient {
 
     /**
      * @Brief 공개 키 요청

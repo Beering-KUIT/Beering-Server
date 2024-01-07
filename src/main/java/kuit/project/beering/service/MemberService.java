@@ -20,9 +20,7 @@ import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.security.jwt.JwtInfo;
 import kuit.project.beering.security.jwt.jwtTokenProvider.BeeringJwtTokenProvider;
 import kuit.project.beering.util.BaseResponseStatus;
-import kuit.project.beering.util.exception.DuplicateNicknameException;
-import kuit.project.beering.util.exception.DuplicateUsernameException;
-import kuit.project.beering.util.exception.MemberException;
+import kuit.project.beering.util.exception.domain.MemberException;
 import kuit.project.beering.util.s3.AwsS3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -115,12 +113,12 @@ public class MemberService {
     }
 
     public MemberEmailResponse checkEmail(String username) {
-        if (memberRepository.existsByUsername(username)) throw new DuplicateUsernameException();
+        if (memberRepository.existsByUsername(username)) throw new MemberException(BaseResponseStatus.DUPLICATED_EMAIL);
         return new MemberEmailResponse(true);
     }
 
     public MemberNicknameResponse checkNickname(String nickname) {
-        if (memberRepository.existsByNickname(nickname)) throw new DuplicateNicknameException();
+        if (memberRepository.existsByNickname(nickname)) throw new MemberException(BaseResponseStatus.DUPLICATED_NICKNAME);
         return new MemberNicknameResponse(true);
     }
 
