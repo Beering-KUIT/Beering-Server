@@ -6,7 +6,7 @@ import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.FavoriteService;
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.BaseResponseStatus;
-import kuit.project.beering.util.exception.FavoriteException;
+import kuit.project.beering.util.exception.domain.FavoriteException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
