@@ -2,16 +2,12 @@ package kuit.project.beering.controller.advice;
 
 import jakarta.persistence.EntityNotFoundException;
 import kuit.project.beering.controller.AuthController;
+import kuit.project.beering.dto.common.ObjectValidationError;
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.BaseResponseStatus;
-import kuit.project.beering.dto.common.ObjectValidationError;
-import kuit.project.beering.util.exception.AgreementValidationException;
 import kuit.project.beering.util.exception.CustomJwtException;
-import kuit.project.beering.util.exception.DuplicateNicknameException;
-import kuit.project.beering.util.exception.DuplicateUsernameException;
+import kuit.project.beering.util.exception.validation.AgreementValidationException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -37,39 +33,6 @@ public class AuthControllerAdvice {
                 .build();
 
         return new BaseResponse<>(BaseResponseStatus.INVALID_FIELD, objectValidationError);
-    }
-
-    /**
-     * @Brief 이메일 중복 예외 처리
-     */
-    @ExceptionHandler(DuplicateUsernameException.class)
-    public BaseResponse<Object> duplicateException(DuplicateUsernameException ex) {
-        return new BaseResponse<>(BaseResponseStatus.DUPLICATED_EMAIL);
-    }
-
-    /**
-     * @Brief 이메일 존재하지 않음
-     */
-    @ExceptionHandler(UsernameNotFoundException.class)
-    public BaseResponse<Object> usernameNotFound(UsernameNotFoundException ex) {
-        return new BaseResponse<>(BaseResponseStatus.NONE_MEMBER);
-    }
-
-    /**
-     * @Brief 닉네임 중복 예외 처리
-     */
-    @ExceptionHandler(DuplicateNicknameException.class)
-    public BaseResponse<Object> duplicateNicknameException(DuplicateNicknameException ex) {
-        log.info("duplicateNicknameException");
-        return new BaseResponse<>(BaseResponseStatus.DUPLICATED_NICKNAME);
-    }
-
-    /**
-     * @Brief 비밀번호 오류
-     */
-    @ExceptionHandler(BadCredentialsException.class)
-    public BaseResponse<Object> badCredential(BadCredentialsException ex) {
-        return new BaseResponse<>(BaseResponseStatus.INVALID_CHECKED_PASSWORD);
     }
 
     /**

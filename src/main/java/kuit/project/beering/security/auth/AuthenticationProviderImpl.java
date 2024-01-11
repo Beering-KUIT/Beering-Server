@@ -1,12 +1,12 @@
 package kuit.project.beering.security.auth;
 
+import kuit.project.beering.util.BaseResponseStatus;
+import kuit.project.beering.util.exception.domain.MemberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -23,7 +23,7 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
     private final PasswordEncoder bCryptPasswordEncoder;
 
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    public Authentication authenticate(Authentication authentication) {
         log.info("AuthenticationProviderImpl 진입");
 
         UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
@@ -33,7 +33,7 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
         AuthMember loginMember = (AuthMember) service.loadUserByUsername(username);
 
         if (!bCryptPasswordEncoder.matches(password, loginMember.getPassword())) {
-            throw new BadCredentialsException(loginMember.getUsername() + " 비밀번호를 확인해주세요.");
+            throw new MemberException(BaseResponseStatus.INVALID_CHECKED_PASSWORD);
         }
 
         return new UsernamePasswordAuthenticationToken(loginMember, password, loginMember.getAuthorities());
