@@ -64,6 +64,10 @@ public class Drink extends BaseTimeEntity{
 
     @OneToMany(mappedBy = "drink")
     private List<DrinkTag> drinkTags = new ArrayList<>();
+
+    @OneToMany(mappedBy = "drink")
+    private List<Record> records = new ArrayList<>();
+
     public void addReview(Review review) {
         this.reviews.add(review);
     }
@@ -71,6 +75,9 @@ public class Drink extends BaseTimeEntity{
         this.favorites.add(favorite);
     }
 
+    public void addRecord(Record record) {
+        this.records.add(record);
+    }
     public void addDrinkTag(DrinkTag drinkTag) {
         this.drinkTags.add(drinkTag);
     }
