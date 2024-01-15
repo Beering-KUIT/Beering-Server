@@ -52,6 +52,9 @@ public class Member extends BaseTimeEntity {
     @OneToMany(mappedBy = "member")
     private List<Tabom> taboms = new ArrayList<>();
 
+    @OneToMany(mappedBy = "member")
+    private List<Record> records = new ArrayList<>();
+
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "oauth_id")
     private OAuth oauth;
@@ -83,4 +86,6 @@ public class Member extends BaseTimeEntity {
     public void createOauthAssociation(OAuth oAuth) {
         this.oauth = oAuth;
     }
+
+    public void addRecord(Record record) { this.records.add(record);    }
 }
