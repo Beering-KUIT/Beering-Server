@@ -31,7 +31,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/validate/username")
-    public BaseResponse<MemberEmailResponse> checkEmail(@Validated @RequestBody MemberEmailRequest memberEmailRequest, BindingResult bindingResult) {
+    public BaseResponse<MemberEmailResponse> checkEmail(@Validated @ModelAttribute MemberEmailRequest memberEmailRequest, BindingResult bindingResult) {
 
         if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
 
@@ -41,10 +41,10 @@ public class MemberController {
     }
 
     @GetMapping("/validate/nickname")
-    public BaseResponse<MemberNicknameResponse> checkNickname(@Validated @RequestBody MemberNicknameRequest memberEmailRequest, BindingResult bindingResult) {
+    public BaseResponse<MemberNicknameResponse> checkNickname(@Validated @ModelAttribute MemberNicknameRequest memberNicknameRequest, BindingResult bindingResult) {
         if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
 
-        MemberNicknameResponse memberEmailResponse = memberService.checkNickname(memberEmailRequest.getNickname());
+        MemberNicknameResponse memberEmailResponse = memberService.checkNickname(memberNicknameRequest.getNickname());
 
         return new BaseResponse<>(memberEmailResponse);
     }

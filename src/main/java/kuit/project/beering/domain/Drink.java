@@ -62,11 +62,24 @@ public class Drink extends BaseTimeEntity{
     @OneToMany(mappedBy = "drink")
     private List<DrinkImage> images = new ArrayList<>();
 
+    @OneToMany(mappedBy = "drink")
+    private List<DrinkTag> drinkTags = new ArrayList<>();
+
+    @OneToMany(mappedBy = "drink")
+    private List<Record> records = new ArrayList<>();
+
     public void addReview(Review review) {
         this.reviews.add(review);
     }
     public void addFavorite(Favorite favorite) {
         this.favorites.add(favorite);
+    }
+
+    public void addRecord(Record record) {
+        this.records.add(record);
+    }
+    public void addDrinkTag(DrinkTag drinkTag) {
+        this.drinkTags.add(drinkTag);
     }
 
     // 가상 칼럼
