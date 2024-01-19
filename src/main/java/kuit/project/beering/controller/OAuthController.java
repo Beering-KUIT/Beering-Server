@@ -40,10 +40,10 @@ public class OAuthController {
     private final OAuthClientServiceResolver oauthClientServiceResolver;
     private final JwtTokenProviderResolver jwtTokenProviderResolver;
 
-    private static Map<String, OAuthType> isserTypeMap = new HashMap<>();
+    private static final Map<String, OAuthType> issuerTypeMap = new HashMap<>();
 
     static {
-        isserTypeMap.put("https://kauth.kakao.com", OAuthType.KAKAO);
+        issuerTypeMap.put("https://kauth.kakao.com", OAuthType.KAKAO);
     }
 
     @GetMapping("/kakao/callback")
@@ -62,7 +62,7 @@ public class OAuthController {
 
         String issuer = jwtTokenProviderResolver.getProvider(idToken).parseIssuer(idToken);
 
-        OAuthClientService oauthClientService = oauthClientServiceResolver.getOauthClientService(isserTypeMap.get(issuer));
+        OAuthClientService oauthClientService = oauthClientServiceResolver.getOauthClientService(issuerTypeMap.get(issuer));
 
         MemberLoginResponse memberLoginResponse = oauthService.sdkLogin(oauthTokenInfo, oauthClientService);
 
