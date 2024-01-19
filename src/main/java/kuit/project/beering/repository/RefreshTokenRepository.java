@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-@Repository
+//@Repository
 @RequiredArgsConstructor
 public class RefreshTokenRepository {
 
