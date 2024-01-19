@@ -53,7 +53,7 @@ public class FavoriteService {
     }
 
     @Transactional
-    public Slice<GetFavoriteDrinkResponse> getFavoriteReviews(Long memberId, Pageable pageable) {
+    public Slice<GetFavoriteDrinkResponse> getFavoriteDrinks(Long memberId, Pageable pageable) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(NONE_MEMBER));
 
