@@ -8,10 +8,8 @@ import kuit.project.beering.dto.common.OAuthMemberInfo;
 import kuit.project.beering.dto.request.auth.OAuthSignupRequest;
 import kuit.project.beering.dto.request.member.MemberSignupRequest;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
-import kuit.project.beering.redis.RefreshToken;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.OAuthRepository;
-import kuit.project.beering.repository.RefreshTokenRepository;
 import kuit.project.beering.security.auth.oauth.service.OAuthClientService;
 import kuit.project.beering.security.jwt.JwtInfo;
 import kuit.project.beering.security.jwt.JwtTokenProviderResolver;
@@ -32,7 +30,6 @@ public class OAuthService {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final OAuthRepository oauthRepository;
-    private final RefreshTokenRepository refreshTokenRepository;
     private final JwtTokenProviderResolver jwtTokenProviderResolver;
 
     @Transactional(noRollbackFor = SignupNotCompletedException.class)
@@ -76,8 +73,6 @@ public class OAuthService {
         // 값 변경
         oauth.tokenReissue(accessToken, refreshToken);
 
-        refreshTokenRepository.save(new RefreshToken(String.valueOf(member.getId()), refreshToken));
-
         return MemberLoginResponse.builder()
                 .memberId(member.getId())
                 .jwtInfo(JwtInfo.builder().accessToken(idToken).refreshToken(refreshToken).build())
@@ -96,8 +91,6 @@ public class OAuthService {
 
         Member member = memberRepository.findByOauthId(oauth.getId()).orElseThrow(
                 () -> new SignupNotCompletedException(sub, oauth.getOauthType()));
-
-        refreshTokenRepository.save(new RefreshToken(String.valueOf(member.getId()), oauthTokenInfo.getRefreshToken()));
 
         return MemberLoginResponse.builder()
                 .memberId(member.getId())
