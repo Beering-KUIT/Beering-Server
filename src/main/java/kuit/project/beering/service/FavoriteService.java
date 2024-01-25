@@ -73,6 +73,9 @@ public class FavoriteService {
                 .nameKr(drink.getNameKr())
                 .manufacturer(drink.getManufacturer())
                 .primaryImageUrl(getPrimaryImage(drink))
+                .avgRating(drink.getAvgRating())
+                .country(drink.getCountry())
+                .countOfReview(drink.getCountOfReview())
                 .build();
     }
 
