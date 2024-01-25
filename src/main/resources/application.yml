@@ -1,0 +1,188 @@
+spring:
+  profiles:
+    group:
+      "local": "localDB, devPort, secret, web-mvc, localRedis"
+      "dev": "devDB, devPort, secret, web-mvc, devRedis"
+      "prod": "prodDB, prodPort, secret, web-mvc, devRedis"
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "localDB"
+
+  datasource:
+    url: ${DATASOURCE_URL_LOCAL}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    dbcp2:
+      validation-query: select 1
+  sql:
+    init:
+      platform: mysql
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "devDB"
+
+  datasource:
+    url: ${DATASOURCE_URL_DEV}
+    username: ${DATASOURCE_USERNAME_DEV}
+    password: ${DATASOURCE_PASSWORD_DEV}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    dbcp2:
+      validation-query: select 1
+  sql:
+    init:
+      platform: mysql
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "prodDB"
+
+  datasource:
+    url: ${DATASOURCE_URL_PROD}
+    username: ${DATASOURCE_USERNAME}
+    password: ${DATASOURCE_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    dbcp2:
+      validation-query: select 1
+  sql:
+    init:
+      platform: mysql
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "devPort"
+
+server:
+  port: 9000
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "prodPort"
+
+server:
+  port: 9001
+
+---
+
+secret:
+  jwt-secret-key: ${JWT_SECRET_KEY}
+  jwt-expired-in: ${JWT_EXPIRED_IN} # 60일
+  jwt-refresh-expired-in: ${JWT_REFRESH_EXPIRED_IN} # 60일
+
+  oauth:
+    kakao:
+      token-url: ${KAKAO_TOKEN_URL}
+      api-url: ${KAKAO_API_URL}
+      redirect-url: ${KAKAO_REDIRECT_URL}
+      restapi-key: ${KAKAO_RESTAPI_KEY}
+      admin-key:  ${KAKAO_ADMIN_KEY}
+      client-secret: ${KAKAO_CLIENT_SECRET}
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "web-mvc"
+
+  #  mvc:
+  #    throw-exception-if-no-handler-found: true
+
+  web:
+    resources:
+      add-mappings: false
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        format_sql: true
+    default_batch_fetch_size: 100
+#  messages:
+#    basename: errors
+
+#  cache:
+#    type: redis
+
+#  data:
+#    redis:
+#      host: localhost
+#      port: 6379
+
+logging.level:
+  org.hibernate.SQL: debug # sql 표시
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "localRedis"
+
+  cache:
+    type: redis
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: "devRedis"
+
+  cache:
+    type: redis
+
+  data:
+    redis:
+      host: ${EC2_PRIVATE_IP}
+      port: 6379
+
+---
+
+# S3 관련 설정
+cloud:
+  aws:
+    s3:
+      bucket: beering-bucket
+    credentials:
+      access-key: ${S3_ACCESS_KEY}
+      secret-key: ${S3_SECRET_KEY}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
+# multipartFile 용량 늘려주는 설정
+spring:
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+
+---
