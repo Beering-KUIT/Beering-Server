@@ -44,6 +44,10 @@ public class Drink extends BaseTimeEntity{
     @Column(nullable = false)
     private String manufacturer;
 
+    // TODO : country table 논의
+    @Column(nullable = true)
+    private String country;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Status status;
