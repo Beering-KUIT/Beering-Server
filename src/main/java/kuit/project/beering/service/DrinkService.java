@@ -26,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static kuit.project.beering.util.BaseResponseStatus.NONE_DRINK;
+import static kuit.project.beering.util.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -51,11 +51,34 @@ public class DrinkService {
     public Slice<DrinkSearchResponse> searchDrinksByName(SearchDrinkRequest request, Long memberId) {
         Pageable pageable = PageRequest.of(request.getPage(), SIZE, SortType.getMatchedSort(request.getOrderBy()));
 
+        validSubOption(request);
+
         DrinkSearchCondition drinkSearchCondition = new DrinkSearchCondition(
                 request.getName(), request.getName(), request.getCategory(), request.getMinPrice(), request.getMaxPrice(),
                 request.getTag(), request.getCountry(), request.getSweetness(), memberId);
 
         return drinkRepository.search(drinkSearchCondition, pageable);
+    }
+
+    private void validSubOption(SearchDrinkRequest request) {
+        if(request.getCategory() == null)
+            return;
+
+        boolean invalid = false;
+
+        // 카테고리 다중 선택임에도 하위 옵션이 선택된 경우
+        if(request.getCategory().size() > 1){
+            if(request.getCountry() != null || request.getSweetness() != null)
+                throw new DrinkException(UNSUPPORTED_SUB_OPTION);
+            else return;
+        }
+
+        String category = request.getCategory().get(0);
+
+        // 카테고리에 따른 하위옵션 검증구간
+        if(category.equals("beer") && request.getSweetness() != null) invalid = true;
+
+        if(invalid) throw new DrinkException(INVALID_SUB_OPTION);
     }
 
     @Transactional
