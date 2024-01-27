@@ -7,6 +7,8 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import kuit.project.beering.domain.Drink;
+import kuit.project.beering.domain.QDrinkTag;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +23,8 @@ import java.util.List;
 
 import static kuit.project.beering.domain.QDrink.drink;
 import static kuit.project.beering.domain.QFavorite.favorite;
+import static kuit.project.beering.domain.QDrinkTag.drinkTag;
+import static kuit.project.beering.domain.QTag.tag;
 import static kuit.project.beering.domain.image.QDrinkImage.drinkImage;
 
 @Slf4j
@@ -34,7 +38,7 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
     public Slice<DrinkSearchResponse> search(DrinkSearchCondition condition, Pageable pageable){
         List<DrinkSearchResponse> drinks = jpaQueryFactory
                                 .select(Projections.constructor(DrinkSearchResponse.class,
-                                        drink.id, drink.nameKr, drink.nameEn, drink.manufacturer,
+                                        drink.id, drink.nameKr, drink.nameEn, drink.manufacturer, drink.avgRating, drink.countOfReview,
                                         Expressions.constant(Collections.emptyList()), // 우선 빈 리스트
                                         Expressions.as(
                                                 Expressions.cases()
@@ -46,7 +50,8 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
                                 .from(drink)
                                 .where(containName(condition.getNameKr(), condition.getNameEn()),
                                         drink.price.between(condition.getMinPrice(), condition.getMaxPrice()),
-                                        eqCategory(condition.getCategories()))
+                                        eqCategory(condition.getCategories()),
+                                        eqTags(condition.getTags()))
                                 .orderBy(drinkSort(pageable))
                                 .offset(pageable.getOffset())
                                 .limit(pageable.getPageSize() + 1)
@@ -96,11 +101,26 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
         return null;
     }
 
+    private BooleanExpression eqTags(List<String> tags) {
+        if(tags==null)
+            return null;
+
+        return drink.id.in(
+                jpaQueryFactory
+                        .select(drinkTag.drink.id)
+                        .from(drinkTag)
+                        .innerJoin(drinkTag.tag, tag)
+                        .where(tag.value.in(tags))
+        );
+    }
+
 
     private BooleanExpression eqCategory(List<String> categories) {
-        BooleanExpression categoryConditions = null;
         if(categories == null)
             return null;
+
+        BooleanExpression categoryConditions = null;
+
         for (String category : categories) {
             BooleanExpression condition = drink.category.name.eq(category);
             if (categoryConditions == null) {
@@ -113,8 +133,7 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
     }
 
     public BooleanExpression containName(String nameKr, String nameEn){
-
-        if (!StringUtils.hasText(nameKr))
+        if (!StringUtils.hasText(nameKr) && !StringUtils.hasText(nameEn))
             return null;
         return drink.nameKr.contains(nameKr).or(drink.nameEn.contains(nameEn));
     }

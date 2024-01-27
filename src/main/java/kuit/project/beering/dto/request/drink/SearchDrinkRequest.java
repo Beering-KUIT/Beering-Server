@@ -18,4 +18,5 @@ public class SearchDrinkRequest {
     private List<String> category;
     private Integer minPrice = 0;
     private Integer maxPrice = Integer.MAX_VALUE;
+    private List<String> tag;
 }

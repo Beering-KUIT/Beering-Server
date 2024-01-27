@@ -39,20 +39,23 @@ public class DrinkService {
 
     private final int SIZE = 10;
 
-//    /**
-//     * 주류 검색 메소드 <br>
-//     * <br>
-//     * @param page 페이지 번호
-//     * @param orderBy 정렬 : 이름순, 리뷰많은순, 최저가순, 평점순
-//     * @param drinkSearchCondition 필터 : 이름, 카테고리이름, 하한선, 상한선
-//     * @return 검색 결과 10개 // 페이징
-//     * @exception DrinkException 유효하지 않은 정렬 방식 입력시 예외 발생
-//     */
-//    public Slice<DrinkSearchResponse> searchDrinksByName(Integer page, String orderBy, DrinkSearchCondition drinkSearchCondition) {
-//        Pageable pageable = PageRequest.of(page, SIZE, SortType.getMatchedSort(orderBy));
-//
-//        return drinkRepository.search(drinkSearchCondition, pageable);
-//    }
+    /**
+     * 주류 검색 메소드 <br>
+     * <br>
+     * page 페이지 번호<br>
+     * orderBy 정렬 : 이름순, 리뷰많은순, 최저가순, 평점순<br>
+     * drinkSearchCondition 필터 : 이름, 카테고리이름, 하한선, 상한선<br>
+     * @return 검색 결과 10개 // 페이징
+     * @exception DrinkException 유효하지 않은 정렬 방식 입력시 예외 발생
+     */
+    public Slice<DrinkSearchResponse> searchDrinksByName(SearchDrinkRequest request, Long memberId) {
+        Pageable pageable = PageRequest.of(request.getPage(), SIZE, SortType.getMatchedSort(request.getOrderBy()));
+
+        DrinkSearchCondition drinkSearchCondition = new DrinkSearchCondition(
+                request.getName(), request.getName(), request.getCategory(), request.getMinPrice(), request.getMaxPrice(), request.getTag(), memberId);
+
+        return drinkRepository.search(drinkSearchCondition, pageable);
+    }
 
     @Transactional
     public GetDrinkResponse getDrinkById(Long drinkId, Long memberId) {
@@ -74,7 +77,6 @@ public class DrinkService {
     }
 
     private List<ReviewPreview> getReviewPreviews(Long drinkId) {
-        // TODO : 생성순 -> 좋아요순으로 정렬하면 더 좋을 듯.
         List<Review> reviews = reviewRepository.findTop5ByDrinkIdOrderByTabomsDesc(drinkId);
         return reviews.stream()
                 .map(review -> new ReviewPreview(
@@ -92,13 +94,4 @@ public class DrinkService {
         return memberService.getProfileImageUrl(member);
     }
 
-
-    public Slice<DrinkSearchResponse> searchDrinksByName(SearchDrinkRequest request, Long memberId) {
-        Pageable pageable = PageRequest.of(request.getPage(), SIZE, SortType.getMatchedSort(request.getOrderBy()));
-
-        DrinkSearchCondition drinkSearchCondition = new DrinkSearchCondition(
-                request.getName(), request.getName(), request.getCategory(), request.getMinPrice(), request.getMaxPrice(), memberId);
-
-        return drinkRepository.search(drinkSearchCondition, pageable);
-    }
 }

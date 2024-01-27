@@ -13,5 +13,6 @@ public class DrinkSearchCondition {
     List<String> categories;
     Integer minPrice;
     Integer maxPrice;
+    List<String> tags;
     Long memberId;
 }
