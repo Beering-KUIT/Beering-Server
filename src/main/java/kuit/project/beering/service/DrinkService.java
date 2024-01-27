@@ -52,7 +52,8 @@ public class DrinkService {
         Pageable pageable = PageRequest.of(request.getPage(), SIZE, SortType.getMatchedSort(request.getOrderBy()));
 
         DrinkSearchCondition drinkSearchCondition = new DrinkSearchCondition(
-                request.getName(), request.getName(), request.getCategory(), request.getMinPrice(), request.getMaxPrice(), request.getTag(), memberId);
+                request.getName(), request.getName(), request.getCategory(), request.getMinPrice(), request.getMaxPrice(),
+                request.getTag(), request.getCountry(), request.getSweetness(), memberId);
 
         return drinkRepository.search(drinkSearchCondition, pageable);
     }
