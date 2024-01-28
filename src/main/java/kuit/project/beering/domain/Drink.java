@@ -49,6 +49,9 @@ public class Drink extends BaseTimeEntity{
     @Column(nullable = false)
     private Status status;
 
+    @Column(nullable = false)
+    private String country;
+
     //연관관계 mapping
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")

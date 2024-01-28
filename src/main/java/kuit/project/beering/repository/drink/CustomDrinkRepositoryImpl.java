@@ -7,7 +7,6 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
-import kuit.project.beering.domain.Beer;
 import kuit.project.beering.domain.Wine;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
@@ -21,7 +20,6 @@ import org.springframework.util.StringUtils;
 import java.util.Collections;
 import java.util.List;
 
-import static kuit.project.beering.domain.QBeer.beer;
 import static kuit.project.beering.domain.QDrink.drink;
 import static kuit.project.beering.domain.QDrinkTag.drinkTag;
 import static kuit.project.beering.domain.QFavorite.favorite;
@@ -63,7 +61,6 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
                                 .leftJoin(favorite)
                                 .on(drink.id.eq(favorite.drink.id).and(favorite.member.id.eq(condition.getMemberId())))
                                 .leftJoin(wine).on(drink.id.eq(wine.id).and(drink.instanceOf(Wine.class)))
-                                .leftJoin(beer).on(drink.id.eq(beer.id).and(drink.instanceOf(Beer.class)))
                                 .fetchJoin()
                                 .fetch();
 
@@ -118,8 +115,7 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
     private BooleanExpression eqCountry(String country) {
         if(!StringUtils.hasText(country))
             return null;
-
-        return wine.country.eq(country).or(beer.country.eq(country));
+        return drink.country.eq(country);
     }
 
     private BooleanExpression eqTags(List<String> tags) {

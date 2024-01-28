@@ -7,5 +7,4 @@ import jakarta.persistence.Entity;
 @DiscriminatorValue("wine")
 public class Wine extends Drink{
     private int sweetness;
-    private String country;
 }
