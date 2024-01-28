@@ -7,6 +7,7 @@ import kuit.project.beering.dto.request.auth.OAuthSignupRequest;
 import kuit.project.beering.dto.request.member.AgreementRequest;
 import kuit.project.beering.dto.response.SignupNotCompletedResponse;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
+import kuit.project.beering.security.auth.OAuthTypeIssuerMapper;
 import kuit.project.beering.security.auth.oauth.service.OAuthClientService;
 import kuit.project.beering.security.auth.oauth.service.OAuthClientServiceResolver;
 import kuit.project.beering.security.jwt.JwtTokenProviderResolver;
@@ -26,9 +27,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @Slf4j
@@ -39,12 +38,7 @@ public class OAuthController {
     private final OAuthService oauthService;
     private final OAuthClientServiceResolver oauthClientServiceResolver;
     private final JwtTokenProviderResolver jwtTokenProviderResolver;
-
-    private static final Map<String, OAuthType> issuerTypeMap = new HashMap<>();
-
-    static {
-        issuerTypeMap.put("https://kauth.kakao.com", OAuthType.KAKAO);
-    }
+    private final OAuthTypeIssuerMapper OAuthTypeIssuerMapper;
 
     @GetMapping("/kakao/callback")
     public BaseResponse<MemberLoginResponse> restapiLogin(@ModelAttribute OAuthCodeRequest OAuthCodeRequest) {
@@ -62,7 +56,7 @@ public class OAuthController {
 
         String issuer = jwtTokenProviderResolver.getProvider(idToken).parseIssuer(idToken);
 
-        OAuthClientService oauthClientService = oauthClientServiceResolver.getOauthClientService(issuerTypeMap.get(issuer));
+        OAuthClientService oauthClientService = oauthClientServiceResolver.getOauthClientService(OAuthTypeIssuerMapper.get(issuer));
 
         MemberLoginResponse memberLoginResponse = oauthService.sdkLogin(oauthTokenInfo, oauthClientService);
 
