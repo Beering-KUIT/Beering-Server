@@ -7,11 +7,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-public class OAuthTypeIssuerMapper {
+public class OAuthTypeMapper {
 
     private final Map<String, OAuthType> issuerOAuthTypeMap = new HashMap<>();
 
-    public OAuthTypeIssuerMapper() {
+    public OAuthTypeMapper() {
         issuerOAuthTypeMap.put("https://kauth.kakao.com", OAuthType.KAKAO);
         issuerOAuthTypeMap.put("https://beering.com", OAuthType.BEERING);
     }
