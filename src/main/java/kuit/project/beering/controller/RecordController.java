@@ -21,7 +21,7 @@ public class RecordController {
     private final RecordService recordService;
 
     @GetMapping
-    public BaseResponse<RecordByDateResponse> getRecord(
+    public BaseResponse<RecordByDateResponse> getUserRecordStatisticByDate(
             @RequestParam("year") int year,
             @RequestParam("month") int month,
             @AuthenticationPrincipal AuthMember member) {
