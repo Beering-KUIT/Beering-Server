@@ -9,7 +9,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class DailyAmount {
-    private Integer date;
+public class MonthlyAmount {
+    private Integer month;
     private Integer totalConsumption;
 }
