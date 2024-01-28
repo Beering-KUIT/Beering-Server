@@ -2,6 +2,7 @@ package kuit.project.beering.service;
 
 import kuit.project.beering.domain.Record;
 import kuit.project.beering.dto.response.record.DailyAmount;
+import kuit.project.beering.dto.response.record.MonthlyAmount;
 import kuit.project.beering.dto.response.record.RecordByDateResponse;
 import kuit.project.beering.repository.RecordRepository;
 import kuit.project.beering.repository.drink.DrinkRepository;
@@ -34,20 +35,58 @@ public class RecordService {
 
         List<DailyAmount> dailyAmounts = getDailyAmounts(records);
 
-        // TODO#2 : month 로 최근 6개월 월별 주량 "List<Map<Integer, Integer>> monthlyAmount" Setting
-        /* e.g.
-            for (int i = 0; i < 6; i++) {
-                recordRepository.findByDateAndUserId(year, month - i, userId)
-                                .stream()
-                                .맵핑
-                                .합계
-            }
-        */
+        // #2 month 로 최근 6개월 월별 주량 "List<MonthlyAmount> monthlyAmounts" Setting
+        List<MonthlyAmount> monthlyAmounts = getRecent6MonthlyAmounts(year, month, userId);
 
         // TODO#3 : month 로 주종별 주량 "List<Map<Integer, Integer>> typeAmount" Setting
 
         // TODO#4 : build 하여 return
-        return new RecordByDateResponse(dailyAmounts, null, null);
+        return new RecordByDateResponse(dailyAmounts, monthlyAmounts, null);
+    }
+
+    /**
+     *
+     * @param month MonthlyAmount 에 포함하기 위한 월
+     * @param records month 에 해당하는 모든 Record 리스트
+     * @return : 해당 월에 대한 MontlyAmount 객체
+     */
+    private MonthlyAmount getMonthlyTotalAmount(int month, List<Record> records) {
+        // 해당 월의 모든 Record 과 연관된 RecordAmount 에서 수량 * 용량 을 합하여 total 집계
+        int total = records.stream()
+                .map(Record::getAmounts)
+                .mapToInt(recordAmounts -> {
+                    return recordAmounts.stream()
+                            .mapToInt(amount -> amount.getVolume() * amount.getQuantity())
+                            .sum();
+                }).sum();
+
+        return new MonthlyAmount(month, total);
+    }
+
+    /**
+     *
+     * @param year 기록 조회를 위한 연도
+     * @param month 기록 조회를 위한 월
+     * @param userId 기록 조회를 위한 유저 id
+     * @return : 월, 월별 총량 을 담는 MonthlyAmount 리스트 (최근 6개월의 데이터를 포함하기 때문에 size 6)
+     */
+    private List<MonthlyAmount> getRecent6MonthlyAmounts(int year, int month, Long userId) {
+
+        List<MonthlyAmount> monthlyAmounts = new ArrayList<>();
+
+        for (int i = 0; i < 6; i++) {
+            // 전년도 이동
+            if (month - i < 1) {
+                month += 12;
+                year -= 1;
+            }
+
+            List<Record> records = recordRepository.findByDateAndUserId(year, month - i, userId);
+
+            monthlyAmounts.add(getMonthlyTotalAmount(month - i, records));
+        }
+
+        return monthlyAmounts;
     }
 
     /**
