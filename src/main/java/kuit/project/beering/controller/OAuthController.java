@@ -5,19 +5,19 @@ import kuit.project.beering.domain.OAuthType;
 import kuit.project.beering.dto.request.auth.OAuthCodeRequest;
 import kuit.project.beering.dto.request.auth.OAuthSignupRequest;
 import kuit.project.beering.dto.request.member.AgreementRequest;
-import kuit.project.beering.dto.response.SignupNotCompletedResponse;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
 import kuit.project.beering.security.auth.OAuthTypeMapper;
 import kuit.project.beering.security.auth.oauth.service.OAuthClientService;
 import kuit.project.beering.security.auth.oauth.service.OAuthClientServiceResolver;
+import kuit.project.beering.security.jwt.JwtParser;
 import kuit.project.beering.security.jwt.JwtTokenProviderResolver;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
 import kuit.project.beering.service.OAuthService;
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.BaseResponseStatus;
+import kuit.project.beering.util.exception.SignupNotCompletedException;
 import kuit.project.beering.util.exception.validation.AgreementValidationException;
 import kuit.project.beering.util.exception.validation.FieldValidationException;
-import kuit.project.beering.util.exception.SignupNotCompletedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
@@ -38,7 +38,7 @@ public class OAuthController {
     private final OAuthService oauthService;
     private final OAuthClientServiceResolver oauthClientServiceResolver;
     private final JwtTokenProviderResolver jwtTokenProviderResolver;
-    private final OAuthTypeMapper OAuthTypeMapper;
+    private final OAuthTypeMapper oAuthTypeMapper;
 
     @GetMapping("/kakao/callback")
     public BaseResponse<MemberLoginResponse> restapiLogin(@ModelAttribute OAuthCodeRequest OAuthCodeRequest) {
@@ -56,7 +56,7 @@ public class OAuthController {
 
         String issuer = jwtTokenProviderResolver.getProvider(idToken).parseIssuer(idToken);
 
-        OAuthClientService oauthClientService = oauthClientServiceResolver.getOauthClientService(OAuthTypeMapper.get(issuer));
+        OAuthClientService oauthClientService = oauthClientServiceResolver.getOauthClientService(oAuthTypeMapper.get(issuer));
 
         MemberLoginResponse memberLoginResponse = oauthService.sdkLogin(oauthTokenInfo, oauthClientService);
 
@@ -72,19 +72,19 @@ public class OAuthController {
         if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
         if (bindingResult.hasGlobalErrors()) throw new AgreementValidationException(bindingResult);
 
-        MemberLoginResponse response = oauthService.signupContinue(request, oauthClientServiceResolver.getOauthClientService(request.getOauthType()));
+        String idToken = request.getIdToken();
+        String issuer = jwtTokenProviderResolver.getProvider(idToken).parseIssuer(idToken);
+        OAuthType oAuthType = oAuthTypeMapper.get(issuer);
+
+        MemberLoginResponse response = oauthService.signupContinue(request, oauthClientServiceResolver.getOauthClientService(oAuthType));
 
         return new BaseResponse<>(response);
     }
 
     @ExceptionHandler(SignupNotCompletedException.class)
-    public BaseResponse<SignupNotCompletedResponse> loginNotCompleted(SignupNotCompletedException ex) {
-        return new BaseResponse<>(BaseResponseStatus.SUCCESS_CONTINUE_SIGNUP, SignupNotCompletedResponse.builder()
-                .isLoginCompleted(false)
-                .sub(ex.getSub())
-                .oauthType(ex.getOauthType()).build());
+    public BaseResponse<Object> loginNotCompleted(SignupNotCompletedException ex) {
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS_CONTINUE_SIGNUP, null);
     }
-
 
     /**
      * @param request
