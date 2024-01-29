@@ -25,10 +25,6 @@ public class OAuthSignupRequest {
     private String nickname;
 
     @NotBlank
-    private String sub;
-
-    @NotNull
-    private OAuthType oauthType;
-
+    private String idToken;
     private List<AgreementRequest> agreements = new ArrayList<>();
 }
