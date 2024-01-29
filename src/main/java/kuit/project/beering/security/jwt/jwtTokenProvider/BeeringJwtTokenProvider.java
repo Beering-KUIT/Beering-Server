@@ -78,6 +78,7 @@ public class BeeringJwtTokenProvider extends AbstractJwtTokenProvider {
                 .setSubject(authentication.getName())
                 .claim("iss", "https://beering.com")
                 .claim("sub", ((AuthMember) authentication.getPrincipal()).getId())
+                .claim("email", ((AuthMember) authentication.getPrincipal()).getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRED_IN))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -85,13 +86,14 @@ public class BeeringJwtTokenProvider extends AbstractJwtTokenProvider {
         String refreshToken = Jwts.builder()
                 .claim("iss", "https://beering.com")
                 .claim("sub", ((AuthMember) authentication.getPrincipal()).getId())
+                .claim("email", ((AuthMember) authentication.getPrincipal()).getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_REFRESH_EXPIRED_IN))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
         return JwtInfo.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
+                .accessToken(BEARER + accessToken)
+                .refreshToken(BEARER + refreshToken)
                 .build();
     }
 
