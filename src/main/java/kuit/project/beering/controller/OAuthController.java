@@ -2,16 +2,15 @@ package kuit.project.beering.controller;
 
 import kuit.project.beering.domain.AgreementName;
 import kuit.project.beering.domain.OAuthType;
-import kuit.project.beering.dto.request.auth.OAuthCodeRequest;
+import kuit.project.beering.dto.common.SignupContinueDto;
 import kuit.project.beering.dto.request.auth.OAuthSignupRequest;
 import kuit.project.beering.dto.request.member.AgreementRequest;
-import kuit.project.beering.dto.response.member.MemberLoginResponse;
+import kuit.project.beering.dto.response.member.MemberSdkLoginResponse;
 import kuit.project.beering.security.auth.OAuthTypeMapper;
-import kuit.project.beering.security.auth.oauth.service.OAuthClientService;
 import kuit.project.beering.security.auth.oauth.service.OAuthClientServiceResolver;
-import kuit.project.beering.security.jwt.JwtParser;
 import kuit.project.beering.security.jwt.JwtTokenProviderResolver;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
+import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
 import kuit.project.beering.service.OAuthService;
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.BaseResponseStatus;
@@ -40,31 +39,31 @@ public class OAuthController {
     private final JwtTokenProviderResolver jwtTokenProviderResolver;
     private final OAuthTypeMapper oAuthTypeMapper;
 
-    @GetMapping("/kakao/callback")
-    public BaseResponse<MemberLoginResponse> restapiLogin(@ModelAttribute OAuthCodeRequest OAuthCodeRequest) {
-
-        if (OAuthCodeRequest.getError() != null) return new BaseResponse<>(BaseResponseStatus.OAUTH_LOGIN_FAILED);
-
-        MemberLoginResponse memberLoginResponse = oauthService.restapiLogin(OAuthCodeRequest.getCode(), oauthClientServiceResolver.getOauthClientService(OAuthType.KAKAO));
-
-        return new BaseResponse<>(memberLoginResponse);
-    }
+    // rest-api
+//    @GetMapping("/kakao/callback")
+//    public BaseResponse<MemberLoginResponse> restapiLogin(@ModelAttribute OAuthCodeRequest OAuthCodeRequest) {
+//
+//        if (OAuthCodeRequest.getError() != null) return new BaseResponse<>(BaseResponseStatus.OAUTH_LOGIN_FAILED);
+//
+//        MemberLoginResponse memberLoginResponse = oauthService.restapiLogin(OAuthCodeRequest.getCode(), oauthClientServiceResolver.getOauthClientService(OAuthType.KAKAO));
+//
+//        return new BaseResponse<>(memberLoginResponse);
+//    }
 
     @PostMapping("/sdk")
-    public BaseResponse<MemberLoginResponse> sdkLogin(@RequestBody OAuthTokenInfo oauthTokenInfo) {
+    public BaseResponse<MemberSdkLoginResponse> sdkLogin(@RequestBody OAuthTokenInfo oauthTokenInfo) {
         String idToken = oauthTokenInfo.getIdToken();
 
         String issuer = jwtTokenProviderResolver.getProvider(idToken).parseIssuer(idToken);
+        OAuthType oAuthType = oAuthTypeMapper.get(issuer);
 
-        OAuthClientService oauthClientService = oauthClientServiceResolver.getOauthClientService(oAuthTypeMapper.get(issuer));
+        MemberSdkLoginResponse memberSdkLoginResponse = oauthService.sdkLogin(oauthTokenInfo, oAuthType);
 
-        MemberLoginResponse memberLoginResponse = oauthService.sdkLogin(oauthTokenInfo, oauthClientService);
-
-        return new BaseResponse<>(memberLoginResponse);
+        return new BaseResponse<>(memberSdkLoginResponse);
     }
 
     @PostMapping("/signup")
-    public BaseResponse<Object> signup(@RequestBody @Validated OAuthSignupRequest request,
+    public BaseResponse<MemberSdkLoginResponse> signup(@RequestBody @Validated OAuthSignupRequest request,
                                        BindingResult bindingResult) {
 
         validateAgreement(request, bindingResult);
@@ -72,11 +71,7 @@ public class OAuthController {
         if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
         if (bindingResult.hasGlobalErrors()) throw new AgreementValidationException(bindingResult);
 
-        String idToken = request.getIdToken();
-        String issuer = jwtTokenProviderResolver.getProvider(idToken).parseIssuer(idToken);
-        OAuthType oAuthType = oAuthTypeMapper.get(issuer);
-
-        MemberLoginResponse response = oauthService.signupContinue(request, oauthClientServiceResolver.getOauthClientService(oAuthType));
+        MemberSdkLoginResponse response = oauthService.signupContinue(createSignupRequestDto(request));
 
         return new BaseResponse<>(response);
     }
@@ -116,5 +111,20 @@ public class OAuthController {
                         true, null, null,
                         "SERVICE, PERSONAL 의 isAgreed 값은 반드시 TRUE"));
         });
+    }
+
+    private SignupContinueDto createSignupRequestDto(OAuthSignupRequest request) {
+        String idToken = request.getIdToken();
+        JwtTokenProvider provider = jwtTokenProviderResolver.getProvider(idToken);
+        String issuer = provider.parseIssuer(idToken);
+
+        OAuthType oAuthType = oAuthTypeMapper.get(issuer);
+        String sub = provider.parseSub(idToken);
+        String email = provider.parseEmail(idToken);
+        return SignupContinueDto.builder()
+                .request(request)
+                .oAuthType(oAuthType)
+                .sub(sub)
+                .email(email).build();
     }
 }
