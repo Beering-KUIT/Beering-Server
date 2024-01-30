@@ -31,8 +31,8 @@ import java.util.List;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/oauth")
-public class OAuthController {
+@RequestMapping("/oauth/sdk")
+public class OAuthSdkController {
 
     private final OAuthService oauthService;
     private final OAuthClientServiceResolver oauthClientServiceResolver;
@@ -50,7 +50,7 @@ public class OAuthController {
 //        return new BaseResponse<>(memberLoginResponse);
 //    }
 
-    @PostMapping("/sdk")
+    @PostMapping("/login")
     public BaseResponse<MemberSdkLoginResponse> sdkLogin(@RequestBody OAuthTokenInfo oauthTokenInfo) {
         String idToken = oauthTokenInfo.getIdToken();
 
