@@ -87,8 +87,8 @@ public abstract class AbstractOIDCJwtTokenProvider extends AbstractJwtTokenProvi
                 .tokenReissue(oauthTokenInfo.getAccessToken(), oauthTokenInfo.getRefreshToken());
 
         return JwtInfo.builder()
-                .accessToken(oauthTokenInfo.getIdToken())
-                .refreshToken(oauthTokenInfo.getRefreshToken())
+                .accessToken(BEARER + oauthTokenInfo.getIdToken())
+                .refreshToken(BEARER + oauthTokenInfo.getRefreshToken())
                 .build();
     }
 
