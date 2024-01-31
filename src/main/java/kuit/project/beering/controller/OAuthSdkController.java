@@ -2,10 +2,11 @@ package kuit.project.beering.controller;
 
 import kuit.project.beering.domain.AgreementName;
 import kuit.project.beering.domain.OAuthType;
+import kuit.project.beering.dto.common.OAuthSdkLoginDto;
 import kuit.project.beering.dto.common.SignupContinueDto;
 import kuit.project.beering.dto.request.auth.OAuthSignupRequest;
 import kuit.project.beering.dto.request.member.AgreementRequest;
-import kuit.project.beering.dto.response.member.MemberSdkLoginResponse;
+import kuit.project.beering.dto.response.member.MemberLoginResponse;
 import kuit.project.beering.security.auth.OAuthTypeMapper;
 import kuit.project.beering.security.auth.oauth.service.OAuthClientService;
 import kuit.project.beering.security.auth.oauth.service.OAuthClientServiceResolver;
@@ -51,20 +52,17 @@ public class OAuthSdkController {
 //    }
 
     @PostMapping("/login")
-    public BaseResponse<MemberSdkLoginResponse> sdkLogin(@RequestBody OAuthTokenInfo oauthTokenInfo) {
-        String idToken = oauthTokenInfo.getIdToken();
-        String issuer = validateIdToken(idToken);
+    public BaseResponse<MemberLoginResponse> sdkLogin(@RequestBody OAuthTokenInfo oauthTokenInfo) {
 
-        String sub = jwtParser.parseSub(idToken);
-        OAuthType oAuthType = oAuthTypeMapper.get(issuer);
+        OAuthSdkLoginDto oAuthSdkLoginDto = createOAuthSdkLoginDto(oauthTokenInfo);
 
-        MemberSdkLoginResponse memberSdkLoginResponse = oauthService.sdkLogin(oauthTokenInfo, oAuthType, sub);
+        MemberLoginResponse memberLoginResponse = oauthService.sdkLogin(oAuthSdkLoginDto);
 
-        return new BaseResponse<>(memberSdkLoginResponse);
+        return new BaseResponse<>(memberLoginResponse);
     }
 
     @PostMapping("/signup")
-    public BaseResponse<MemberSdkLoginResponse> signup(@RequestBody @Validated OAuthSignupRequest request,
+    public BaseResponse<MemberLoginResponse> signup(@RequestBody @Validated OAuthSignupRequest request,
                                        BindingResult bindingResult) {
 
         validateAgreement(request, bindingResult);
@@ -72,7 +70,7 @@ public class OAuthSdkController {
         if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
         if (bindingResult.hasGlobalErrors()) throw new AgreementValidationException(bindingResult);
 
-        MemberSdkLoginResponse response = oauthService.signupContinue(createSignupRequestDto(request));
+        MemberLoginResponse response = oauthService.signupContinue(createSignupRequestDto(request));
 
         return new BaseResponse<>(response);
     }
@@ -127,6 +125,23 @@ public class OAuthSdkController {
                 .oAuthType(oAuthType)
                 .sub(sub)
                 .email(email).build();
+    }
+
+    private OAuthSdkLoginDto createOAuthSdkLoginDto(OAuthTokenInfo oauthTokenInfo) {
+
+        String idToken = oauthTokenInfo.getIdToken();
+        String issuer = validateIdToken(idToken);
+
+        String sub = jwtParser.parseSub(idToken);
+        String email = jwtParser.parseEmail(idToken);
+        OAuthType oAuthType = oAuthTypeMapper.get(issuer);
+
+        return OAuthSdkLoginDto.builder()
+                .oauthTokenInfo(oauthTokenInfo)
+                .oAuthType(oAuthType)
+                .sub(sub)
+                .email(email)
+                .build();
     }
 
     private String validateIdToken(String idToken) {
