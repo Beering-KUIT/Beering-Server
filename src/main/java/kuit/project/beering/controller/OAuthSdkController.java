@@ -7,10 +7,10 @@ import kuit.project.beering.dto.request.auth.OAuthSignupRequest;
 import kuit.project.beering.dto.request.member.AgreementRequest;
 import kuit.project.beering.dto.response.member.MemberSdkLoginResponse;
 import kuit.project.beering.security.auth.OAuthTypeMapper;
+import kuit.project.beering.security.auth.oauth.service.OAuthClientService;
 import kuit.project.beering.security.auth.oauth.service.OAuthClientServiceResolver;
-import kuit.project.beering.security.jwt.JwtTokenProviderResolver;
+import kuit.project.beering.security.jwt.JwtParser;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
-import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
 import kuit.project.beering.service.OAuthService;
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.BaseResponseStatus;
@@ -35,8 +35,8 @@ import java.util.List;
 public class OAuthSdkController {
 
     private final OAuthService oauthService;
-    private final OAuthClientServiceResolver oauthClientServiceResolver;
-    private final JwtTokenProviderResolver jwtTokenProviderResolver;
+    private final OAuthClientServiceResolver oAuthClientServiceResolver;
+    private final JwtParser jwtParser;
     private final OAuthTypeMapper oAuthTypeMapper;
 
     // rest-api
@@ -53,11 +53,12 @@ public class OAuthSdkController {
     @PostMapping("/login")
     public BaseResponse<MemberSdkLoginResponse> sdkLogin(@RequestBody OAuthTokenInfo oauthTokenInfo) {
         String idToken = oauthTokenInfo.getIdToken();
+        String issuer = validateIdToken(idToken);
 
-        String issuer = jwtTokenProviderResolver.getProvider(idToken).parseIssuer(idToken);
+        String sub = jwtParser.parseSub(idToken);
         OAuthType oAuthType = oAuthTypeMapper.get(issuer);
 
-        MemberSdkLoginResponse memberSdkLoginResponse = oauthService.sdkLogin(oauthTokenInfo, oAuthType);
+        MemberSdkLoginResponse memberSdkLoginResponse = oauthService.sdkLogin(oauthTokenInfo, oAuthType, sub);
 
         return new BaseResponse<>(memberSdkLoginResponse);
     }
@@ -115,16 +116,24 @@ public class OAuthSdkController {
 
     private SignupContinueDto createSignupRequestDto(OAuthSignupRequest request) {
         String idToken = request.getIdToken();
-        JwtTokenProvider provider = jwtTokenProviderResolver.getProvider(idToken);
-        String issuer = provider.parseIssuer(idToken);
+        String issuer = validateIdToken(idToken);
 
         OAuthType oAuthType = oAuthTypeMapper.get(issuer);
-        String sub = provider.parseSub(idToken);
-        String email = provider.parseEmail(idToken);
+        String sub = jwtParser.parseSub(idToken);
+        String email = jwtParser.parseEmail(idToken);
+
         return SignupContinueDto.builder()
                 .request(request)
                 .oAuthType(oAuthType)
                 .sub(sub)
                 .email(email).build();
+    }
+
+    private String validateIdToken(String idToken) {
+        String issuer = jwtParser.parseIssuer(idToken);
+        OAuthClientService oauthClientService = oAuthClientServiceResolver.getOauthClientService(issuer);
+        oauthClientService.validateToken(idToken);
+
+        return issuer;
     }
 }
