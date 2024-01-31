@@ -25,7 +25,4 @@ public class SignupContinueDto {
     public List<AgreementRequest> getAgreements() {
         return request.getAgreements();
     }
-    public String getIdToken() {
-        return request.getIdToken();
-    }
 }
