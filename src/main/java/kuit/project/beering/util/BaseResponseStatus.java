@@ -43,6 +43,9 @@ public enum BaseResponseStatus {
     EXPIRED_REFRESH_TOKEN(false, 2008, "Refresh 토큰이 만료되어 재로그인이 필요합니다."),
     INVALID_REFRESH_TOKEN(false, 2009, "잘못된 Refresh 토큰입니다."),
 
+    // IdToken 예외
+    EXPIRED_ID_TOKEN(false, 2020, "이미 만료된 ID 토큰입니다."),
+
     // UserException
     INVALID_FIELD(false, 2010, "요청 값이 잘못되었습니다."),
     DUPLICATED_EMAIL(false, 2011, "중복된 이메일입니다."),
