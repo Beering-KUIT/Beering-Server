@@ -10,9 +10,7 @@ import kuit.project.beering.dto.request.member.MemberSignupRequest;
 import kuit.project.beering.dto.response.member.MemberSdkLoginResponse;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.OAuthRepository;
-import kuit.project.beering.security.jwt.JwtTokenProviderResolver;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
-import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
 import kuit.project.beering.util.exception.SignupNotCompletedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,6 @@ public class OAuthService {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final OAuthRepository oauthRepository;
-    private final JwtTokenProviderResolver jwtTokenProviderResolver;
 
 //     rest-api 임시 주석처리
 //    @Transactional(noRollbackFor = SignupNotCompletedException.class)
@@ -42,9 +39,9 @@ public class OAuthService {
 //    }
 
     @Transactional(noRollbackFor = SignupNotCompletedException.class)
-    public MemberSdkLoginResponse sdkLogin(OAuthTokenInfo oauthTokenInfo, OAuthType oAuthType) {
+    public MemberSdkLoginResponse sdkLogin(OAuthTokenInfo oauthTokenInfo, OAuthType oAuthType, String sub) {
         // token의 sub로 OAuth 조회, 없으면 첫 로그인이므로 회원가입 마저 진행
-        return checkAlreadySignup(oauthTokenInfo, oAuthType);
+        return checkAlreadySignup(oauthTokenInfo, oAuthType, sub);
     }
 
     //sdk 전용?
@@ -78,9 +75,7 @@ public class OAuthService {
                 .build();
     }
 
-    private MemberSdkLoginResponse checkAlreadySignup(OAuthTokenInfo oauthTokenInfo, OAuthType oauthType) {
-        JwtTokenProvider tokenProvider = jwtTokenProviderResolver.getProvider(oauthTokenInfo.getIdToken());
-        String sub = tokenProvider.parseSub(oauthTokenInfo.getIdToken());
+    private MemberSdkLoginResponse checkAlreadySignup(OAuthTokenInfo oauthTokenInfo, OAuthType oauthType, String sub) {
 
         OAuth oauth = oauthRepository.findBySubAndOauthType(sub, oauthType)
                 .orElseThrow(() -> {
@@ -95,5 +90,4 @@ public class OAuthService {
                 .memberId(member.getId())
                 .build();
     }
-
 }
