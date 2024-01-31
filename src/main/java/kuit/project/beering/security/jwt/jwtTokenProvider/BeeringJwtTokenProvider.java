@@ -10,7 +10,6 @@ import kuit.project.beering.security.jwt.JwtParser;
 import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.exception.CustomJwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,8 +22,7 @@ import java.util.Date;
 
 @Slf4j
 @Component
-@Qualifier
-public class BeeringJwtTokenProvider extends AbstractJwtTokenProvider {
+public class BeeringJwtTokenProvider {
 
     @Value("${jwt-expired-in}")
     private long JWT_EXPIRED_IN;
@@ -34,8 +32,11 @@ public class BeeringJwtTokenProvider extends AbstractJwtTokenProvider {
 
     private final Key key;
 
+    private final String BEARER = "Bearer";
+    private final JwtParser jwtParser;
+
     public BeeringJwtTokenProvider(@Value("${jwt-secret-key}") String secretKey, JwtParser jwtParser) {
-        super(jwtParser);
+        this.jwtParser = jwtParser;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }
 
@@ -44,7 +45,6 @@ public class BeeringJwtTokenProvider extends AbstractJwtTokenProvider {
      * @param token
      * @return
      */
-    @Override
     public boolean validateToken(String token) {
         try {
             Jws<Claims> claims = Jwts.parserBuilder()
@@ -74,19 +74,21 @@ public class BeeringJwtTokenProvider extends AbstractJwtTokenProvider {
      */
     public JwtInfo createToken(Authentication authentication) {
 
+        AuthMember authMember = (AuthMember) authentication.getPrincipal();
+
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("iss", "https://beering.com")
-                .claim("sub", ((AuthMember) authentication.getPrincipal()).getId())
-                .claim("email", ((AuthMember) authentication.getPrincipal()).getUsername())
+                .claim("sub", authMember.getId())
+                .claim("email", authMember.getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRED_IN))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
 
         String refreshToken = Jwts.builder()
                 .claim("iss", "https://beering.com")
-                .claim("sub", ((AuthMember) authentication.getPrincipal()).getId())
-                .claim("email", ((AuthMember) authentication.getPrincipal()).getUsername())
+                .claim("sub", authMember.getId())
+                .claim("email", authMember.getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_REFRESH_EXPIRED_IN))
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -102,9 +104,8 @@ public class BeeringJwtTokenProvider extends AbstractJwtTokenProvider {
      * @param token
      * @return Authentication
      */
-    @Override
     public Authentication getAuthentication(String token) {
-        Claims claims = parseUnsignedClaims(token);
+        Claims claims = jwtParser.parseUnsignedClaims(token);
 
         UserDetails authMember =
                 AuthMember.builder()
@@ -116,12 +117,16 @@ public class BeeringJwtTokenProvider extends AbstractJwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(authMember, "", new ArrayList<>());
     }
 
+    public JwtInfo reissueJwtToken(String refreshToken) {
+        validateRefreshToken(refreshToken);
+        return createToken(getAuthentication(refreshToken));
+    }
+
     /**
      * @Brief 리프레시 토큰 검증
      * @return memberId
      */
-    @Override
-    public String validateRefreshToken(String refreshToken) {
+    private void validateRefreshToken(String refreshToken) {
         // 리프레시 토큰 자체 검증
         try {
             validateToken(refreshToken);
@@ -131,17 +136,6 @@ public class BeeringJwtTokenProvider extends AbstractJwtTokenProvider {
             }
             throw ex;
         }
-
-        return parseSub(refreshToken);
-    }
-
-    @Override
-    public JwtInfo reissueJwtToken(String refreshToken) {
-        return createToken(getAuthentication(refreshToken));
-    }
-
-    public String parseSub(String token) {
-        return String.valueOf(parseClaimsField(token, "sub", Long.class));
     }
 
 }
