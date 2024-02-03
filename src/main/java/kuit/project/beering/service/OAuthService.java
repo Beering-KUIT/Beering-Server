@@ -45,12 +45,12 @@ public class OAuthService {
 
     @Transactional(noRollbackFor = SignupNotCompletedException.class)
     public MemberLoginResponse sdkLogin(OAuthSdkLoginDto oAuthSdkLoginDto) {
-        // token의 sub로 OAuth 조회, 없으면 첫 로그인이므로 회원가입 마저 진행
         OAuthTokenInfo oauthTokenInfo = oAuthSdkLoginDto.getOauthTokenInfo();
         OAuthType oAuthType = oAuthSdkLoginDto.getOAuthType();
         String sub = oAuthSdkLoginDto.getSub();
         String email = oAuthSdkLoginDto.getEmail();
 
+        // token의 sub로 OAuth 조회, 없으면 첫 로그인이므로 회원가입 마저 진행
         Long memberId = checkAlreadySignup(oauthTokenInfo, oAuthType, sub);
 
         JwtInfo jwtInfo = createToken(email);
