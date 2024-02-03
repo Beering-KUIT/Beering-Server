@@ -1,9 +1,8 @@
 package kuit.project.beering.service;
 
 import kuit.project.beering.dto.request.auth.RefreshTokenRequest;
-import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.security.jwt.JwtInfo;
-import kuit.project.beering.security.jwt.jwtTokenProvider.BeeringJwtTokenProvider;
+import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
 import kuit.project.beering.util.exception.CustomJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class TokenService {
 
-    private final BeeringJwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional(noRollbackFor = CustomJwtException.class)
     public JwtInfo reissueToken(RefreshTokenRequest request) {

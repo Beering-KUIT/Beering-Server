@@ -22,7 +22,7 @@ import java.util.Date;
 
 @Slf4j
 @Component
-public class BeeringJwtTokenProvider {
+public class JwtTokenProvider {
 
     @Value("${jwt-expired-in}")
     private long JWT_EXPIRED_IN;
@@ -35,7 +35,7 @@ public class BeeringJwtTokenProvider {
     private final String BEARER = "Bearer";
     private final JwtParser jwtParser;
 
-    public BeeringJwtTokenProvider(@Value("${jwt-secret-key}") String secretKey, JwtParser jwtParser) {
+    public JwtTokenProvider(@Value("${jwt-secret-key}") String secretKey, JwtParser jwtParser) {
         this.jwtParser = jwtParser;
         this.key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(secretKey));
     }

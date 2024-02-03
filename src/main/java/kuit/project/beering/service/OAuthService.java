@@ -13,7 +13,7 @@ import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.OAuthRepository;
 import kuit.project.beering.security.jwt.JwtInfo;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
-import kuit.project.beering.security.jwt.jwtTokenProvider.BeeringJwtTokenProvider;
+import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
 import kuit.project.beering.util.exception.SignupNotCompletedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,7 +31,7 @@ public class OAuthService {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final OAuthRepository oauthRepository;
-    private final BeeringJwtTokenProvider jwtTokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
 
 //     rest-api 임시 주석처리
 //    @Transactional(noRollbackFor = SignupNotCompletedException.class)

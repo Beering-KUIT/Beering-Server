@@ -16,7 +16,7 @@ import kuit.project.beering.repository.ImageRepository;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.security.jwt.JwtInfo;
-import kuit.project.beering.security.jwt.jwtTokenProvider.BeeringJwtTokenProvider;
+import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
 import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.exception.domain.MemberException;
 import kuit.project.beering.util.s3.AwsS3Uploader;
@@ -44,7 +44,7 @@ public class MemberService {
     private final ImageRepository imageRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final PasswordEncoder passwordEncoder;
-    private final BeeringJwtTokenProvider beeringJwtTokenProvider;
+    private final JwtTokenProvider jwtTokenProvider;
     private final AwsS3Uploader awsS3Uploader;
 
     @Transactional
@@ -94,7 +94,7 @@ public class MemberService {
         /**
          * @Brief 인증 정보 기반으로 토큰 생성.
          */
-        JwtInfo jwtInfo = beeringJwtTokenProvider.createToken(authentication);
+        JwtInfo jwtInfo = jwtTokenProvider.createToken(authentication);
         AuthMember principal = (AuthMember) authentication.getPrincipal();
 
         return MemberLoginResponse.builder()
