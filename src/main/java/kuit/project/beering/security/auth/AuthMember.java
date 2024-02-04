@@ -1,23 +1,25 @@
 package kuit.project.beering.security.auth;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.List;
 
 @Getter
-@AllArgsConstructor
-@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder(access = AccessLevel.PRIVATE)
 public class AuthMember implements UserDetails {
 
-    private Long id;
-    private String username;
-    private String password;
-    private List<GrantedAuthority> authorities;
+    private final Long id;
+    private final String username;
+    private final String password;
+    private final List<GrantedAuthority> authorities;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -53,4 +55,23 @@ public class AuthMember implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    public static AuthMember GUEST(List<GrantedAuthority> authorities) {
+        return AuthMember.builder()
+                .id(0L)
+                .username("")
+                .password("")
+                .authorities(authorities)
+                .build();
+    }
+
+    public static AuthMember MEMBER(Long id, String username, List<GrantedAuthority> authorities) {
+        return AuthMember.builder()
+                .id(id)
+                .username(username)
+                .password("")
+                .authorities(authorities)
+                .build();
+    }
+
 }
