@@ -40,7 +40,7 @@ public class SecurityConfig {
                     authorizeRequest.requestMatchers("/", "/auth/**", "/oauth/**","/members",
                             "/members/validate/**","/drinks/**", "/error", "/reviews/**", "/reviewOptions/**").permitAll();
                 })
-                .authorizeHttpRequests(authorizeRequest -> authorizeRequest.anyRequest().authenticated())
+                .authorizeHttpRequests(authorizeRequest -> authorizeRequest.anyRequest().hasRole("MEMBER"))
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtExceptionFilter(), JwtAuthenticationFilter.class);
 
