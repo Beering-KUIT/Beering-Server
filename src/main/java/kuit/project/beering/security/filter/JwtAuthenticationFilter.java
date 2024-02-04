@@ -4,14 +4,19 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
 import lombok.AllArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 
 @AllArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -26,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
          * @Breif 토큰 검증 후 Spring Security Context에 인증 정보 담음
          * @Condition 토큰 값이 존재하고, 검증 되었으면 실행
          */
-        if (token != null) tokenValidateAndAuthorization(token);
+        tokenValidateAndAuthorization(token);
 
         filterChain.doFilter(request,response);
     }
@@ -51,8 +56,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private void tokenValidateAndAuthorization(String token) {
 
         if (jwtTokenProvider.validateToken(token)) {
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            setAuthentication(jwtTokenProvider.getAuthentication(token));
+            return;
         }
+
+        setAuthentication(createGuestAuthentication());
+    }
+
+    private void setAuthentication(Authentication authentication) {
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    private static Authentication createGuestAuthentication() {
+        List<GrantedAuthority> role_guest = AuthorityUtils.createAuthorityList("ROLE_GUEST");
+
+        return new UsernamePasswordAuthenticationToken(
+                AuthMember.GUEST(role_guest),
+                "", role_guest);
     }
 }
