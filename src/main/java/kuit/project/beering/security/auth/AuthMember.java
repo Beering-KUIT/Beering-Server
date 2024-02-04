@@ -74,4 +74,13 @@ public class AuthMember implements UserDetails {
                 .build();
     }
 
+    public boolean isGuest() {
+        return authorities.contains(new SimpleGrantedAuthority("ROLE_GUEST"));
+    }
+
+    public boolean isMember() {
+        return authorities.contains(new SimpleGrantedAuthority("ROLE_MEMBER"));
+    }
+
+
 }
