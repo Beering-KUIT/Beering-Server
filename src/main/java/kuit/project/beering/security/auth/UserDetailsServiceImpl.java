@@ -7,12 +7,11 @@ import kuit.project.beering.util.exception.domain.MemberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -28,14 +27,13 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         Member member = memberRepository.findByUsername(username).orElseThrow(() ->
                 new MemberException(BaseResponseStatus.NONE_MEMBER));
 
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        authorities.add(new SimpleGrantedAuthority("MEMBER"));
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList("ROLE_MEMBER");
 
-        return AuthMember.builder()
-                .id(member.getId())
-                .username(member.getUsername())
-                .password(member.getPassword())
-                .authorities(authorities)
-                .build();
+        return AuthMember.MEMBER(
+                member.getId(),
+                member.getUsername(),
+                authorities
+        );
+
     }
 }
