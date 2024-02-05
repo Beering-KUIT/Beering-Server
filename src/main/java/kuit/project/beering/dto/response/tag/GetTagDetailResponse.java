@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class GetTagDetailResponse {
-//    Long tagId;
+    Long tagId;
     String tagName;
     String description;
 }

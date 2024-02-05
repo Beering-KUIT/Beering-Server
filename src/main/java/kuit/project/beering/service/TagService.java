@@ -25,11 +25,11 @@ public class TagService {
             Tag tag = result.get();
 
             return GetTagDetailResponse.builder()
+                    .tagId(tag.getId())
                     .tagName(tag.getValue())
                     .description(tag.getDescription())
                     .build();
         }
-
         return null;
     }
 
