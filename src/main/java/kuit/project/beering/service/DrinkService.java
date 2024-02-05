@@ -129,7 +129,7 @@ public class DrinkService {
                 .drinkId(drinkId)
                 .nameKr(drink.getNameKr())
                 .nameEn(drink.getNameEn())
-                .description(drink.getDescription())
+                .country(drink.getCountry())
                 .manufacturer(drink.getManufacturer())
                 .alcohol(drink.getAlcohol())
                 .AvgRating(drink.getAvgRating())

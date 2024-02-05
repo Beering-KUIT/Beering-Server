@@ -16,7 +16,7 @@ public class DrinkRecommendResponse {
     Long drinkId;
     String nameKr;
     String nameEn;
-    String description;
+    String country;
     String manufacturer;
     float alcohol;
     float AvgRating;
