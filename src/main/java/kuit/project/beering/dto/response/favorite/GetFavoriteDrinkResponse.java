@@ -15,4 +15,7 @@ public class GetFavoriteDrinkResponse {
     String nameEn;
     String manufacturer;
     String primaryImageUrl;
+    String country;
+    Float avgRating;
+    Integer countOfReview;
 }

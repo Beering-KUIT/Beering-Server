@@ -16,6 +16,8 @@ public class DrinkSearchResponse {
     String nameKr;
     String nameEn;
     String manufacturer;
+    Float avgRating;
+    Integer countOfReview;
     List<String> imageUrlList;
     Boolean isLiked;
 }

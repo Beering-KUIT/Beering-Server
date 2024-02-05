@@ -69,6 +69,8 @@ public enum BaseResponseStatus {
     // 2100 : DrinkException
     NONE_DRINK(false, 2100, "해당 주류가 존재하지 않습니다."),
     INVALID_ORDER(false, 2101, "유효하지 않은 정렬방식 입니다."),
+    INVALID_SUB_OPTION(false, 2102, "유효하지 않은 하위 옵션(들)입니다."),
+    UNSUPPORTED_SUB_OPTION(false, 2103, "하위 옵션을 제공하지 않습니다."),
 
 
     // 2200 : FavoriteException
