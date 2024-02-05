@@ -34,7 +34,7 @@ public class JwtTokenProvider {
 
     private final Key key;
 
-    private final String BEARER = "Bearer ";
+    public final String BEARER = "Bearer ";
     private final JwtParser jwtParser;
 
     public JwtTokenProvider(@Value("${jwt-secret-key}") String secretKey, JwtParser jwtParser) {
@@ -81,7 +81,7 @@ public class JwtTokenProvider {
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("iss", "https://beering.com")
-                .claim("sub", authMember.getId())
+                .claim("sub", String.valueOf(authMember.getId()))
                 .claim("email", authMember.getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRED_IN))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -89,7 +89,7 @@ public class JwtTokenProvider {
 
         String refreshToken = Jwts.builder()
                 .claim("iss", "https://beering.com")
-                .claim("sub", authMember.getId())
+                .claim("sub", String.valueOf(authMember.getId()))
                 .claim("email", authMember.getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_REFRESH_EXPIRED_IN))
                 .signWith(key, SignatureAlgorithm.HS256)
