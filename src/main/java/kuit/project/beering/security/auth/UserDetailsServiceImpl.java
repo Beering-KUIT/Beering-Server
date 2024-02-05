@@ -32,6 +32,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         return AuthMember.MEMBER(
                 member.getId(),
                 member.getUsername(),
+                member.getPassword(),
                 authorities
         );
 
