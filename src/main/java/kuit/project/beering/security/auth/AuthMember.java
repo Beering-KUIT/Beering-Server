@@ -1,5 +1,6 @@
 package kuit.project.beering.security.auth;
 
+import kuit.project.beering.domain.Role;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -74,13 +75,21 @@ public class AuthMember implements UserDetails {
                 .build();
     }
 
+    public static AuthMember MEMBER(Long id, String username, String password, List<GrantedAuthority> authorities) {
+        return AuthMember.builder()
+                .id(id)
+                .username(username)
+                .password(password)
+                .authorities(authorities)
+                .build();
+    }
+
     public boolean isGuest() {
-        return authorities.contains(new SimpleGrantedAuthority("ROLE_GUEST"));
+        return authorities.contains(new SimpleGrantedAuthority(Role.GUEST.getRole()));
     }
 
     public boolean isMember() {
-        return authorities.contains(new SimpleGrantedAuthority("ROLE_MEMBER"));
+        return authorities.contains(new SimpleGrantedAuthority(Role.MEMBER.getRole()));
     }
-
 
 }
