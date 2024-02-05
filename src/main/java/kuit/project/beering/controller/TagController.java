@@ -2,6 +2,7 @@ package kuit.project.beering.controller;
 
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
 import kuit.project.beering.dto.response.tag.GetTagDetailResponse;
+import kuit.project.beering.dto.response.tag.GetTagResponse;
 import kuit.project.beering.service.TagService;
 import kuit.project.beering.util.BaseResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 import static kuit.project.beering.util.BaseResponseStatus.NONE_TAG;
 
 @RestController
@@ -23,6 +26,18 @@ public class TagController {
 
     private static final Logger logger = LoggerFactory.getLogger(TagController.class);
     private final TagService tagService;
+
+    /**
+     * 모든 태그를 받아오는 API
+     * @return BaseResponse<List<GetTagResponse>>
+     */
+    @GetMapping("/tags")
+    public BaseResponse<List<GetTagResponse>> getAllTags() {
+
+        List<GetTagResponse> getTagResponses = tagService.getAllTags();
+
+        return new BaseResponse<>(getTagResponses);
+    }
 
     /**
      * tagId 를 받아, 해당 tag 의 description return
