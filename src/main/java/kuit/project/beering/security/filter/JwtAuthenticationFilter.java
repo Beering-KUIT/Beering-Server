@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import kuit.project.beering.domain.Role;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @AllArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -41,9 +44,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      * @return 토큰 값(Bearer 제외)
      */
     private String resolveToken(HttpServletRequest request) {
-        String authorization = request.getHeader("Authorization");
-        if (StringUtils.hasText(authorization) && authorization.startsWith("Bearer")) {
-            return authorization.substring(7);
+        String authorization = request.getHeader(AUTHORIZATION);
+        if (StringUtils.hasText(authorization) && authorization.startsWith(jwtTokenProvider.BEARER)) {
+            return authorization.substring(jwtTokenProvider.BEARER.length());
         }
 
         return null;
@@ -55,12 +58,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private void tokenValidateAndAuthorization(String token) {
 
-        if (jwtTokenProvider.validateToken(token)) {
-            setAuthentication(jwtTokenProvider.getAuthentication(token));
+        if (token == null) {
+            setAuthentication(createGuestAuthentication());
             return;
         }
 
-        setAuthentication(createGuestAuthentication());
+        if (jwtTokenProvider.validateToken(token)) {
+            setAuthentication(jwtTokenProvider.getAuthentication(token));
+        }
+
     }
 
     private void setAuthentication(Authentication authentication) {
@@ -68,10 +74,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private static Authentication createGuestAuthentication() {
-        List<GrantedAuthority> role_guest = AuthorityUtils.createAuthorityList("ROLE_GUEST");
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(Role.GUEST.getRole());
 
         return new UsernamePasswordAuthenticationToken(
-                AuthMember.GUEST(role_guest),
-                "", role_guest);
+                AuthMember.GUEST(authorities),
+                "", authorities);
     }
 }
