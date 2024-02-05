@@ -1,9 +1,11 @@
 package kuit.project.beering.service;
 
+import kuit.project.beering.domain.DrinkType;
 import kuit.project.beering.domain.Record;
 import kuit.project.beering.dto.response.record.DailyAmount;
 import kuit.project.beering.dto.response.record.MonthlyAmount;
 import kuit.project.beering.dto.response.record.RecordByDateResponse;
+import kuit.project.beering.dto.response.record.TypelyAmount;
 import kuit.project.beering.repository.RecordRepository;
 import kuit.project.beering.repository.drink.DrinkRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,10 +41,10 @@ public class RecordService {
         // #2 month 로 최근 6개월 월별 주량 "List<MonthlyAmount> monthlyAmounts" Setting
         List<MonthlyAmount> monthlyAmounts = getRecent6MonthlyAmounts(year, month, userId);
 
-        // TODO#3 : month 로 주종별 주량 "List<Map<Integer, Integer>> typeAmount" Setting
+        // #3 : month 로 주종별 주량 "List<TypelyAmount> typeAmount" Setting
+        List<TypelyAmount> typelyAmounts = getTypelyAmounts(records);
 
-        // TODO#4 : build 하여 return
-        return new RecordByDateResponse(dailyAmounts, monthlyAmounts, null);
+        return new RecordByDateResponse(dailyAmounts, monthlyAmounts, typelyAmounts);
     }
 
     /**
@@ -116,5 +119,36 @@ public class RecordService {
         }
 
         return dailyAmountList;
+    }
+
+    /**
+     * 조회한 연-월 에 해당하는 User 의 Records 를 기반으로,
+     * DrinkType 별 주량을 담는, TyelyAmount 정보들을 구해 리턴한다
+     * @param records 조회한 연-월 에 해당하는 User 의 Records
+     * @return List<TypelyAmount>
+     */
+    private List<TypelyAmount> getTypelyAmounts(List<Record> records) {
+
+        Map<DrinkType, Integer> typelyAmounts = new HashMap<>();
+
+        for (DrinkType drinkType : DrinkType.getAllTypes()) {
+            typelyAmounts.putIfAbsent(drinkType, 0);
+        }
+
+        for (Record record : records) {
+            DrinkType recordDrinkType = record.getDrink()
+                    .getCategory()
+                    .getName();
+
+            typelyAmounts.computeIfPresent(recordDrinkType, ((type, amount) -> amount + record.calculateTotalAmount()));
+        }
+
+        return typelyAmounts.entrySet().stream()
+                .map(entry -> TypelyAmount.builder()
+                        .drinkType(entry.getKey().getDrinkTypeKr())
+                        .totalConsumption(entry.getValue())
+                        .build()
+                )
+                .collect(Collectors.toList());
     }
 }

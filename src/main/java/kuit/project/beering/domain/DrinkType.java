@@ -3,6 +3,9 @@ package kuit.project.beering.domain;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+import java.util.List;
+
 @RequiredArgsConstructor
 @Getter
 public enum DrinkType {
@@ -21,5 +24,9 @@ public enum DrinkType {
             }
         }
         return null;
+    }
+
+    public static List<DrinkType> getAllTypes() {
+        return Arrays.asList(values());
     }
 }

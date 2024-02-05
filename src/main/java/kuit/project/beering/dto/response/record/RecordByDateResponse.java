@@ -19,5 +19,5 @@ public class RecordByDateResponse {
     // 그래프 표시될 <월 : 월별 총 주량> 맵 리스트 (최근 6개월)
     List<MonthlyAmount> monthlyAmount;
     // 그래프 표시될 <주종 : 주종별 총 주량> 맵 리스트
-    List<Map<Integer, Integer>> typeAmount;
+    List<TypelyAmount> typeAmount;
 }

@@ -55,4 +55,10 @@ public class Record extends BaseTimeEntity{
     public void addRecordAmount(RecordAmount recordAmount){
         this.amounts.add(recordAmount);
     }
+
+    public Integer calculateTotalAmount() {
+        return amounts.stream()
+                .mapToInt(amount -> amount.getQuantity() * amount.getVolume())
+                .sum();
+    }
 }
