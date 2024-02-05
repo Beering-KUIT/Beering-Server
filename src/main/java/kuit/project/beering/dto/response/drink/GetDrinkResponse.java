@@ -19,6 +19,7 @@ public class GetDrinkResponse {
     float alcohol;
     String description;
     String manufacturer;
+    String country;
     float totalRating;
     int reviewCount;
     boolean isLiked;

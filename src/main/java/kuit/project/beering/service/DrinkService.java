@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import static kuit.project.beering.util.BaseResponseStatus.NONE_DRINK;
+import static kuit.project.beering.util.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -38,20 +38,47 @@ public class DrinkService {
 
     private final int SIZE = 10;
 
-//    /**
-//     * 주류 검색 메소드 <br>
-//     * <br>
-//     * @param page 페이지 번호
-//     * @param orderBy 정렬 : 이름순, 리뷰많은순, 최저가순, 평점순
-//     * @param drinkSearchCondition 필터 : 이름, 카테고리이름, 하한선, 상한선
-//     * @return 검색 결과 10개 // 페이징
-//     * @exception DrinkException 유효하지 않은 정렬 방식 입력시 예외 발생
-//     */
-//    public Slice<DrinkSearchResponse> searchDrinksByName(Integer page, String orderBy, DrinkSearchCondition drinkSearchCondition) {
-//        Pageable pageable = PageRequest.of(page, SIZE, SortType.getMatchedSort(orderBy));
-//
-//        return drinkRepository.search(drinkSearchCondition, pageable);
-//    }
+    /**
+     * 주류 검색 메소드 <br>
+     * <br>
+     * page 페이지 번호<br>
+     * orderBy 정렬 : 이름순, 리뷰많은순, 최저가순, 평점순<br>
+     * drinkSearchCondition 필터 : 이름, 카테고리이름, 하한선, 상한선<br>
+     * @return 검색 결과 10개 // 페이징
+     * @exception DrinkException 유효하지 않은 정렬 방식 입력시 예외 발생
+     */
+    public Slice<DrinkSearchResponse> searchDrinksByName(SearchDrinkRequest request, Long memberId) {
+        Pageable pageable = PageRequest.of(request.getPage(), SIZE, SortType.getMatchedSort(request.getOrderBy()));
+
+        validSubOption(request);
+
+        DrinkSearchCondition drinkSearchCondition = new DrinkSearchCondition(
+                request.getName(), request.getName(), request.getCategory(), request.getMinPrice(), request.getMaxPrice(),
+                request.getTag(), request.getCountry(), request.getSweetness(), memberId);
+
+        return drinkRepository.search(drinkSearchCondition, pageable);
+    }
+
+    private void validSubOption(SearchDrinkRequest request) {
+        if(request.getCategory() == null)
+            return;
+
+        boolean invalid = false;
+
+        // 카테고리 다중 선택임에도 하위 옵션이 선택된 경우
+        if(request.getCategory().size() > 1){
+            if(request.getCountry() != null || request.getSweetness() != null)
+                throw new DrinkException(UNSUPPORTED_SUB_OPTION);
+            else return;
+        }
+
+        String category = request.getCategory().get(0);
+
+        // 카테고리에 따른 하위옵션 검증구간
+        if(category.equals("beer") && request.getSweetness() != null) invalid = true;
+
+        if(invalid) throw new DrinkException(INVALID_SUB_OPTION);
+    }
 
     @Transactional
     public GetDrinkResponse getDrinkById(Long drinkId, Long memberId) {
@@ -73,7 +100,6 @@ public class DrinkService {
     }
 
     private List<ReviewPreview> getReviewPreviews(Long drinkId) {
-        // TODO : 생성순 -> 좋아요순으로 정렬하면 더 좋을 듯.
         List<Review> reviews = reviewRepository.findTop5ByDrinkIdOrderByTabomsDesc(drinkId);
         return reviews.stream()
                 .map(review -> new ReviewPreview(
@@ -89,16 +115,6 @@ public class DrinkService {
     private String getProfileImageUrl(Review review){
         Member member = review.getMember();
         return memberService.getProfileImageUrl(member);
-    }
-
-
-    public Slice<DrinkSearchResponse> searchDrinksByName(SearchDrinkRequest request, Long memberId) {
-        Pageable pageable = PageRequest.of(request.getPage(), SIZE, SortType.getMatchedSort(request.getOrderBy()));
-
-        DrinkSearchCondition drinkSearchCondition = new DrinkSearchCondition(
-                request.getName(), request.getName(), request.getCategory(), request.getMinPrice(), request.getMaxPrice(), memberId);
-
-        return drinkRepository.search(drinkSearchCondition, pageable);
     }
 
     public DrinkRecommendResponse recommendDrink() {
