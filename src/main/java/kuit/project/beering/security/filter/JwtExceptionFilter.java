@@ -18,19 +18,21 @@ import java.io.IOException;
 @Slf4j
 public class JwtExceptionFilter extends OncePerRequestFilter {
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("JwtExceptionFilter 진입");
         try {
             filterChain.doFilter(request, response);
         } catch (CustomJwtException e) {
-            setResponse(response, new ObjectMapper(), e.getStatus());
+            setResponse(response, e.getStatus());
         } catch (JwtException e) {
-            setResponse(response, new ObjectMapper(), BaseResponseStatus.INVALID_TOKEN_TYPE);
+            setResponse(response, BaseResponseStatus.INVALID_TOKEN_TYPE);
         }
     }
 
-    private void setResponse(HttpServletResponse response, ObjectMapper objectMapper, BaseResponseStatus status) throws IOException {
+    private void setResponse(HttpServletResponse response, BaseResponseStatus status) throws IOException {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
         objectMapper.writeValue(response.getWriter(), new BaseResponse<>(status));

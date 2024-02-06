@@ -6,7 +6,7 @@ import kuit.project.beering.security.jwt.OAuthTokenInfo;
 
 public interface OAuthClientService {
 
-    boolean validateToken(String token);
+    void validateToken(String token);
 
     OAuthTokenInfo reissueToken(String refreshToken);
 

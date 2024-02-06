@@ -21,7 +21,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
 import java.util.Base64;
-import java.util.Date;
 
 @Slf4j
 public abstract class AbstractOAuthClientService implements OAuthClientService {
@@ -43,13 +42,22 @@ public abstract class AbstractOAuthClientService implements OAuthClientService {
      * @Brief 토큰 검증+
      */
     @Override
-    public boolean validateToken(String token) {
+    public void validateToken(String token) {
+        String iss = oauthProperties.getAuthUrl();
+        String aud = oauthProperties.getRestapiKey();
+        OIDCPublicKeysResponse oidcPublicKeysResponse = oauthTokenClient.getOIDCOpenKeys();
 
-        return isAvailable(
-                token,
-                oauthProperties.getAuthUrl(),
-                oauthProperties.getRestapiKey(),
-                oauthTokenClient.getOIDCOpenKeys());
+        // 기타 필드 검증
+        String kid = getKidFromUnsignedIdToken(token, iss, aud);
+
+        OIDCPublicKey oidcPublicKey =
+                oidcPublicKeysResponse.getKeys().stream()
+                        .filter(o -> o.getKid().equals(kid))
+                        .findFirst()
+                        .orElseThrow();
+
+        // 서명 검증
+        signKey(token, oidcPublicKey.getN(), oidcPublicKey.getE());
     }
 
     /**
@@ -86,34 +94,17 @@ public abstract class AbstractOAuthClientService implements OAuthClientService {
         return oauthInfoClient.getOAuthAccount("Bearer " + accessToken);
     }
 
-    private boolean isAvailable(
-            String token, String iss, String aud, OIDCPublicKeysResponse oidcPublicKeysResponse) {
-
-        // 기타 필드 검증
-        String kid = getKidFromUnsignedIdToken(token, iss, aud);
-
-        OIDCPublicKey oidcPublicKey =
-                oidcPublicKeysResponse.getKeys().stream()
-                        .filter(o -> o.getKid().equals(kid))
-                        .findFirst()
-                        .orElseThrow();
-
-        // 서명 검증
-        return signKey(token, oidcPublicKey.getN(), oidcPublicKey.getE());
-    }
-
     /**
      * @Brief 공개 키 서명
      */
-    private boolean signKey(String token, String modulus, String exponent) {
+    private void signKey(String token, String modulus, String exponent) {
 
         try {
             Jws<Claims> claims = Jwts.parserBuilder()
                     .setSigningKey(getRSAPublicKey(modulus, exponent)).build()
                     .parseClaimsJws(token);
-            return claims.getBody().getExpiration().after(new Date());
         } catch (ExpiredJwtException e) {
-            throw new CustomJwtException(BaseResponseStatus.EXPIRED_ACCESS_TOKEN);
+            throw new CustomJwtException(BaseResponseStatus.EXPIRED_ID_TOKEN);
         } catch (UnsupportedJwtException e) {
             throw new CustomJwtException(BaseResponseStatus.UNSUPPORTED_TOKEN_TYPE);
         } catch (SignatureException e) {
@@ -148,7 +139,7 @@ public abstract class AbstractOAuthClientService implements OAuthClientService {
             throw new CustomJwtException(BaseResponseStatus.EXPIRED_ACCESS_TOKEN);
         } catch (UnsupportedJwtException e) {
             throw e;
-        }catch (Exception e) {
+        } catch (Exception e) {
             log.error(e.toString());
             throw new CustomJwtException(BaseResponseStatus.INVALID_TOKEN_TYPE);
         }

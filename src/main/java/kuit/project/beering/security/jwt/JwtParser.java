@@ -1,6 +1,8 @@
 package kuit.project.beering.security.jwt;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
 import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.exception.CustomJwtException;
 import lombok.RequiredArgsConstructor;
@@ -25,13 +27,6 @@ public class JwtParser {
         }
     }
 
-    /**
-     * @Breif 토큰 서명 검증 없이 클레임 필드 파싱
-     */
-    public <T> T parseClaimsField(String token, String field, Class<T> tClass) {
-        return parseUnsignedClaims(token).get(field, tClass);
-    }
-
     public boolean isJwt(String token) {
         try {
             Jwts.parserBuilder().build().parse(getUnsignedToken(token));
@@ -39,6 +34,25 @@ public class JwtParser {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public String parseSub(String token) {
+        return parseClaimsField(token, "sub", String.class);
+    }
+
+    public String parseIssuer(String token) {
+        return parseClaimsField(token, "iss", String.class);
+    }
+
+    public String parseEmail(String token) {
+        return parseClaimsField(token, "email", String.class);
+    }
+
+    /**
+     * @Breif 토큰 서명 검증 없이 클레임 필드 파싱
+     */
+    private  <T> T parseClaimsField(String token, String field, Class<T> tClass) {
+        return parseUnsignedClaims(token).get(field, tClass);
     }
 
     /**
