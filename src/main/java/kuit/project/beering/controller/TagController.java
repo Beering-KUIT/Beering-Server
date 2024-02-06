@@ -1,6 +1,5 @@
 package kuit.project.beering.controller;
 
-import kuit.project.beering.dto.response.drink.GetDrinkResponse;
 import kuit.project.beering.dto.response.tag.GetTagDetailResponse;
 import kuit.project.beering.dto.response.tag.GetTagResponse;
 import kuit.project.beering.service.TagService;
@@ -15,8 +14,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-
-import static kuit.project.beering.util.BaseResponseStatus.NONE_TAG;
 
 @RestController
 @RequiredArgsConstructor
@@ -49,9 +46,6 @@ public class TagController {
 
         GetTagDetailResponse getTagDetailResponse = tagService.getTagDetail(tagId);
 
-        if (getTagDetailResponse == null) {
-            return new BaseResponse<>(NONE_TAG);
-        }
         return new BaseResponse<>(getTagDetailResponse);
     }
 

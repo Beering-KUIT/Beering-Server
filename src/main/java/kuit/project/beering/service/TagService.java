@@ -4,14 +4,16 @@ import kuit.project.beering.domain.Tag;
 import kuit.project.beering.dto.response.tag.GetTagDetailResponse;
 import kuit.project.beering.dto.response.tag.GetTagResponse;
 import kuit.project.beering.repository.TagRepository;
+import kuit.project.beering.util.exception.domain.TagException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static kuit.project.beering.util.BaseResponseStatus.NONE_TAG;
 
 @Service
 @RequiredArgsConstructor
@@ -31,18 +33,14 @@ public class TagService {
     }
 
     public GetTagDetailResponse getTagDetail(Long tagId) {
-        Optional<Tag> result = tagRepository.findById(tagId);
+        Tag tag = tagRepository.findById(tagId)
+                .orElseThrow(() -> new TagException(NONE_TAG));
 
-        if (result.isPresent()) {
-            Tag tag = result.get();
-
-            return GetTagDetailResponse.builder()
-                    .tagId(tag.getId())
-                    .tagName(tag.getValue())
-                    .description(tag.getDescription())
-                    .build();
-        }
-        return null;
+        return GetTagDetailResponse.builder()
+                .tagId(tag.getId())
+                .tagName(tag.getValue())
+                .description(tag.getDescription())
+                .build();
     }
 
 }
