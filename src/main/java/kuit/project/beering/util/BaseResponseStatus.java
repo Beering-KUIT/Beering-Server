@@ -85,6 +85,10 @@ public enum BaseResponseStatus {
     // 2300 : TabomException
     POST_TABOM_ALREADY_CREATED(false, 2300, "이미 좋아요나 싫어요가 존재합니다."),
 
+    // 2400 : TagException
+    NONE_TAG(false, 2400, "해당 태그가 존재하지 않습니다."),
+
+
     /**
      * 3000 : Response 오류
      */
