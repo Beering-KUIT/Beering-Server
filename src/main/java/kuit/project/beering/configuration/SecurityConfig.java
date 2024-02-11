@@ -1,5 +1,6 @@
 package kuit.project.beering.configuration;
 
+import kuit.project.beering.domain.Role;
 import kuit.project.beering.security.filter.JwtAuthenticationFilter;
 import kuit.project.beering.security.filter.JwtExceptionFilter;
 import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
@@ -40,7 +41,7 @@ public class SecurityConfig {
                     authorizeRequest.requestMatchers("/", "/auth/**", "/oauth/**","/members",
                             "/members/validate/**","/drinks/**", "/error", "/reviews/**", "/reviewOptions/**", "/tags/**").permitAll();
                 })
-                .authorizeHttpRequests(authorizeRequest -> authorizeRequest.anyRequest().authenticated())
+                .authorizeHttpRequests(authorizeRequest -> authorizeRequest.anyRequest().hasRole(Role.MEMBER.getValue()))
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtExceptionFilter(), JwtAuthenticationFilter.class);
 

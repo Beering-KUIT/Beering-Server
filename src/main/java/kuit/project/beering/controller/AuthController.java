@@ -64,7 +64,10 @@ public class AuthController {
      * @return
      */
     @PostMapping("/token")
-    public BaseResponse<JwtInfo> reissueToken(@RequestBody RefreshTokenRequest refreshToken) {
+    public BaseResponse<JwtInfo> reissueToken(@RequestBody @Validated RefreshTokenRequest refreshToken, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) throw new FieldValidationException(bindingResult);
+
         JwtInfo jwtInfo = tokenService.reissueToken(refreshToken);
 
         return new BaseResponse<>(jwtInfo);
