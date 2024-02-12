@@ -20,8 +20,9 @@ public class Category extends BaseTimeEntity {
     @Column(name = "category_id")
     private Long id;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String name;
+    private DrinkType name;
 
     @Enumerated(EnumType.STRING)
     @Column

@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import kuit.project.beering.domain.DrinkType;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -102,7 +103,12 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
         if(categories == null)
             return null;
         for (String category : categories) {
-            BooleanExpression condition = drink.category.name.eq(category);
+
+            DrinkType drinkType = DrinkType.fromName(category);
+            if (drinkType == null)
+                continue;
+
+            BooleanExpression condition = drink.category.name.eq(drinkType);
             if (categoryConditions == null) {
                 categoryConditions = condition;
             } else {
