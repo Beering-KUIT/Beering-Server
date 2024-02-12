@@ -2,6 +2,7 @@ package kuit.project.beering.controller.advice;
 
 import jakarta.persistence.EntityNotFoundException;
 import kuit.project.beering.controller.AuthController;
+import kuit.project.beering.controller.OAuthSdkController;
 import kuit.project.beering.dto.common.ObjectValidationError;
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.BaseResponseStatus;
@@ -13,7 +14,7 @@ import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-@RestControllerAdvice(assignableTypes = AuthController.class)
+@RestControllerAdvice(assignableTypes = {AuthController.class, OAuthSdkController.class})
 @Slf4j
 public class AuthControllerAdvice {
 

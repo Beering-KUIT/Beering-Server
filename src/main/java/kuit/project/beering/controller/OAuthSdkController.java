@@ -2,21 +2,22 @@ package kuit.project.beering.controller;
 
 import kuit.project.beering.domain.AgreementName;
 import kuit.project.beering.domain.OAuthType;
-import kuit.project.beering.dto.request.auth.OAuthCodeRequest;
+import kuit.project.beering.dto.common.OAuthSdkLoginDto;
+import kuit.project.beering.dto.common.SignupContinueDto;
 import kuit.project.beering.dto.request.auth.OAuthSignupRequest;
 import kuit.project.beering.dto.request.member.AgreementRequest;
-import kuit.project.beering.dto.response.SignupNotCompletedResponse;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
+import kuit.project.beering.security.auth.OAuthTypeMapper;
 import kuit.project.beering.security.auth.oauth.service.OAuthClientService;
 import kuit.project.beering.security.auth.oauth.service.OAuthClientServiceResolver;
-import kuit.project.beering.security.jwt.JwtTokenProviderResolver;
+import kuit.project.beering.security.jwt.JwtParser;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
 import kuit.project.beering.service.OAuthService;
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.BaseResponseStatus;
+import kuit.project.beering.util.exception.SignupNotCompletedException;
 import kuit.project.beering.util.exception.validation.AgreementValidationException;
 import kuit.project.beering.util.exception.validation.FieldValidationException;
-import kuit.project.beering.util.exception.SignupNotCompletedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.BindingResult;
@@ -26,51 +27,42 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/oauth")
-public class OAuthController {
+@RequestMapping("/oauth/sdk")
+public class OAuthSdkController {
 
     private final OAuthService oauthService;
-    private final OAuthClientServiceResolver oauthClientServiceResolver;
-    private final JwtTokenProviderResolver jwtTokenProviderResolver;
+    private final OAuthClientServiceResolver oAuthClientServiceResolver;
+    private final JwtParser jwtParser;
+    private final OAuthTypeMapper oAuthTypeMapper;
 
-    private static Map<String, OAuthType> isserTypeMap = new HashMap<>();
+    // rest-api
+//    @GetMapping("/kakao/callback")
+//    public BaseResponse<MemberLoginResponse> restapiLogin(@ModelAttribute OAuthCodeRequest OAuthCodeRequest) {
+//
+//        if (OAuthCodeRequest.getError() != null) return new BaseResponse<>(BaseResponseStatus.OAUTH_LOGIN_FAILED);
+//
+//        MemberLoginResponse memberLoginResponse = oauthService.restapiLogin(OAuthCodeRequest.getCode(), oauthClientServiceResolver.getOauthClientService(OAuthType.KAKAO));
+//
+//        return new BaseResponse<>(memberLoginResponse);
+//    }
 
-    static {
-        isserTypeMap.put("https://kauth.kakao.com", OAuthType.KAKAO);
-    }
-
-    @GetMapping("/kakao/callback")
-    public BaseResponse<MemberLoginResponse> restapiLogin(@ModelAttribute OAuthCodeRequest OAuthCodeRequest) {
-
-        if (OAuthCodeRequest.getError() != null) return new BaseResponse<>(BaseResponseStatus.OAUTH_LOGIN_FAILED);
-
-        MemberLoginResponse memberLoginResponse = oauthService.restapiLogin(OAuthCodeRequest.getCode(), oauthClientServiceResolver.getOauthClientService(OAuthType.KAKAO));
-
-        return new BaseResponse<>(memberLoginResponse);
-    }
-
-    @PostMapping("/sdk")
+    @PostMapping("/login")
     public BaseResponse<MemberLoginResponse> sdkLogin(@RequestBody OAuthTokenInfo oauthTokenInfo) {
-        String idToken = oauthTokenInfo.getIdToken();
 
-        String issuer = jwtTokenProviderResolver.getProvider(idToken).parseIssuer(idToken);
+        OAuthSdkLoginDto oAuthSdkLoginDto = createOAuthSdkLoginDto(oauthTokenInfo);
 
-        OAuthClientService oauthClientService = oauthClientServiceResolver.getOauthClientService(isserTypeMap.get(issuer));
-
-        MemberLoginResponse memberLoginResponse = oauthService.sdkLogin(oauthTokenInfo, oauthClientService);
+        MemberLoginResponse memberLoginResponse = oauthService.sdkLogin(oAuthSdkLoginDto);
 
         return new BaseResponse<>(memberLoginResponse);
     }
 
     @PostMapping("/signup")
-    public BaseResponse<Object> signup(@RequestBody @Validated OAuthSignupRequest request,
+    public BaseResponse<MemberLoginResponse> signup(@RequestBody @Validated OAuthSignupRequest request,
                                        BindingResult bindingResult) {
 
         validateAgreement(request, bindingResult);
@@ -78,19 +70,15 @@ public class OAuthController {
         if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
         if (bindingResult.hasGlobalErrors()) throw new AgreementValidationException(bindingResult);
 
-        MemberLoginResponse response = oauthService.signup(request, oauthClientServiceResolver.getOauthClientService(request.getOauthType()));
+        MemberLoginResponse response = oauthService.signupContinue(createSignupRequestDto(request));
 
         return new BaseResponse<>(response);
     }
 
     @ExceptionHandler(SignupNotCompletedException.class)
-    public BaseResponse<SignupNotCompletedResponse> loginNotCompleted(SignupNotCompletedException ex) {
-        return new BaseResponse<>(BaseResponseStatus.SUCCESS_CONTINUE_SIGNUP, SignupNotCompletedResponse.builder()
-                .isLoginCompleted(false)
-                .sub(ex.getSub())
-                .oauthType(ex.getOauthType()).build());
+    public BaseResponse<Object> loginNotCompleted(SignupNotCompletedException ex) {
+        return new BaseResponse<>(BaseResponseStatus.SUCCESS_CONTINUE_SIGNUP, null);
     }
-
 
     /**
      * @param request
@@ -122,5 +110,45 @@ public class OAuthController {
                         true, null, null,
                         "SERVICE, PERSONAL 의 isAgreed 값은 반드시 TRUE"));
         });
+    }
+
+    private SignupContinueDto createSignupRequestDto(OAuthSignupRequest request) {
+        String idToken = request.getIdToken();
+        String issuer = validateIdToken(idToken);
+
+        OAuthType oAuthType = oAuthTypeMapper.get(issuer);
+        String sub = jwtParser.parseSub(idToken);
+        String email = jwtParser.parseEmail(idToken);
+
+        return SignupContinueDto.builder()
+                .request(request)
+                .oAuthType(oAuthType)
+                .sub(sub)
+                .email(email).build();
+    }
+
+    private OAuthSdkLoginDto createOAuthSdkLoginDto(OAuthTokenInfo oauthTokenInfo) {
+
+        String idToken = oauthTokenInfo.getIdToken();
+        String issuer = validateIdToken(idToken);
+
+        String sub = jwtParser.parseSub(idToken);
+        String email = jwtParser.parseEmail(idToken);
+        OAuthType oAuthType = oAuthTypeMapper.get(issuer);
+
+        return OAuthSdkLoginDto.builder()
+                .oauthTokenInfo(oauthTokenInfo)
+                .oAuthType(oAuthType)
+                .sub(sub)
+                .email(email)
+                .build();
+    }
+
+    private String validateIdToken(String idToken) {
+        String issuer = jwtParser.parseIssuer(idToken);
+        OAuthClientService oauthClientService = oAuthClientServiceResolver.getOauthClientService(issuer);
+        oauthClientService.validateToken(idToken);
+
+        return issuer;
     }
 }

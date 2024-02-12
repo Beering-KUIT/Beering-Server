@@ -2,7 +2,7 @@ package kuit.project.beering.configuration;
 
 import kuit.project.beering.security.filter.JwtAuthenticationFilter;
 import kuit.project.beering.security.filter.JwtExceptionFilter;
-import kuit.project.beering.security.jwt.JwtTokenProviderResolver;
+import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,7 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtTokenProviderResolver jwtTokenProviderResolver;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Bean
     public PasswordEncoder bCryptPasswordEncoder() {
@@ -38,10 +38,10 @@ public class SecurityConfig {
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeRequest -> {
                     authorizeRequest.requestMatchers("/", "/auth/**", "/oauth/**","/members",
-                            "/members/validate/**","/drinks/**", "/error", "/reviews/**", "/reviewOptions/**", "/upload/**").permitAll();
+                            "/members/validate/**","/drinks/**", "/error", "/reviews/**", "/reviewOptions/**", "/tags/**", "/upload/**").permitAll();
                 })
                 .authorizeHttpRequests(authorizeRequest -> authorizeRequest.anyRequest().authenticated())
-                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProviderResolver), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new JwtExceptionFilter(), JwtAuthenticationFilter.class);
 
         return http.build();
