@@ -35,13 +35,13 @@ public class UploadService {
     private final ImageRepository imageRepository;
 
     // 테스트 이미지를 S3에 저장하고 테스트 이미지 엔티티 생성
-    public List<Image> uploadTestImages(List<MultipartFile> testImages) {
+    public List<Image> uploadImages(List<MultipartFile> uploadImages, AttachmentType attachmentType) {
 
-        List<String> uploadNames = testImages.stream()
+        List<String> uploadNames = uploadImages.stream()
                 .map(testImage -> testImage.getOriginalFilename().toUpperCase())
                 .collect(Collectors.toList());
-        List<String> urls = testImages.stream()
-                .map(testImage -> awsS3Uploader.upload(testImage, AttachmentType.TEST.getType()))
+        List<String> urls = uploadImages.stream()
+                .map(testImage -> awsS3Uploader.upload(testImage, attachmentType.getType()))
                 .collect(Collectors.toList());
         List<Image> images = new ArrayList<>();
         for(int i=0; i< urls.size(); i++) {

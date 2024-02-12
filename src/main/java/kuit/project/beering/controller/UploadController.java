@@ -1,5 +1,6 @@
 package kuit.project.beering.controller;
 
+import kuit.project.beering.domain.AttachmentType;
 import kuit.project.beering.domain.image.Image;
 import kuit.project.beering.service.UploadService;
 import kuit.project.beering.util.BaseResponse;
@@ -26,9 +27,10 @@ public class UploadController {
     @PostMapping(value="/upload",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public BaseResponse<List<Image>> saveImage(
-            @RequestParam(value="image") List<MultipartFile> images) throws IOException {
+            @RequestParam(value="image") List<MultipartFile> images,
+            @RequestParam(value="type") String type) throws IOException {
 
-        List<Image> imageList = uploadService.uploadTestImages(images);
+        List<Image> imageList = uploadService.uploadImages(images, AttachmentType.fromString(type));
 
         return new BaseResponse<>(imageList);
 
