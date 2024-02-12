@@ -1,13 +1,16 @@
 package kuit.project.beering.controller;
 
+import kuit.project.beering.dto.response.tag.GetFrequentTagResponse;
 import kuit.project.beering.dto.response.tag.GetTagDetailResponse;
 import kuit.project.beering.dto.response.tag.GetTagResponse;
+import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.TagService;
 import kuit.project.beering.util.BaseResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -49,4 +52,12 @@ public class TagController {
         return new BaseResponse<>(getTagDetailResponse);
     }
 
+    @GetMapping("/tags/frequent-tags")
+    public BaseResponse<GetFrequentTagResponse> getFrequentTags(@AuthenticationPrincipal AuthMember authMember) {
+
+        // TODO : authMember isMember 처리
+        GetFrequentTagResponse getFrequentTagResponse = tagService.getFrequentTags(authMember.getId());
+
+        return new BaseResponse<>(getFrequentTagResponse);
+    }
 }
