@@ -35,4 +35,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "order by r.createdAt desc ")
     Slice<Review> findAllReviewsSliceByDrinkIdByCreatedAtDesc(@Param("drinkId")Long drinkId, Pageable pageable);
 
+    @Query("select r from Review r " +
+            "where r.member.id = :userId")
+    List<Review> findAllReviewsByUserId(@Param("userId") Long userId);
 }
