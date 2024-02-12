@@ -10,4 +10,8 @@ import java.util.List;
 public interface RecordRepository extends JpaRepository<Record, Long> {
     @Query("SELECT r FROM Record r WHERE r.member.id = :userId AND YEAR(r.date) = :year AND MONTH(r.date) = :month")
     List<Record> findByDateAndUserId(@Param("year") int year, @Param("month") int month, @Param("userId") Long userId);
+
+    @Query("select r from Record r " +
+            "where r.member.id = :userId")
+    List<Record> findAllRecordsByUserId(@Param("userId") Long userId);
 }
