@@ -1,5 +1,6 @@
 package kuit.project.beering.dto.response.drink;
 
+import kuit.project.beering.domain.Beer;
 import kuit.project.beering.domain.Drink;
 import kuit.project.beering.domain.image.DrinkImage;
 import kuit.project.beering.domain.image.Image;
@@ -23,6 +24,7 @@ public class GetDrinkResponseBuilder implements ResponseBuilder<GetDrinkResponse
                 .alcohol(drink.getAlcohol())
                 .description(drink.getDescription())
                 .manufacturer(drink.getManufacturer())
+                .country(drink.getCountry())
                 .totalRating(drink.getAvgRating())
                 .reviewCount(drink.getCountOfReview())
                 .isLiked(isLiked)
