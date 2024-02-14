@@ -4,22 +4,23 @@ import jakarta.persistence.EntityNotFoundException;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.OAuth;
 import kuit.project.beering.domain.OAuthType;
-import kuit.project.beering.dto.common.OAuthMemberInfo;
-import kuit.project.beering.dto.request.auth.OAuthSignupRequest;
+import kuit.project.beering.dto.common.OAuthSdkLoginDto;
+import kuit.project.beering.dto.common.SignupContinueDto;
+import kuit.project.beering.dto.request.member.AgreementRequest;
 import kuit.project.beering.dto.request.member.MemberSignupRequest;
 import kuit.project.beering.dto.response.member.MemberLoginResponse;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.OAuthRepository;
-import kuit.project.beering.security.auth.oauth.service.OAuthClientService;
 import kuit.project.beering.security.jwt.JwtInfo;
-import kuit.project.beering.security.jwt.JwtTokenProviderResolver;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
 import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
 import kuit.project.beering.util.exception.SignupNotCompletedException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -30,75 +31,84 @@ public class OAuthService {
     private final MemberService memberService;
     private final MemberRepository memberRepository;
     private final OAuthRepository oauthRepository;
-    private final JwtTokenProviderResolver jwtTokenProviderResolver;
+    private final JwtTokenProvider jwtTokenProvider;
+
+//     rest-api 임시 주석처리
+//    @Transactional(noRollbackFor = SignupNotCompletedException.class)
+//    public MemberLoginResponse restapiLogin(String code, OAuthClientService oAuthClientService) {
+//        // 1. "인가 코드"로 "액세스 토큰" 요청
+//        OAuthTokenInfo oauthTokenInfo = oAuthClientService.createToken(code);
+//
+//        // 2. token의 sub로 OAuth 조회, 없으면 첫 로그인이므로 회원가입 마저 진행
+//        return checkAlreadySignup(oauthTokenInfo, oAuthClientService.getOauthType());
+//    }
 
     @Transactional(noRollbackFor = SignupNotCompletedException.class)
-    public MemberLoginResponse restapiLogin(String code, OAuthClientService oAuthClientService) {
-        // 1. "인가 코드"로 "액세스 토큰" 요청
-        OAuthTokenInfo oauthTokenInfo = oAuthClientService.createToken(code);
+    public MemberLoginResponse sdkLogin(OAuthSdkLoginDto oAuthSdkLoginDto) {
+        OAuthTokenInfo oauthTokenInfo = oAuthSdkLoginDto.getOauthTokenInfo();
+        OAuthType oAuthType = oAuthSdkLoginDto.getOAuthType();
+        String sub = oAuthSdkLoginDto.getSub();
+        String email = oAuthSdkLoginDto.getEmail();
 
-        // 2. token의 sub로 OAuth 조회, 없으면 첫 로그인이므로 회원가입 마저 진행
-        return checkAlreadySignup(oauthTokenInfo, oAuthClientService.getOauthType());
-    }
-
-    @Transactional(noRollbackFor = SignupNotCompletedException.class)
-    public MemberLoginResponse sdkLogin(OAuthTokenInfo oauthTokenInfo, OAuthClientService oauthClientService) {
         // token의 sub로 OAuth 조회, 없으면 첫 로그인이므로 회원가입 마저 진행
-        return checkAlreadySignup(oauthTokenInfo, oauthClientService.getOauthType());
-    }
+        Long memberId = checkAlreadySignup(oauthTokenInfo, oAuthType, sub);
 
-    @Transactional
-    public MemberLoginResponse signup(OAuthSignupRequest request, OAuthClientService oauthClientService) {
-
-        OAuth oauth = oauthRepository.findBySubAndOauthType(request.getSub(), request.getOauthType())
-                .orElseThrow(EntityNotFoundException::new);
-
-        OAuthMemberInfo oauthAccountInfo = oauthClientService.getAccount(oauth.getAccessToken());
-
-        String email = oauthAccountInfo.getEmail();
-        String nickname = request.getNickname();
-
-        // 회원가입 처리
-        memberService.signup(new MemberSignupRequest(email, UUID.randomUUID().toString(), nickname, request.getAgreements()));
-        Member member = memberRepository.findByUsername(email).orElseThrow(EntityNotFoundException::new);
-        member.createOauthAssociation(oauth);
-
-        // 토큰 발행
-        OAuthTokenInfo oauthTokenInfo = oauthClientService.reissueToken(oauth.getRefreshToken());
-
-        String idToken = oauthTokenInfo.getIdToken();
-        String accessToken = oauthTokenInfo.getAccessToken();
-        String refreshToken = oauthTokenInfo.getRefreshToken();
-
-        // 값 변경
-        oauth.tokenReissue(accessToken, refreshToken);
+        JwtInfo jwtInfo = createToken(email);
 
         return MemberLoginResponse.builder()
-                .memberId(member.getId())
-                .jwtInfo(JwtInfo.builder().accessToken(idToken).refreshToken(refreshToken).build())
+                .jwtInfo(jwtInfo)
+                .memberId(memberId)
                 .build();
     }
 
-    private MemberLoginResponse checkAlreadySignup(OAuthTokenInfo oauthTokenInfo, OAuthType oauthType) {
-        JwtTokenProvider tokenProvider = jwtTokenProviderResolver.getProvider(oauthTokenInfo.getIdToken());
-        String sub = tokenProvider.parseSub(oauthTokenInfo.getIdToken());
+    //sdk 전용?
+    @Transactional
+    public MemberLoginResponse signupContinue(SignupContinueDto signupContinueDto) {
+
+        OAuth oauth = oauthRepository.findBySubAndOauthType(signupContinueDto.getSub(), signupContinueDto.getOAuthType())
+                .orElseThrow(EntityNotFoundException::new);
+
+        String email = signupContinueDto.getEmail();
+        String nickname = signupContinueDto.getNickname();
+        List<AgreementRequest> agreements = signupContinueDto.getAgreements();
+
+        // 회원가입 처리
+        memberService.signup(new MemberSignupRequest(email, UUID.randomUUID().toString(), nickname, agreements));
+        Member member = memberRepository.findByUsername(email).orElseThrow(EntityNotFoundException::new);
+        member.createOauthAssociation(oauth);
+
+        JwtInfo jwtInfo = createToken(email);
+
+//         토큰 발행 rest-api에서 필요. 임시 주석처리
+//        OAuthTokenInfo oauthTokenInfo = oauthClientService.reissueToken(oauth.getRefreshToken());
+//
+//        String idToken = oauthTokenInfo.getIdToken();
+//        String accessToken = oauthTokenInfo.getAccessToken();
+//        String refreshToken = oauthTokenInfo.getRefreshToken();
+//
+//        // 값 변경
+//        oauth.tokenReissue(accessToken, refreshToken);
+
+        return MemberLoginResponse.builder()
+                .memberId(member.getId())
+                .jwtInfo(jwtInfo)
+                .build();
+    }
+    private Long checkAlreadySignup(OAuthTokenInfo oauthTokenInfo, OAuthType oauthType, String sub) {
 
         OAuth oauth = oauthRepository.findBySubAndOauthType(sub, oauthType)
                 .orElseThrow(() -> {
                     oauthRepository.save(OAuth.createOauth(sub, oauthType, oauthTokenInfo.getAccessToken(), oauthTokenInfo.getRefreshToken()));
-                    throw new SignupNotCompletedException(sub, oauthType);
+                    throw new SignupNotCompletedException();
                 });
 
-        Member member = memberRepository.findByOauthId(oauth.getId()).orElseThrow(
-                () -> new SignupNotCompletedException(sub, oauth.getOauthType()));
+        Member member = memberRepository.findByOauthId(oauth.getId())
+                .orElseThrow(SignupNotCompletedException::new);
 
-        return MemberLoginResponse.builder()
-                .memberId(member.getId())
-                .jwtInfo(JwtInfo.builder()
-                        .accessToken(oauthTokenInfo.getIdToken())
-                        .refreshToken(oauthTokenInfo.getRefreshToken())
-                        .build())
-                .build();
+        return member.getId();
     }
 
+    private JwtInfo createToken(String email) {
+        return jwtTokenProvider.createToken(new UsernamePasswordAuthenticationToken(email, ""));
+    }
 }
