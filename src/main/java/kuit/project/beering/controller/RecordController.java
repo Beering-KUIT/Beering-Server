@@ -26,7 +26,7 @@ public class RecordController {
             @RequestParam("month") int month,
             @AuthenticationPrincipal AuthMember member) {
 
-        System.out.println("RecordController getRecord 진입 " + year + " 년 " + month + " 월");
+        log.info("RecordController getUserRecordStatisticByDate 진입 = {} 년 {} 월 조회", year, month);
         RecordByDateResponse response = recordService.getUserRecordStatisticByDate(year, month, member.getId());
 
         return new BaseResponse<>(response);

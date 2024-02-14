@@ -37,6 +37,8 @@ public class TagService {
     private final RecordRepository recordRepository;
 
     public List<GetTagResponse> getAllTags() {
+        log.info("TagService getAllTags 진입");
+
         return tagRepository.findAll().stream()
                 .map(tag -> GetTagResponse.builder()
                         .tagId(tag.getId())
@@ -46,6 +48,8 @@ public class TagService {
     }
 
     public GetTagDetailResponse getTagDetail(Long tagId) {
+        log.info("TagService getTagDetail 진입");
+
         Tag tag = tagRepository.findById(tagId)
                 .orElseThrow(() -> new TagException(NONE_TAG));
 
@@ -57,6 +61,7 @@ public class TagService {
     }
 
     public GetFrequentTagResponse getFrequentTags(Long userId) {
+        log.info("TagService getFrequentTags 진입");
 
         Map<Tag, Integer> tagAndCounts = new HashMap<>();
 

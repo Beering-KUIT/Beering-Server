@@ -24,7 +24,6 @@ import java.util.List;
 @RequestMapping
 public class TagController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TagController.class);
     private final TagService tagService;
 
     /**
@@ -34,6 +33,7 @@ public class TagController {
     @GetMapping("/tags")
     public BaseResponse<List<GetTagResponse>> getAllTags() {
 
+        log.info("TagController getAllTags 진입");
         List<GetTagResponse> getTagResponses = tagService.getAllTags();
 
         return new BaseResponse<>(getTagResponses);
@@ -45,7 +45,7 @@ public class TagController {
     @GetMapping("/tags/{tagId}")
     public BaseResponse<GetTagDetailResponse> getTagDetail(@PathVariable Long tagId){
 
-        logger.info("[tagId] : " + tagId);
+        log.info("TagController getTagDetail 진입 = tagId {}", tagId);
 
         GetTagDetailResponse getTagDetailResponse = tagService.getTagDetail(tagId);
 
@@ -55,6 +55,7 @@ public class TagController {
     @GetMapping("/tags/frequent-tags")
     public BaseResponse<GetFrequentTagResponse> getFrequentTags(@AuthenticationPrincipal AuthMember authMember) {
 
+        log.info("TagController getFrequentTags 진입");
         // TODO : authMember isMember 처리
         GetFrequentTagResponse getFrequentTagResponse = tagService.getFrequentTags(authMember.getId());
 

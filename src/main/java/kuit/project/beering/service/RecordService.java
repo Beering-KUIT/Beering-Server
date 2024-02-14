@@ -29,8 +29,7 @@ public class RecordService {
     private final RecordRepository recordRepository;
 
     public RecordByDateResponse getUserRecordStatisticByDate(int year, int month, Long userId) {
-
-        System.out.println("getRecordsByDate 진입");
+        log.info("RecordService getUserRecordStatisticByDate 진입");
 
         // #1 Record 의 '일자' 로 일자별 주량 "List<DailyAmount> dailyAmounts" Setting
         List<Record> records = recordRepository.findByDateAndUserId(year, month, userId);
@@ -54,6 +53,8 @@ public class RecordService {
      * @return : 해당 월에 대한 MontlyAmount 객체
      */
     private MonthlyAmount getMonthlyTotalAmount(int month, List<Record> records) {
+        log.info("RecordService getMonthlyTotalAmount 진입");
+
         // 해당 월의 모든 Record 과 연관된 RecordAmount 에서 수량 * 용량 을 합하여 total 집계
         int total = records.stream()
                 .map(Record::getAmounts)
@@ -74,6 +75,7 @@ public class RecordService {
      * @return : 월, 월별 총량 을 담는 MonthlyAmount 리스트 (최근 6개월의 데이터를 포함하기 때문에 size 6)
      */
     private List<MonthlyAmount> getRecent6MonthlyAmounts(int year, int month, Long userId) {
+        log.info("RecordService getRecent6MonthlyAmounts 진입");
 
         List<MonthlyAmount> monthlyAmounts = new ArrayList<>();
 
@@ -98,6 +100,7 @@ public class RecordService {
      * @return : 일자, 총량 을 담는 DailyAmount 리스트
      */
     private List<DailyAmount> getDailyAmounts(List<Record> records) {
+        log.info("RecordService getDailyAmounts 진입");
 
         Map<Integer, Integer> dailyAmounts = new HashMap<>();
 
@@ -128,6 +131,7 @@ public class RecordService {
      * @return List<TypelyAmount>
      */
     private List<TypelyAmount> getTypelyAmounts(List<Record> records) {
+        log.info("RecordService getTypelyAmounts 진입");
 
         Map<DrinkType, Integer> typelyAmounts = new HashMap<>();
 
