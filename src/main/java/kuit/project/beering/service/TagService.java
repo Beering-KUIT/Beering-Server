@@ -99,8 +99,6 @@ public class TagService {
                     tagCounts.add(tagCount);
                 });
 
-        return GetFrequentTagResponse.builder()
-                .tagCounts(tagCounts)
-                .build();
+        return new GetFrequentTagResponse(tagCounts);
     }
 }
