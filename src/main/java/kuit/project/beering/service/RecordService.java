@@ -7,7 +7,6 @@ import kuit.project.beering.dto.response.record.MonthlyAmount;
 import kuit.project.beering.dto.response.record.RecordByDateResponse;
 import kuit.project.beering.dto.response.record.TypelyAmount;
 import kuit.project.beering.repository.RecordRepository;
-import kuit.project.beering.repository.drink.DrinkRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,16 +24,16 @@ import java.util.stream.Collectors;
 @Transactional
 public class RecordService {
 
-    private final DrinkRepository drinkRepository;
     private final RecordRepository recordRepository;
 
     public RecordByDateResponse getUserRecordStatisticByDate(int year, int month, Long userId) {
         log.info("RecordService getUserRecordStatisticByDate 진입");
 
-        // #1 Record 의 '일자' 로 일자별 주량 "List<DailyAmount> dailyAmounts" Setting
+        // #0 year 년 month 월 기록. 일별 주량(#1) & 주종별 주량(#3) 에서 사용
         List<Record> records = recordRepository.findByDateAndUserId(year, month, userId);
-        System.out.println("User 의 연/월 에 해당하는 Record 기록 조회 완료 - 기록 개수 : " + records.size());
+        log.info("User 의 {}년/{}월 에 해당하는 Record 기록 조회 완료 - 기록 개수 : {}", year, month, records.size());
 
+        // #1 Record 의 '일자' 로 일자별 주량 "List<DailyAmount> dailyAmounts" Setting
         List<DailyAmount> dailyAmounts = getDailyAmounts(records);
 
         // #2 month 로 최근 6개월 월별 주량 "List<MonthlyAmount> monthlyAmounts" Setting
@@ -47,28 +46,36 @@ public class RecordService {
     }
 
     /**
-     *
-     * @param month MonthlyAmount 에 포함하기 위한 월
-     * @param records month 에 해당하는 모든 Record 리스트
-     * @return : 해당 월에 대한 MontlyAmount 객체
+     * 일별 주량 리스트를 받아오는 메서드이다. 주량이 존재하는 일자 정보만 포함한다.
+     * @param records : 요청한 User 가 작성한, 특정 연/월 에 해당하는 Record list
+     * @return : 일자, 총량 을 담는 DailyAmount 리스트
      */
-    private MonthlyAmount getMonthlyTotalAmount(int month, List<Record> records) {
-        log.info("RecordService getMonthlyTotalAmount 진입");
+    private List<DailyAmount> getDailyAmounts(List<Record> records) {
+        log.info("RecordService getDailyAmounts 진입");
 
-        // 해당 월의 모든 Record 과 연관된 RecordAmount 에서 수량 * 용량 을 합하여 total 집계
-        int total = records.stream()
-                .map(Record::getAmounts)
-                .mapToInt(recordAmounts -> {
-                    return recordAmounts.stream()
-                            .mapToInt(amount -> amount.getVolume() * amount.getQuantity())
-                            .sum();
-                }).sum();
+        Map<Integer, Integer> dayAndAmount = new HashMap<>();
 
-        return new MonthlyAmount(month, total);
+        for(Record record: records) {
+            int dayOfMonth = record.getDate().toLocalDateTime().getDayOfMonth();
+            int additionalValue = record.getAmounts().stream()
+                .mapToInt(amount -> amount.getQuantity() * amount.getVolume())
+                .sum();
+
+            // value 를 key 에 해당하는 value 에 sum 하되, 없으면 key 로 value 저장
+            dayAndAmount.merge(dayOfMonth, additionalValue, Integer::sum);
+        }
+
+        // DailyAmount 객체 리스트 생성
+        List<DailyAmount> dailyAmounts = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> entry : dayAndAmount.entrySet()) {
+            dailyAmounts.add(new DailyAmount(entry.getKey(), entry.getValue()));
+        }
+
+        return dailyAmounts;
     }
 
     /**
-     *
+     * 입력받은 year month 를 포함하여 최근 6개월의 월별 주량을 받아오는 메서드이다.
      * @param year 기록 조회를 위한 연도
      * @param month 기록 조회를 위한 월
      * @param userId 기록 조회를 위한 유저 id
@@ -87,41 +94,30 @@ public class RecordService {
             }
 
             List<Record> records = recordRepository.findByDateAndUserId(year, month - i, userId);
-
             monthlyAmounts.add(getMonthlyTotalAmount(month - i, records));
         }
-
         return monthlyAmounts;
     }
 
     /**
-     *
-     * @param records : 요청한 User 가 작성한, 특정 연/월 에 해당하는 Record list
-     * @return : 일자, 총량 을 담는 DailyAmount 리스트
+     * 특정 월에 해당하는 모든 기록의 주량 총합을 받아오는 메서드이다.
+     * @param month MonthlyAmount 에 포함하기 위한 월
+     * @param records month 에 해당하는 모든 Record 리스트
+     * @return : 해당 월에 대한 MontlyAmount 객체
      */
-    private List<DailyAmount> getDailyAmounts(List<Record> records) {
-        log.info("RecordService getDailyAmounts 진입");
+    private MonthlyAmount getMonthlyTotalAmount(int month, List<Record> records) {
+        log.info("RecordService getMonthlyTotalAmount 진입");
 
-        Map<Integer, Integer> dailyAmounts = new HashMap<>();
+        // 해당 월의 모든 Record 과 연관된 RecordAmount 에서 수량 * 용량 을 합하여 total 집계
+        int total = records.stream()
+                .map(Record::getAmounts)
+                .mapToInt(recordAmounts -> {
+                    return recordAmounts.stream()
+                            .mapToInt(amount -> amount.getVolume() * amount.getQuantity())
+                            .sum();
+                }).sum();
 
-        for(Record record: records) {
-            int dayOfMonth = record.getDate().toLocalDateTime().getDayOfMonth();
-            int additionalValue = record.getAmounts().stream()
-                    .mapToInt(amount -> amount.getQuantity() * amount.getVolume())
-                    .sum();
-
-            dailyAmounts.computeIfPresent(dayOfMonth, (k, v) -> v + additionalValue);
-            // 처음 한번만 실행
-            dailyAmounts.putIfAbsent(dayOfMonth, additionalValue);
-        }
-
-        // DailyAmount 객체 리스트 생성
-        List<DailyAmount> dailyAmountList = new ArrayList<>();
-        for (Map.Entry<Integer, Integer> entry : dailyAmounts.entrySet()) {
-            dailyAmountList.add(new DailyAmount(entry.getKey(), entry.getValue()));
-        }
-
-        return dailyAmountList;
+        return new MonthlyAmount(month, total);
     }
 
     /**
@@ -144,7 +140,7 @@ public class RecordService {
                     .getCategory()
                     .getName();
 
-            typelyAmounts.computeIfPresent(recordDrinkType, ((type, amount) -> amount + record.calculateTotalAmount()));
+            typelyAmounts.merge(recordDrinkType, record.calculateTotalAmount(), Integer::sum);
         }
 
         return typelyAmounts.entrySet().stream()
