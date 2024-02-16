@@ -3,13 +3,11 @@ package kuit.project.beering.service;
 import kuit.project.beering.domain.Drink;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.Review;
+import kuit.project.beering.domain.image.Image;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
 import kuit.project.beering.dto.request.drink.SearchDrinkRequest;
 import kuit.project.beering.dto.request.drink.SortType;
-import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
-import kuit.project.beering.dto.response.drink.GetDrinkResponse;
-import kuit.project.beering.dto.response.drink.GetDrinkResponseBuilder;
-import kuit.project.beering.dto.response.drink.ReviewPreview;
+import kuit.project.beering.dto.response.drink.*;
 import kuit.project.beering.repository.FavoriteRepository;
 import kuit.project.beering.repository.ReviewRepository;
 import kuit.project.beering.repository.drink.DrinkRepository;
@@ -24,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import static kuit.project.beering.util.BaseResponseStatus.*;
@@ -118,4 +117,26 @@ public class DrinkService {
         return memberService.getProfileImageUrl(member);
     }
 
+    public DrinkRecommendResponse recommendDrink() {
+        Random random = new Random();
+        long totalDrinks = drinkRepository.count();
+        long drinkId = random.nextLong(totalDrinks) + 1;
+
+        Drink drink = drinkRepository.findById(drinkId)
+                .orElseThrow(() -> new DrinkException(NONE_DRINK));
+
+        return DrinkRecommendResponse.builder()
+                .drinkId(drinkId)
+                .nameKr(drink.getNameKr())
+                .nameEn(drink.getNameEn())
+                .country(drink.getCountry())
+                .manufacturer(drink.getManufacturer())
+                .alcohol(drink.getAlcohol())
+                .AvgRating(drink.getAvgRating())
+                .reviewCount(drink.getCountOfReview())
+                .drinkImageUrlList(drink.getImages().stream()
+                        .map(Image::getImageUrl)
+                        .collect(Collectors.toList()))
+                .build();
+    }
 }
