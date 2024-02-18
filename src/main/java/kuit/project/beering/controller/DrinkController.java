@@ -2,7 +2,7 @@ package kuit.project.beering.controller;
 
 import kuit.project.beering.dto.request.drink.SearchDrinkRequest;
 import kuit.project.beering.dto.response.SliceResponse;
-import kuit.project.beering.dto.response.drink.DrinkRecommendResponse;
+import kuit.project.beering.dto.response.drink.DrinkPreview;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
 import kuit.project.beering.security.auth.AuthMember;
@@ -42,10 +42,10 @@ public class DrinkController {
     }
 
     @GetMapping("/recommendation")
-    public BaseResponse<DrinkRecommendResponse> recommendDrink() {
+    public BaseResponse<DrinkPreview> recommendDrink() {
 
-        DrinkRecommendResponse drinkRecommendResponse = drinkService.recommendDrink();
-        return new BaseResponse<>(drinkRecommendResponse);
+        DrinkPreview drinkPreview = drinkService.recommendDrink();
+        return new BaseResponse<>(drinkPreview);
     }
 
     private Long isLoginMember(AuthMember member) {

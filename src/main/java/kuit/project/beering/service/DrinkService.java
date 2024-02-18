@@ -117,7 +117,7 @@ public class DrinkService {
         return memberService.getProfileImageUrl(member);
     }
 
-    public DrinkRecommendResponse recommendDrink() {
+    public DrinkPreview recommendDrink() {
         Random random = new Random();
         long totalDrinks = drinkRepository.count();
         long drinkId = random.nextLong(totalDrinks) + 1;
@@ -125,7 +125,7 @@ public class DrinkService {
         Drink drink = drinkRepository.findById(drinkId)
                 .orElseThrow(() -> new DrinkException(NONE_DRINK));
 
-        return DrinkRecommendResponse.builder()
+        return DrinkPreview.builder()
                 .drinkId(drinkId)
                 .nameKr(drink.getNameKr())
                 .nameEn(drink.getNameEn())

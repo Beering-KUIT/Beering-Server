@@ -11,7 +11,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @Builder
-public class DrinkRecommendResponse {
+public class DrinkPreview {
 
     Long drinkId;
     String nameKr;
