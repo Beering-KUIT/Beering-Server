@@ -26,18 +26,18 @@ public class RecordService {
 
     private final RecordRepository recordRepository;
 
-    public RecordByDateResponse getUserRecordStatisticByDate(int year, int month, Long userId) {
+    public RecordByDateResponse getUserRecordStatisticByDate(int year, int month, Long memberId) {
         log.info("RecordService getUserRecordStatisticByDate 진입");
 
         // #0 year 년 month 월 기록. 일별 주량(#1) & 주종별 주량(#3) 에서 사용
-        List<Record> records = recordRepository.findByDateAndUserId(year, month, userId);
+        List<Record> records = recordRepository.findByDateAndMemberId(year, month, memberId);
         log.info("User 의 {}년/{}월 에 해당하는 Record 기록 조회 완료 - 기록 개수 : {}", year, month, records.size());
 
         // #1 Record 의 '일자' 로 일자별 주량 "List<DailyAmount> dailyAmounts" Setting
         List<DailyAmount> dailyAmounts = getDailyAmounts(records);
 
         // #2 month 로 최근 6개월 월별 주량 "List<MonthlyAmount> monthlyAmounts" Setting
-        List<MonthlyAmount> monthlyAmounts = getRecent6MonthlyAmounts(year, month, userId);
+        List<MonthlyAmount> monthlyAmounts = getRecent6MonthlyAmounts(year, month, memberId);
 
         // #3 : month 로 주종별 주량 "List<TypelyAmount> typeAmount" Setting
         List<TypelyAmount> typelyAmounts = getTypelyAmounts(records);
@@ -78,10 +78,10 @@ public class RecordService {
      * 입력받은 year month 를 포함하여 최근 6개월의 월별 주량을 받아오는 메서드이다.
      * @param year 기록 조회를 위한 연도
      * @param month 기록 조회를 위한 월
-     * @param userId 기록 조회를 위한 유저 id
+     * @param memberId 기록 조회를 위한 유저 id
      * @return : 월, 월별 총량 을 담는 MonthlyAmount 리스트 (최근 6개월의 데이터를 포함하기 때문에 size 6)
      */
-    private List<MonthlyAmount> getRecent6MonthlyAmounts(int year, int month, Long userId) {
+    private List<MonthlyAmount> getRecent6MonthlyAmounts(int year, int month, Long memberId) {
         log.info("RecordService getRecent6MonthlyAmounts 진입");
 
         List<MonthlyAmount> monthlyAmounts = new ArrayList<>();
@@ -93,7 +93,7 @@ public class RecordService {
                 year -= 1;
             }
 
-            List<Record> records = recordRepository.findByDateAndUserId(year, month - i, userId);
+            List<Record> records = recordRepository.findByDateAndMemberId(year, month - i, memberId);
             monthlyAmounts.add(getMonthlyTotalAmount(month - i, records));
         }
         return monthlyAmounts;
