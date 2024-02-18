@@ -60,13 +60,13 @@ public class TagService {
                 .build();
     }
 
-    public GetFrequentTagResponse getFrequentTags(Long userId) {
+    public GetFrequentTagResponse getFrequentTags(Long memberId) {
         log.info("TagService getFrequentTags 진입");
 
         Map<Tag, Integer> tagAndCounts = new HashMap<>();
 
         // 리뷰에 등록된 주류의 태그 집계
-        reviewRepository.findAllReviewsByUserId(userId).stream()
+        reviewRepository.findAllReviewsByMemberId(memberId).stream()
                 .map(Review::getDrink)
                 .map(Drink::getDrinkTags)
                 .forEach(drinkTags -> {
@@ -76,7 +76,7 @@ public class TagService {
                 });
 
         // 기록에 등록된 주류의 태그 집계
-        recordRepository.findAllRecordsByUserId(userId).stream()
+        recordRepository.findAllRecordsByMemberId(memberId).stream()
                 .map(Record::getDrink)
                 .map(Drink::getDrinkTags)
                 .forEach(drinkTags -> {
