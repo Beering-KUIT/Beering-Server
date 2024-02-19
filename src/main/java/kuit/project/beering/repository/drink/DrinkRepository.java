@@ -14,4 +14,10 @@ public interface DrinkRepository extends JpaRepository<Drink, Long>, CustomDrink
             "right join fetch Favorite f on f.drink.id = d.id " +
             "where f.member.id = ?1")
     Slice<Drink> findByMemberIdAndFavorite(Long memberId, Pageable pageable);
+
+    @Query(value = "select d from Drink d " +
+            "left join fetch Review r on r.drink.id = d.id " +
+            "left join fetch Member m on m.id = r.member.id " +
+            "where m.id = ?1")
+    Slice<Drink> findAllReviewdDrinksByMember(Long memberId, Pageable pageable);
 }

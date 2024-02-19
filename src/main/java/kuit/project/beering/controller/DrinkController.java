@@ -4,11 +4,14 @@ import kuit.project.beering.dto.request.drink.SearchDrinkRequest;
 import kuit.project.beering.dto.response.SliceResponse;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
+import kuit.project.beering.dto.response.favorite.GetDrinkPreviewResponse;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.DrinkService;
 import kuit.project.beering.util.BaseResponse;
+import kuit.project.beering.util.exception.domain.DrinkException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +24,8 @@ import org.springframework.web.bind.annotation.*;
 public class DrinkController {
 
     private final DrinkService drinkService;
+
+    private final int SIZE = 5;
 
     @GetMapping("/search")
     public BaseResponse<SliceResponse<DrinkSearchResponse>> searchDrinks(
@@ -43,6 +48,19 @@ public class DrinkController {
     private Long isLoginMember(AuthMember member) {
         if(member == null) return 0L;
         else return member.getId();
+    /** 사용자 리뷰 남긴 주류 모아보기
+     * @return 주류 요약 리스트
+     */
+    @GetMapping("/members/{memberId}/reviews")
+    public BaseResponse<SliceResponse<GetDrinkPreviewResponse>> getReviewedDrinksByMember(
+            @PathVariable Long memberId,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @AuthenticationPrincipal AuthMember member){
+
+        validateMember(member, memberId, DrinkException::new);
+        Slice<GetDrinkPreviewResponse> result = drinkService.getReviewedDrinksByMember(memberId, PageRequest.of(page, SIZE));
+
+        return new BaseResponse<>(new SliceResponse<>(result));
     }
 
 }
