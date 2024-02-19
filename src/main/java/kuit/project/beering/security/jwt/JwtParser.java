@@ -14,19 +14,6 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class JwtParser {
 
-    /**
-     * @Breif 토큰 서명 검증 없이 클레임 파싱
-     */
-    public Claims parseUnsignedClaims(String token) {
-        try {
-            return Jwts.parserBuilder()
-                    .build()
-                    .parseClaimsJwt(getUnsignedToken(token)).getBody();
-        } catch (ExpiredJwtException e) {
-            throw new CustomJwtException(BaseResponseStatus.EXPIRED_ACCESS_TOKEN);
-        }
-    }
-
     public boolean isJwt(String token) {
         try {
             Jwts.parserBuilder().build().parse(getUnsignedToken(token));
@@ -53,6 +40,19 @@ public class JwtParser {
      */
     private  <T> T parseClaimsField(String token, String field, Class<T> tClass) {
         return parseUnsignedClaims(token).get(field, tClass);
+    }
+
+    /**
+     * @Breif 토큰 서명 검증 없이 클레임 파싱
+     */
+    private Claims parseUnsignedClaims(String token) {
+        try {
+            return Jwts.parserBuilder()
+                    .build()
+                    .parseClaimsJwt(getUnsignedToken(token)).getBody();
+        } catch (ExpiredJwtException e) {
+            throw new CustomJwtException(BaseResponseStatus.EXPIRED_ACCESS_TOKEN);
+        }
     }
 
     /**

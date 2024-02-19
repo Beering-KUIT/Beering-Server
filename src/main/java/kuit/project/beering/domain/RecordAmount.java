@@ -13,10 +13,10 @@ public class RecordAmount extends BaseTimeEntity{
     @Column(name = "record_amount_id")
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "smallint")
     private Integer volume;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "tinyint")
     private Integer quantity;
 
     @Enumerated(EnumType.STRING)

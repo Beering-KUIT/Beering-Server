@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -26,11 +27,10 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
     public Authentication authenticate(Authentication authentication) {
         log.info("AuthenticationProviderImpl 진입");
 
-        UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
-        String username = token.getName();
-        String password = (String) token.getCredentials();
+        String username = authentication.getName();
+        String password = (String) authentication.getCredentials();
 
-        AuthMember loginMember = (AuthMember) service.loadUserByUsername(username);
+        UserDetails loginMember = service.loadUserByUsername(username);
 
         if (!bCryptPasswordEncoder.matches(password, loginMember.getPassword())) {
             throw new MemberException(BaseResponseStatus.INVALID_CHECKED_PASSWORD);

@@ -2,6 +2,7 @@ package kuit.project.beering.controller;
 
 import kuit.project.beering.dto.request.drink.SearchDrinkRequest;
 import kuit.project.beering.dto.response.SliceResponse;
+import kuit.project.beering.dto.response.drink.DrinkRecommendResponse;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
 import kuit.project.beering.dto.response.favorite.GetDrinkPreviewResponse;
@@ -54,12 +55,19 @@ public class DrinkController {
     public BaseResponse<SliceResponse<GetDrinkPreviewResponse>> getReviewedDrinksByMember(
             @PathVariable Long memberId,
             @RequestParam(required = false, defaultValue = "0") int page,
-            @AuthenticationPrincipal AuthMember member){
+            @AuthenticationPrincipal AuthMember member) {
 
         validateMember(member, memberId, DrinkException::new);
         Slice<GetDrinkPreviewResponse> result = drinkService.getReviewedDrinksByMember(memberId, PageRequest.of(page, SIZE));
 
         return new BaseResponse<>(new SliceResponse<>(result));
+    }
+
+    @GetMapping("/recommendation")
+    public BaseResponse<DrinkRecommendResponse> recommendDrink() {
+
+        DrinkRecommendResponse drinkRecommendResponse = drinkService.recommendDrink();
+        return new BaseResponse<>(drinkRecommendResponse);
     }
 
 }

@@ -13,12 +13,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -32,7 +34,7 @@ public class JwtTokenProvider {
 
     private final Key key;
 
-    private final String BEARER = "Bearer";
+    public final String BEARER = "Bearer ";
     private final JwtParser jwtParser;
 
     public JwtTokenProvider(@Value("${jwt-secret-key}") String secretKey, JwtParser jwtParser) {
@@ -79,7 +81,7 @@ public class JwtTokenProvider {
         String accessToken = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("iss", "https://beering.com")
-                .claim("sub", authMember.getId())
+                .claim("sub", String.valueOf(authMember.getId()))
                 .claim("email", authMember.getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_EXPIRED_IN))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -87,7 +89,7 @@ public class JwtTokenProvider {
 
         String refreshToken = Jwts.builder()
                 .claim("iss", "https://beering.com")
-                .claim("sub", authMember.getId())
+                .claim("sub", String.valueOf(authMember.getId()))
                 .claim("email", authMember.getUsername())
                 .setExpiration(new Date(System.currentTimeMillis() + JWT_REFRESH_EXPIRED_IN))
                 .signWith(key, SignatureAlgorithm.HS256)
@@ -105,16 +107,15 @@ public class JwtTokenProvider {
      * @return Authentication
      */
     public Authentication getAuthentication(String token) {
-        Claims claims = jwtParser.parseUnsignedClaims(token);
 
-        UserDetails authMember =
-                AuthMember.builder()
-                .id(claims.get("sub", Long.class))
-                .username(claims.getSubject())
-                .password("")
-                .build();
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList("ROLE_MEMBER");
 
-        return new UsernamePasswordAuthenticationToken(authMember, "", new ArrayList<>());
+        UserDetails authMember = AuthMember.MEMBER(
+                Long.parseLong(jwtParser.parseSub(token)),
+                jwtParser.parseEmail(token),
+                        authorities);
+
+        return new UsernamePasswordAuthenticationToken(authMember, "", authorities);
     }
 
     public JwtInfo reissueJwtToken(String refreshToken) {
