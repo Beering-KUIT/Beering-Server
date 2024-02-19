@@ -9,5 +9,7 @@ import java.util.List;
 
 @Repository
 public interface RecordRepository extends JpaRepository<Record, Long> {
+    Record findByDateAndMemberIdAndDrinkId(Timestamp date, Long memberId, Long drinkId);
+
     List<Record> findAllByDateAndMemberId(Timestamp date, Long memberId);
 }

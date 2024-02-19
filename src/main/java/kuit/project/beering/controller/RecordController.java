@@ -26,6 +26,22 @@ import static kuit.project.beering.util.BaseResponseStatus.*;
 public class RecordController {
 
     private final RecordService recordService;
+    /** 특정 날짜, 특정 주류의 용량기록 가져오기
+     * @return (recordAmount Id, 용량, 개수) 리스트
+     */
+    @GetMapping("/members/{memberId}/drinks/{drinkId}/records")
+    public BaseResponse<List<GetRecordAmountResponse>> getRecordAmounts(
+            @PathVariable Long memberId,
+            @PathVariable Long drinkId,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
+            @AuthenticationPrincipal AuthMember member){
+
+        List<GetRecordAmountResponse> result = recordService.getRecordAmounts(memberId, drinkId, new Timestamp(date.getTime()));
+        if(result.isEmpty())
+            return new BaseResponse<>(EMPTY_RECORD_AMOUNTS);
+        return new BaseResponse<>(result);
+    }
+
     /** 특정 날짜의 기록 가져오기
      * @return (기록 id, 주류 이름, 총용량) 리스트 반환
      */

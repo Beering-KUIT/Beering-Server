@@ -26,6 +26,8 @@ public enum BaseResponseStatus {
 
     // 1400 : record 요청 성공
     EMPTY_RECORDS(true, 1400, "해당 날짜에 아직 기록이 없습니다."),
+    EMPTY_RECORD_AMOUNTS(true, 1401, "해당 날짜의 주류에 아직 기록이 없습니다."),
+
     /**
      * 2000 : Request 오류
      */
