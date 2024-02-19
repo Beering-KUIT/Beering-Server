@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import static kuit.project.beering.util.BaseResponseStatus.*;
+import static kuit.project.beering.util.CheckMember.validateMember;
 
 @RestController
 @RequiredArgsConstructor
@@ -41,6 +42,7 @@ public class RecordController {
             @RequestBody @Validated List<AddRecordRequest> request,
             @AuthenticationPrincipal AuthMember member){
 
+        validateMember(member, memberId, RecordException::new);
         BaseResponseStatus status = recordService.addRecord(memberId, drinkId, request, new Timestamp(date.getTime()));
         return new BaseResponse<>(status);
     }
@@ -55,6 +57,7 @@ public class RecordController {
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
             @AuthenticationPrincipal AuthMember member){
 
+        validateMember(member, memberId, RecordException::new);
         List<GetRecordAmountResponse> result = recordService.getRecordAmounts(memberId, drinkId, new Timestamp(date.getTime()));
         if(result.isEmpty())
             return new BaseResponse<>(EMPTY_RECORD_AMOUNTS);
@@ -70,6 +73,7 @@ public class RecordController {
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
             @AuthenticationPrincipal AuthMember member
     ){
+        validateMember(member, memberId, RecordException::new);
         List<GetRecordsResponse> result = recordService.getRecords(memberId, new Timestamp(date.getTime()));
         if(result.isEmpty())
             return new BaseResponse<>(EMPTY_RECORDS);
