@@ -8,6 +8,7 @@ import java.util.List;
 
 @Repository
 public interface RecordAmountRepository extends JpaRepository<RecordAmount, Long> {
+    RecordAmount findByRecordIdAndVolume(Long recordId, Integer volume);
 
     List<RecordAmount> findAllByRecordId(Long recordId);
 }

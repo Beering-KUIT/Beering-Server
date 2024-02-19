@@ -37,4 +37,7 @@ public class RecordAmount extends BaseTimeEntity{
         this.status = Status.ACTIVE;
     }
 
+    public void updateQuantity(Integer quantity){
+        this.quantity = quantity;
+    }
 }

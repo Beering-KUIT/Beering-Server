@@ -1,6 +1,7 @@
 package kuit.project.beering.controller;
 
 import kuit.project.beering.dto.request.record.AddRecordRequest;
+import kuit.project.beering.dto.response.record.GetRecordAmountResponse;
 import kuit.project.beering.dto.response.record.GetRecordsResponse;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.RecordService;
@@ -26,6 +27,24 @@ import static kuit.project.beering.util.BaseResponseStatus.*;
 public class RecordController {
 
     private final RecordService recordService;
+
+    /** 기록 추가하기
+     * @param date
+     * @param drinkId
+     * @param request (용량, 개수) 리스트
+     */
+    @PostMapping("/members/{memberId}/drinks/{drinkId}/records")
+    public BaseResponse<BaseResponseStatus> addRecord(
+            @PathVariable Long memberId,
+            @PathVariable Long drinkId,
+            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
+            @RequestBody @Validated List<AddRecordRequest> request,
+            @AuthenticationPrincipal AuthMember member){
+
+        BaseResponseStatus status = recordService.addRecord(memberId, drinkId, request, new Timestamp(date.getTime()));
+        return new BaseResponse<>(status);
+    }
+
     /** 특정 날짜, 특정 주류의 용량기록 가져오기
      * @return (recordAmount Id, 용량, 개수) 리스트
      */
