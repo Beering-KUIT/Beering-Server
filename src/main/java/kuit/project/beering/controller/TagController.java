@@ -1,11 +1,15 @@
 package kuit.project.beering.controller;
 
+import static kuit.project.beering.util.BaseResponseStatus.TOKEN_PATH_MISMATCH;
+
+import java.util.Objects;
 import kuit.project.beering.dto.response.tag.GetFrequentTagResponse;
 import kuit.project.beering.dto.response.tag.GetTagDetailResponse;
 import kuit.project.beering.dto.response.tag.GetTagResponse;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.TagService;
 import kuit.project.beering.util.BaseResponse;
+import kuit.project.beering.util.exception.domain.TagException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
@@ -51,14 +55,23 @@ public class TagController {
 
         return new BaseResponse<>(getTagDetailResponse);
     }
-
-    @GetMapping("/tags/frequent-tags")
-    public BaseResponse<GetFrequentTagResponse> getFrequentTags(@AuthenticationPrincipal AuthMember authMember) {
+    @GetMapping("/members/{memberId}/tags/frequent-tags")
+    public BaseResponse<GetFrequentTagResponse> getFrequentTags(
+        @PathVariable Long memberId,
+        @AuthenticationPrincipal AuthMember authMember
+    ) {
 
         log.info("TagController getFrequentTags 진입");
         // TODO : authMember isMember 처리
+        validateMember(memberId, authMember.getId());
+
         GetFrequentTagResponse getFrequentTagResponse = tagService.getFrequentTags(authMember.getId());
 
         return new BaseResponse<>(getFrequentTagResponse);
+    }
+
+    private void validateMember(Long authId, Long memberId) {
+        if (!Objects.equals(authId, memberId))
+            throw new TagException(TOKEN_PATH_MISMATCH);
     }
 }

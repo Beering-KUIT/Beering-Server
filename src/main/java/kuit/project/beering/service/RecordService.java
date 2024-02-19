@@ -26,12 +26,12 @@ public class RecordService {
 
     private final RecordRepository recordRepository;
 
-    public RecordByDateResponse getUserRecordStatisticByDate(int year, int month, Long memberId) {
-        log.info("RecordService getUserRecordStatisticByDate 진입");
+    public RecordByDateResponse getMemberRecordStatisticByDate(int year, int month, Long memberId) {
+        log.info("RecordService getMemberRecordStatisticByDate 진입");
 
         // #0 year 년 month 월 기록. 일별 주량(#1) & 주종별 주량(#3) 에서 사용
         List<Record> records = recordRepository.findByDateAndMemberId(year, month, memberId);
-        log.info("User 의 {}년/{}월 에 해당하는 Record 기록 조회 완료 - 기록 개수 : {}", year, month, records.size());
+        log.info("Member 의 {}년/{}월 에 해당하는 Record 기록 조회 완료 - 기록 개수 : {}", year, month, records.size());
 
         // #1 Record 의 '일자' 로 일자별 주량 "List<DailyAmount> dailyAmounts" Setting
         List<DailyAmount> dailyAmounts = getDailyAmounts(records);
@@ -47,7 +47,7 @@ public class RecordService {
 
     /**
      * 일별 주량 리스트를 받아오는 메서드이다. 주량이 존재하는 일자 정보만 포함한다.
-     * @param records : 요청한 User 가 작성한, 특정 연/월 에 해당하는 Record list
+     * @param records : 요청한 Member 가 작성한, 특정 연/월 에 해당하는 Record list
      * @return : 일자, 총량 을 담는 DailyAmount 리스트
      */
     private List<DailyAmount> getDailyAmounts(List<Record> records) {
@@ -121,9 +121,9 @@ public class RecordService {
     }
 
     /**
-     * 조회한 연-월 에 해당하는 User 의 Records 를 기반으로,
+     * 조회한 연-월 에 해당하는 Member 의 Records 를 기반으로,
      * DrinkType 별 주량을 담는, TyelyAmount 정보들을 구해 리턴한다
-     * @param records 조회한 연-월 에 해당하는 User 의 Records
+     * @param records 조회한 연-월 에 해당하는 Member 의 Records
      * @return List<TypelyAmount>
      */
     private List<TypelyAmount> getTypelyAmounts(List<Record> records) {
