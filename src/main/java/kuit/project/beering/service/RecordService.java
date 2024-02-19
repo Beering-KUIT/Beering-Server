@@ -75,6 +75,16 @@ public class RecordService {
                 .toList();
 
     }
+
+    private Integer sumVolume(Record record) {
+        List<RecordAmount> recordAmounts = recordAmountRepository.findAllByRecordId(record.getId());
+
+        return recordAmounts.stream()
+                .mapToInt(recordAmount -> {
+                    return recordAmount.getVolume() * recordAmount.getQuantity();
+                }).sum();
+    }
+
     /**
      * t의 시간부분을 0으로 초기화하여 반환하는 메소드
      * @param t Timestamp
