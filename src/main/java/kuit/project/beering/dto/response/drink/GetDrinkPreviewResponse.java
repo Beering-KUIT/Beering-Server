@@ -1,4 +1,4 @@
-package kuit.project.beering.dto.response.favorite;
+package kuit.project.beering.dto.response.drink;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

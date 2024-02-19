@@ -5,7 +5,7 @@ import kuit.project.beering.dto.response.SliceResponse;
 import kuit.project.beering.dto.response.drink.DrinkRecommendResponse;
 import kuit.project.beering.dto.response.drink.DrinkSearchResponse;
 import kuit.project.beering.dto.response.drink.GetDrinkResponse;
-import kuit.project.beering.dto.response.favorite.GetDrinkPreviewResponse;
+import kuit.project.beering.dto.response.drink.GetDrinkPreviewResponse;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.DrinkService;
 import kuit.project.beering.util.BaseResponse;

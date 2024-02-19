@@ -1,7 +1,7 @@
 package kuit.project.beering.controller;
 
 import kuit.project.beering.dto.response.SliceResponse;
-import kuit.project.beering.dto.response.favorite.GetDrinkPreviewResponse;
+import kuit.project.beering.dto.response.drink.GetDrinkPreviewResponse;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.FavoriteService;
 import kuit.project.beering.util.BaseResponse;
@@ -14,9 +14,6 @@ import org.springframework.data.domain.Slice;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
-
-import static kuit.project.beering.util.BaseResponseStatus.TOKEN_PATH_MISMATCH;
 import static kuit.project.beering.util.CheckMember.validateMember;
 
 @RestController

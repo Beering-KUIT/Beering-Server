@@ -3,8 +3,8 @@ package kuit.project.beering.service;
 import kuit.project.beering.domain.Drink;
 import kuit.project.beering.domain.Favorite;
 import kuit.project.beering.domain.Member;
-import kuit.project.beering.dto.response.favorite.GetDrinkPreviewResponse;
-import kuit.project.beering.dto.response.favorite.GetDrinkPreviewResponseBuilder;
+import kuit.project.beering.dto.response.drink.GetDrinkPreviewResponse;
+import kuit.project.beering.dto.response.drink.GetDrinkPreviewResponseBuilder;
 import kuit.project.beering.repository.FavoriteRepository;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.drink.DrinkRepository;
@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static kuit.project.beering.util.BaseResponseStatus.*;
 
