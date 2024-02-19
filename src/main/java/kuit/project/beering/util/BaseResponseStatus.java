@@ -24,6 +24,8 @@ public enum BaseResponseStatus {
     SUCCESS_CHANGE_TABOM(true, 1301, "좋아요 / 싫어요로 변경하였습니다."),
     SUCCESS_ADD_TABOM(true, 1302, "좋아요 / 싫어요를 추가하였습니다."),
 
+    // 1400 : record 요청 성공
+    EMPTY_RECORDS(true, 1400, "해당 날짜에 아직 기록이 없습니다."),
     /**
      * 2000 : Request 오류
      */
