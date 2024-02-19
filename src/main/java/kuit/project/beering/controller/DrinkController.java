@@ -23,11 +23,11 @@ public class DrinkController {
     private final DrinkService drinkService;
 
     @GetMapping("/search")
-    public BaseResponse<SliceResponse<DrinkSearchResponse>> searchDrinksByName(
+    public BaseResponse<SliceResponse<DrinkSearchResponse>> searchDrinks(
             @ModelAttribute SearchDrinkRequest searchDrinkRequest,
             @AuthenticationPrincipal AuthMember member
     ) {
-        Slice<DrinkSearchResponse> result = drinkService.searchDrinksByName(searchDrinkRequest, isLoginMember(member));
+        Slice<DrinkSearchResponse> result = drinkService.searchDrinks(searchDrinkRequest, isLoginMember(member));
         return new BaseResponse<>(new SliceResponse<>(result));
     }
 
