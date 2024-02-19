@@ -3,7 +3,8 @@ package kuit.project.beering.service;
 import kuit.project.beering.domain.Drink;
 import kuit.project.beering.domain.Favorite;
 import kuit.project.beering.domain.Member;
-import kuit.project.beering.dto.response.favorite.GetFavoriteDrinkResponse;
+import kuit.project.beering.dto.response.favorite.GetDrinkPreviewResponse;
+import kuit.project.beering.dto.response.favorite.GetDrinkPreviewResponseBuilder;
 import kuit.project.beering.repository.FavoriteRepository;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.drink.DrinkRepository;
@@ -53,35 +54,16 @@ public class FavoriteService {
     }
 
     @Transactional
-    public Slice<GetFavoriteDrinkResponse> getFavoriteDrinks(Long memberId, Pageable pageable) {
+    public Slice<GetDrinkPreviewResponse> getFavoriteDrinks(Long memberId, Pageable pageable) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(NONE_MEMBER));
 
         Slice<Drink> drinks = drinkRepository.findByMemberIdAndFavorite(member.getId(), pageable);
 
-        List<GetFavoriteDrinkResponse> dto = drinks.stream()
-                .map(this::getFavoriteDrinkResponseBuild)
-                .collect(Collectors.toList());
+        List<GetDrinkPreviewResponse> dto = drinks.stream()
+                .map(GetDrinkPreviewResponseBuilder::build)
+                .toList();
 
         return new SliceImpl<>(dto, pageable, drinks.hasNext());
-    }
-
-    private GetFavoriteDrinkResponse getFavoriteDrinkResponseBuild(Drink drink) {
-        return GetFavoriteDrinkResponse.builder()
-                .drinkId(drink.getId())
-                .nameEn(drink.getNameEn())
-                .nameKr(drink.getNameKr())
-                .manufacturer(drink.getManufacturer())
-                .primaryImageUrl(getPrimaryImage(drink))
-                .avgRating(drink.getAvgRating())
-                .country(drink.getCountry())
-                .countOfReview(drink.getCountOfReview())
-                .build();
-    }
-
-    private String getPrimaryImage(Drink drink) {
-        if(drink.getImages().size() == 0)
-            return null;
-        return drink.getImages().get(0).getImageUrl();
     }
 }

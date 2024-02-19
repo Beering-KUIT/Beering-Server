@@ -38,13 +38,13 @@ public class FavoriteController {
     }
 
     @GetMapping("/members/{memberId}/favorites")
-    public BaseResponse<SliceResponse<GetFavoriteDrinkResponse>> getFavoriteDrinks(
+    public BaseResponse<SliceResponse<GetDrinkPreviewResponse>> getFavoriteDrinks(
             @PathVariable Long memberId,
             @RequestParam(required = false, defaultValue = "0") int page,
             @AuthenticationPrincipal AuthMember member) {
 
         validateMember(member.getId(), memberId);
-        Slice<GetFavoriteDrinkResponse> result = favoriteService.getFavoriteDrinks(memberId, PageRequest.of(page, SIZE));
+        Slice<GetDrinkPreviewResponse> result = favoriteService.getFavoriteDrinks(memberId, PageRequest.of(page, SIZE));
 
         return new BaseResponse<>(new SliceResponse<>(result));
     }
