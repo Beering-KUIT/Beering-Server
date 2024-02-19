@@ -38,7 +38,7 @@ public class CustomDrinkRepositoryImpl implements CustomDrinkRepository {
     public Slice<DrinkSearchResponse> search(DrinkSearchCondition condition, Pageable pageable){
         List<DrinkSearchResponse> drinks = jpaQueryFactory
                                 .select(Projections.constructor(DrinkSearchResponse.class,
-                                        drink.id, drink.nameKr, drink.nameEn, drink.manufacturer, drink.avgRating, drink.countOfReview,
+                                        drink.id, drink.nameKr, drink.nameEn, drink.manufacturer, drink.country, drink.alcohol, drink.avgRating, drink.countOfReview,
                                         Expressions.constant(Collections.emptyList()), // 우선 빈 리스트
                                         Expressions.as(
                                                 Expressions.cases()
