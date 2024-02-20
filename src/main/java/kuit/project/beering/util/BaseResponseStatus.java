@@ -88,6 +88,9 @@ public enum BaseResponseStatus {
     // 2400 : TagException
     NONE_TAG(false, 2400, "해당 태그가 존재하지 않습니다."),
 
+    // 2500 : RecordException
+    INVALID_YEAR(false, 2500, "조회 연도가 유효하지 않습니다."),
+    INVALID_MONTH(false, 2501, "조회 월이 유효하지 않습니다."),
 
     /**
      * 3000 : Response 오류
