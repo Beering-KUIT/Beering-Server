@@ -2,6 +2,7 @@ package kuit.project.beering.dto.response.review;
 
 import kuit.project.beering.domain.Review;
 import kuit.project.beering.domain.image.Image;
+import kuit.project.beering.dto.response.drink.DrinkPreview;
 import kuit.project.beering.util.ConvertCreatedDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,7 +36,10 @@ public class ReviewReadResponseDto {
     private long dislike;
     private String isTabomed;
 
-    public ReviewReadResponseDto (Review review, String profileImageUrl, long isUpCount, long isDownCount, String isTabomed) {
+    // 주류 관련
+    private DrinkPreview drinkPreview;
+
+    public ReviewReadResponseDto (Review review, String profileImageUrl, long isUpCount, long isDownCount, String isTabomed, DrinkPreview drinkPreview) {
         this.memberId = review.getMember().getId();
         this.nickName = review.getMember().getNickname();
         this.profileImage = profileImageUrl;
@@ -45,9 +49,11 @@ public class ReviewReadResponseDto {
                 .map(Image::getImageUrl)
                 .collect(Collectors.toList());
         this.content = review.getContent();
-        this.diffFromCurrentTime = review.getDrink().getNameEn() + " · " + ConvertCreatedDate.setCreatedDate(review.getCreatedAt());
+        this.diffFromCurrentTime = ConvertCreatedDate.setCreatedDate(review.getCreatedAt());
         this.like = isUpCount;
         this.dislike = isDownCount;
         this.isTabomed = isTabomed;
+
+        this.drinkPreview = drinkPreview;
     }
 }

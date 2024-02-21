@@ -4,6 +4,8 @@ import kuit.project.beering.domain.*;
 import kuit.project.beering.domain.image.ReviewImage;
 import kuit.project.beering.dto.request.review.ReviewCreateRequestDto;
 import kuit.project.beering.dto.request.selectedOption.SelectedOptionCreateRequestDto;
+import kuit.project.beering.dto.response.drink.DrinkPreview;
+import kuit.project.beering.dto.response.drink.DrinkPreviewBuilder;
 import kuit.project.beering.dto.response.review.ReviewDeleteResponseDto;
 import kuit.project.beering.dto.response.SliceResponse;
 import kuit.project.beering.dto.response.review.ReviewDetailReadResponseDto;
@@ -181,10 +183,18 @@ public class ReviewService {
                 .map(r -> tabomRepository.findCountByIsDownAndReviewId(r.getId()).orElseThrow())
                 .collect(Collectors.toList());
 
+        // drink preview 관련
+        List<DrinkPreview> drinkPreviews = reviews.stream()
+                .map(Review::getDrink)
+                .map(d -> new DrinkPreviewBuilder()
+                        .setDrink(d)
+                        .buildResponse())
+                .collect(Collectors.toList());
+
         List<ReviewReadResponseDto> responseDtos = new ArrayList<>();
         for(int i=0; i<reviews.size(); i++) {
             String profileImageUrl = memberService.getProfileImageUrl(reviews.get(i).getMember());
-            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i), tabomed.get(i)));
+            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i), tabomed.get(i), drinkPreviews.get(i)));
         }
 
         return new SliceResponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
@@ -223,10 +233,18 @@ public class ReviewService {
                 .map(r -> tabomRepository.findCountByIsDownAndReviewId(r.getId()).orElseThrow())
                 .collect(Collectors.toList());
 
+        // drink preview 관련
+        List<DrinkPreview> drinkPreviews = reviews.stream()
+                .map(Review::getDrink)
+                .map(d -> new DrinkPreviewBuilder()
+                        .setDrink(d)
+                        .buildResponse())
+                .collect(Collectors.toList());
+
         List<ReviewReadResponseDto> responseDtos = new ArrayList<>();
         for(int i=0; i<reviews.size(); i++) {
             String profileImageUrl = memberService.getProfileImageUrl(reviews.get(i).getMember());
-            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i), tabomed.get(i)));
+            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i), tabomed.get(i), drinkPreviews.get(i)));
         }
 
         return new SliceResponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
@@ -264,10 +282,18 @@ public class ReviewService {
                 .map(r -> tabomRepository.findCountByIsDownAndReviewId(r.getId()).orElseThrow())
                 .collect(Collectors.toList());
 
+        // drink preview 관련
+        List<DrinkPreview> drinkPreviews = reviews.stream()
+                .map(Review::getDrink)
+                .map(d -> new DrinkPreviewBuilder()
+                        .setDrink(d)
+                        .buildResponse())
+                .collect(Collectors.toList());
+
         List<ReviewReadResponseDto> responseDtos = new ArrayList<>();
         for(int i=0; i<reviews.size(); i++) {
             String profileImageUrl = memberService.getProfileImageUrl(reviews.get(i).getMember());
-            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i), tabomed.get(i)));
+            responseDtos.add(new ReviewReadResponseDto(reviews.get(i), profileImageUrl, upCounts.get(i), downCounts.get(i), tabomed.get(i), drinkPreviews.get(i)));
         }
 
         return new SliceResponse<>(responseDtos, allReviewsSliceBy.getPageable().getPageNumber(), allReviewsSliceBy.isLast());
