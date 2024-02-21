@@ -96,6 +96,8 @@ public enum BaseResponseStatus {
     // 2500 : RecordException
     NONE_RECORD(false, 2500, "해당 기록이 존재하지 않습니다."),
     ADD_RECORD_AMOUNT_ERROR(false, 2501, "기록 추가 중 데이터베이스에 오류가 발생하였습니다."),
+    INVALID_YEAR(false, 2502, "조회 연도가 유효하지 않습니다."),
+    INVALID_MONTH(false, 2503, "조회 월이 유효하지 않습니다."),
 
     /**
      * 3000 : Response 오류
