@@ -9,7 +9,6 @@ import org.springframework.data.repository.query.Param;
 import java.sql.Timestamp;
 import java.util.List;
 
-@Repository
 public interface RecordRepository extends JpaRepository<Record, Long> {
     Record findByDateAndMemberIdAndDrinkId(Timestamp date, Long memberId, Long drinkId);
 
