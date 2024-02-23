@@ -52,8 +52,8 @@ public class MemberService {
         /**
          * @Brief 회원부터 저장, username이 중복일 경우에는 예외 발생하고 더이상 진행되지 않고 종료
          */
-        checkEmail(request.getUsername());
-        checkNickname(request.getNickname());
+        if (memberRepository.existsByUsername(request.getUsername())) throw new MemberException(BaseResponseStatus.DUPLICATED_EMAIL);
+        if (memberRepository.existsByNickname(request.getNickname())) throw new MemberException(BaseResponseStatus.DUPLICATED_NICKNAME);
 
         Member member = memberRepository.saveAndFlush(
                 Member.createMember(
@@ -108,13 +108,11 @@ public class MemberService {
     }
 
     public MemberEmailResponse checkEmail(String username) {
-        if (memberRepository.existsByUsername(username)) throw new MemberException(BaseResponseStatus.DUPLICATED_EMAIL);
-        return new MemberEmailResponse(true);
+        return new MemberEmailResponse(memberRepository.existsByUsername(username));
     }
 
     public MemberNicknameResponse checkNickname(String nickname) {
-        if (memberRepository.existsByNickname(nickname)) throw new MemberException(BaseResponseStatus.DUPLICATED_NICKNAME);
-        return new MemberNicknameResponse(true);
+        return new MemberNicknameResponse(memberRepository.existsByNickname(nickname));
     }
 
     @Transactional
