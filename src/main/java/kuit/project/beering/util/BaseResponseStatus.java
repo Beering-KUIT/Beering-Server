@@ -55,6 +55,7 @@ public enum BaseResponseStatus {
     NONE_MEMBER(false, 2015, "존재하지 않는 회원입니다."),
     NONE_OAUTH_PROVIDER(false, 2016, "존재하지 않는 소셜로그인 타입입니다."),
     OAUTH_LOGIN_FAILED(false, 2017, "로그인이 취소되었습니다."),
+    NONE_OAUTH(false, 2018, "소셜 계정이 존재하지 않습니다."),
 
     // 2400 : ReviewException
     POST_REVIEW_EMPTY_USER(false, 2400, "해당 사용자가 존재하지 않습니다."),
