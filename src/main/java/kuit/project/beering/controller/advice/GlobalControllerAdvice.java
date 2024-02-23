@@ -30,6 +30,7 @@ public class GlobalControllerAdvice {
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     public BaseResponse<?> handleTypeMismatchException(MethodArgumentTypeMismatchException ex) {
         // TODO : String으로 반환할지 JSON으로 반환할지 고민
         // String result = ex.getName() + " : " + ex.getMessage();
