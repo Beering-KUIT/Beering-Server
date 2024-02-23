@@ -9,9 +9,11 @@ import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.exception.CustomJwtException;
 import kuit.project.beering.util.exception.validation.AgreementValidationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice(assignableTypes = {AuthController.class, OAuthSdkController.class})
@@ -22,6 +24,7 @@ public class AuthControllerAdvice {
      * @Breif 약관 정보 누락 시 거절 - 앱 개발 자체에서 실수
      */
     @ExceptionHandler(AgreementValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseResponse<Object> handleValidationException(AgreementValidationException ex) {
 
         BindingResult bindingResult = ex.getBindingResult();
@@ -40,6 +43,7 @@ public class AuthControllerAdvice {
      * @Brief jwt 예외
      */
     @ExceptionHandler(CustomJwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public BaseResponse<Object> handleJwtException(CustomJwtException ex) {
         return new BaseResponse<>(ex.getStatus());
     }
@@ -48,6 +52,7 @@ public class AuthControllerAdvice {
      * @Brief 존재하지 않는 유저
      */
     @ExceptionHandler(EntityNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
     public BaseResponse<Object> handleEntityNotFound(EntityNotFoundException ex) {
         return new BaseResponse<>(BaseResponseStatus.NONE_MEMBER);
     }

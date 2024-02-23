@@ -1,6 +1,5 @@
 package kuit.project.beering.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.OAuth;
 import kuit.project.beering.domain.OAuthType;
@@ -14,7 +13,10 @@ import kuit.project.beering.repository.OAuthRepository;
 import kuit.project.beering.security.jwt.JwtInfo;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
 import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
+import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.exception.SignupNotCompletedException;
+import kuit.project.beering.util.exception.domain.MemberException;
+import kuit.project.beering.util.exception.domain.OAuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -66,7 +68,8 @@ public class OAuthService {
     public MemberLoginResponse signupContinue(SignupContinueDto signupContinueDto) {
 
         OAuth oauth = oauthRepository.findBySubAndOauthType(signupContinueDto.getSub(), signupContinueDto.getOAuthType())
-                .orElseThrow(EntityNotFoundException::new);
+                .orElseThrow(
+                        () -> { throw new OAuthException(BaseResponseStatus.NONE_OAUTH);});
 
         String email = signupContinueDto.getEmail();
         String nickname = signupContinueDto.getNickname();
@@ -74,7 +77,9 @@ public class OAuthService {
 
         // 회원가입 처리
         memberService.signup(new MemberSignupRequest(email, UUID.randomUUID().toString(), nickname, agreements));
-        Member member = memberRepository.findByUsername(email).orElseThrow(EntityNotFoundException::new);
+        Member member = memberRepository.findByUsername(email)
+                .orElseThrow(
+                        () -> { throw new MemberException(BaseResponseStatus.NONE_MEMBER);});
         member.createOauthAssociation(oauth);
 
         JwtInfo jwtInfo = createToken(email);
@@ -94,6 +99,7 @@ public class OAuthService {
                 .jwtInfo(jwtInfo)
                 .build();
     }
+
     private Long checkAlreadySignup(OAuthTokenInfo oauthTokenInfo, OAuthType oauthType, String sub) {
 
         OAuth oauth = oauthRepository.findBySubAndOauthType(sub, oauthType)

@@ -4,9 +4,9 @@ import kuit.project.beering.util.BaseResponseStatus;
 import lombok.Getter;
 
 @Getter
-public class RecordException extends DomainException {
+public class OAuthException extends DomainException {
 
-    public RecordException(BaseResponseStatus status) {
+    public OAuthException(BaseResponseStatus status) {
         super(status);
     }
 }

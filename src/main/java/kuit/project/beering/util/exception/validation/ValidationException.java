@@ -1,13 +1,19 @@
 package kuit.project.beering.util.exception.validation;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.validation.BindingResult;
 
-@AllArgsConstructor
 @Getter
+@Slf4j
 public class ValidationException extends RuntimeException{
 
-    private BindingResult bindingResult;
+    private final BindingResult bindingResult;
 
+    public ValidationException(BindingResult bindingResult) {
+        this.bindingResult = bindingResult;
+        log.info("{} - message : {}", this.getClass().getSimpleName(),
+                bindingResult.getAllErrors().stream().map(DefaultMessageSourceResolvable::getDefaultMessage));
+    }
 }
