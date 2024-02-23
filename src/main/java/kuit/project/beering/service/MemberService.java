@@ -1,6 +1,5 @@
 package kuit.project.beering.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import kuit.project.beering.domain.Member;
 import kuit.project.beering.domain.Status;
 import kuit.project.beering.domain.image.MemberImage;
@@ -118,9 +117,12 @@ public class MemberService {
     @Transactional
     public void uploadImage(MultipartFile multipartFile, Long memberId) {
 
-        Member member = memberRepository.findById(memberId).orElseThrow(EntityNotFoundException::new);
+        Member member = memberRepository.findById(memberId).orElseThrow(() -> {
+            throw new MemberException(BaseResponseStatus.NONE_MEMBER);
+        });
 
-        if(!multipartFile.isEmpty())
+
+        if (!multipartFile.isEmpty())
             uploadMemberImage(multipartFile, member);
     }
 
