@@ -9,7 +9,7 @@ import kuit.project.beering.dto.response.review.ReviewResponseDto;
 import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.ReviewService;
 import kuit.project.beering.util.BaseResponse;
-import kuit.project.beering.util.exception.domain.FavoriteException;
+import kuit.project.beering.util.exception.domain.ReviewException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 import static kuit.project.beering.util.BaseResponseStatus.TOKEN_PATH_MISMATCH;
+import static kuit.project.beering.util.CheckMember.validateMember;
 
 @RestController
 @RequiredArgsConstructor
@@ -39,7 +40,7 @@ public class ReviewController {
             @RequestPart List<MultipartFile> reviewImages,
             @AuthenticationPrincipal AuthMember member) {
 
-        validateMember(member.getId(), memberId);
+        validateMember(member, memberId, ReviewException::new);
         log.info("reviewImages = {}", reviewImages.isEmpty());
         log.info("reviewImages.size() = {}", reviewImages.size());
         ReviewResponseDto responseDto = reviewService.save(memberId, drinkId, requestDto, reviewImages);
@@ -65,7 +66,7 @@ public class ReviewController {
                                                                                    @RequestParam(value = "size", required = false, defaultValue = "5") int size,
                                                                                    @AuthenticationPrincipal AuthMember member) {
 
-        validateMember(member.getId(), memberId);
+        validateMember(member, memberId, ReviewException::new);
         PageRequest pageRequest = PageRequest.of(page, size);
         SliceResponse<ReviewReadResponseDto> responseDtos = reviewService.findAllReviewByMemberIdByPage(memberId, pageRequest);
         return new BaseResponse<>(responseDtos);
@@ -108,13 +109,9 @@ public class ReviewController {
     public BaseResponse<ReviewDeleteResponseDto> deleteReview(@PathVariable Long memberId,
                                                               @PathVariable Long reviewId,
                                                               @AuthenticationPrincipal AuthMember member) {
-        validateMember(member.getId(), memberId);
+        validateMember(member, memberId, ReviewException::new);
         ReviewDeleteResponseDto responseDto = reviewService.deleteReview(reviewId, memberId);
         return new BaseResponse<>(responseDto);
     }
 
-    private void validateMember(Long authId, Long memberId) {
-        if (!Objects.equals(authId, memberId))
-            throw new FavoriteException(TOKEN_PATH_MISMATCH);
-    }
 }

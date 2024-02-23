@@ -15,9 +15,7 @@ import org.springframework.data.domain.Slice;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Objects;
-
-import static kuit.project.beering.util.BaseResponseStatus.TOKEN_PATH_MISMATCH;
+import static kuit.project.beering.util.CheckMember.validateMember;
 
 @RestController
 @RequiredArgsConstructor
@@ -34,7 +32,7 @@ public class TabomController {
             @RequestParam boolean isUp,
             @AuthenticationPrincipal AuthMember member
     ) {
-        validateMember(member.getId(), memberId);
+        validateMember(member, memberId, TabomException::new);
         BaseResponseStatus status = tabomService.postTabom(memberId, reviewId, isUp);
         return new BaseResponse<>(status);
     }
@@ -45,16 +43,10 @@ public class TabomController {
             @RequestParam(required = false, defaultValue = "0") int page,
             @AuthenticationPrincipal AuthMember member
     ){
-        validateMember(member.getId(), memberId);
+        validateMember(member, memberId, TabomException::new);
         Slice<GetTabomResponse> result = tabomService.getTabomReviews(memberId, PageRequest.of(page, SIZE));
 
         return new BaseResponse<>(new SliceResponse<>(result));
-    }
-
-
-    private void validateMember(Long authId, Long memberId) {
-        if (!Objects.equals(authId, memberId))
-            throw new TabomException(TOKEN_PATH_MISMATCH);
     }
 
 }

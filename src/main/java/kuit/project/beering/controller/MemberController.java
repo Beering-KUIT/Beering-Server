@@ -18,9 +18,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Objects;
-
-import static kuit.project.beering.util.BaseResponseStatus.TOKEN_PATH_MISMATCH;
+import static kuit.project.beering.util.CheckMember.validateMember;
 
 @RestController
 @RequiredArgsConstructor
@@ -60,16 +58,10 @@ public class MemberController {
     @PostMapping("/{memberId}/images")
     public BaseResponse<Object> uploadProfileImage(@RequestParam("profile_image") MultipartFile multipartFile,
                                                    @PathVariable Long memberId, @AuthenticationPrincipal AuthMember authMember) {
-        validateMember(authMember.getId(), memberId);
-
+        validateMember(authMember, memberId, MemberException::new);
         memberService.uploadImage(multipartFile, memberId);
 
         return new BaseResponse<>(new Object());
-    }
-
-    private void validateMember(Long authId, Long memberId) {
-        if (!Objects.equals(authId, memberId))
-            throw new MemberException(TOKEN_PATH_MISMATCH);
     }
 
 }

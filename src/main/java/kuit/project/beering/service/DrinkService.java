@@ -7,17 +7,22 @@ import kuit.project.beering.domain.image.Image;
 import kuit.project.beering.dto.request.drink.DrinkSearchCondition;
 import kuit.project.beering.dto.request.drink.SearchDrinkRequest;
 import kuit.project.beering.dto.request.drink.SortType;
+import kuit.project.beering.dto.response.drink.GetDrinkPreviewResponse;
+import kuit.project.beering.dto.response.drink.GetDrinkPreviewResponseBuilder;
 import kuit.project.beering.dto.response.drink.*;
 import kuit.project.beering.repository.FavoriteRepository;
+import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.ReviewRepository;
 import kuit.project.beering.repository.drink.DrinkRepository;
 import kuit.project.beering.util.ConvertCreatedDate;
 import kuit.project.beering.util.exception.domain.DrinkException;
+import kuit.project.beering.util.exception.domain.MemberException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +38,7 @@ import static kuit.project.beering.util.BaseResponseStatus.*;
 public class DrinkService {
     private final DrinkRepository drinkRepository;
     private final FavoriteRepository favoriteRepository;
+    private final MemberRepository memberRepository;
     private final MemberService memberService;
     private final ReviewRepository reviewRepository;
 
@@ -47,7 +53,7 @@ public class DrinkService {
      * @return 검색 결과 10개 // 페이징
      * @exception DrinkException 유효하지 않은 정렬 방식 입력시 예외 발생
      */
-    public Slice<DrinkSearchResponse> searchDrinksByName(SearchDrinkRequest request, Long memberId) {
+    public Slice<DrinkSearchResponse> searchDrinks(SearchDrinkRequest request, Long memberId) {
         Pageable pageable = PageRequest.of(request.getPage(), SIZE, SortType.getMatchedSort(request.getOrderBy()));
 
         validSubOption(request);
@@ -78,6 +84,19 @@ public class DrinkService {
         if(category.equals("beer") && request.getSweetness() != null) invalid = true;
 
         if(invalid) throw new DrinkException(INVALID_SUB_OPTION);
+    }
+
+    public Slice<GetDrinkPreviewResponse> getReviewedDrinksByMember(Long memberId, Pageable pageable) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new MemberException(NONE_MEMBER));
+
+        Slice<Drink> drinks = drinkRepository.findAllReviewdDrinksByMember(memberId, pageable);
+
+        List<GetDrinkPreviewResponse> dto = drinks.stream()
+                .map(GetDrinkPreviewResponseBuilder::build)
+                .toList();
+
+        return new SliceImpl<>(dto, pageable, drinks.hasNext());
     }
 
     @Transactional
