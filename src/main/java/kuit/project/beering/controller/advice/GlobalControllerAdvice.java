@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
+import java.util.HashMap;
+
 import static kuit.project.beering.util.BaseResponseStatus.METHOD_ARGUMENT_TYPE_MISMATCH;
 
 @RestControllerAdvice
@@ -29,13 +31,21 @@ public class GlobalControllerAdvice {
         return new BaseResponse<>(ex.getStatus());
     }
 
+    private static final HashMap<String, String> messageTypeMismatchException = new HashMap<>();
+    static {
+        messageTypeMismatchException.put("date", "date의 format은 yyyy-MM-dd 입니다.");
+    }
+
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
     public BaseResponse<?> handleTypeMismatchException(MethodArgumentTypeMismatchException ex) {
-        // TODO : String으로 반환할지 JSON으로 반환할지 고민
-        // String result = ex.getName() + " : " + ex.getMessage();
+        String msg = messageTypeMismatchException.get(ex.getName());
+        if(msg == null)
+            msg = ex.getMessage();
+
         JSONObject result = new JSONObject();
-        result.put(ex.getName(), ex.getMessage());
+        result.put(ex.getName(), msg);
+
         return new BaseResponse<>(METHOD_ARGUMENT_TYPE_MISMATCH, result);
     }
 }
