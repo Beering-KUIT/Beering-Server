@@ -36,8 +36,6 @@ public class RecordController {
     private final RecordService recordService;
 
     /** 기록 추가하기
-     * @param date
-     * @param drinkId
      * @param request (용량, 개수) 리스트
      */
     @PostMapping("/members/{memberId}/drinks/{drinkId}/records")
@@ -52,6 +50,22 @@ public class RecordController {
         BaseResponseStatus status = recordService.addRecord(memberId, drinkId, request, new Timestamp(date.getTime()));
         return new BaseResponse<>(status);
     }
+
+    /** 기록 삭제하기
+     * @Params : memberId, recordId
+     */
+    @DeleteMapping("/members/{memberId}/records/{recordId}")
+    public BaseResponse<BaseResponseStatus> deleteRecord(
+            @PathVariable Long memberId,
+            @PathVariable Long recordId,
+            @AuthenticationPrincipal AuthMember member){
+
+        validateMember(member, memberId, RecordException::new);
+        BaseResponseStatus status = recordService.deleteRecord(recordId);
+        return new BaseResponse<>(status);
+    }
+
+
 
     /** 특정 기록 상세보기
      * @return - DrinkPreview

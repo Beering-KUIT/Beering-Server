@@ -11,4 +11,5 @@ public interface RecordAmountRepository extends JpaRepository<RecordAmount, Long
     RecordAmount findByRecordIdAndVolume(Long recordId, Integer volume);
 
     List<RecordAmount> findAllByRecordId(Long recordId);
+    void deleteAllByRecordId(Long recordId);
 }

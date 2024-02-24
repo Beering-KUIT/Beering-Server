@@ -28,7 +28,7 @@ public enum BaseResponseStatus {
     EMPTY_RECORDS(true, 1400, "해당 날짜에 아직 기록이 없습니다."),
     EMPTY_RECORD_AMOUNTS(true, 1401, "해당 날짜의 주류에 아직 기록이 없습니다."),
     SUCCESS_ADD_RECORD_AMOUNT(true, 1402, "해당 날짜의 주류 기록에 용량과 개수를 추가하였습니다."),
-
+    SUCCESS_DELETE_RECORD(true, 1403, "기록을 삭제하였습니다."),
     /**
      * 2000 : Request 오류
      */
@@ -99,6 +99,7 @@ public enum BaseResponseStatus {
     ADD_RECORD_AMOUNT_ERROR(false, 2501, "기록 추가 중 데이터베이스에 오류가 발생하였습니다."),
     INVALID_YEAR(false, 2502, "조회 연도가 유효하지 않습니다."),
     INVALID_MONTH(false, 2503, "조회 월이 유효하지 않습니다."),
+
 
     /**
      * 3000 : Response 오류

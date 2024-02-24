@@ -3,6 +3,7 @@ package kuit.project.beering.service;
 import kuit.project.beering.domain.*;
 import kuit.project.beering.domain.Record;
 import kuit.project.beering.dto.request.record.AddRecordRequest;
+import kuit.project.beering.dto.response.drink.GetDrinkPreviewResponseBuilder;
 import kuit.project.beering.dto.response.record.*;
 import kuit.project.beering.repository.MemberRepository;
 import kuit.project.beering.repository.RecordAmountRepository;
@@ -57,6 +58,9 @@ public class RecordService {
         if (record == null){
             record = recordRepository.save(new Record(member, drink, date));
         }
+
+        // 빈리스트인 경우 delete Record & RecordAmounts
+        if(amounts.isEmpty()) return deleteRecordAndRecordAmounts(record);
 
         return updateRecordAmounts(record, amounts);
     }
@@ -118,6 +122,21 @@ public class RecordService {
                         .totalVolume(sumVolume(record)).build())
                 .toList();
 
+    }
+
+
+    public BaseResponseStatus deleteRecord(Long recordId) {
+        Record record = recordRepository.findById(recordId)
+                .orElseThrow(() -> new RecordException(NONE_RECORD));
+
+        return deleteRecordAndRecordAmounts(record);
+    }
+
+    private BaseResponseStatus deleteRecordAndRecordAmounts(Record record) {
+        List<RecordAmount> recordAmounts = recordAmountRepository.findAllByRecordId(record.getId());
+        recordAmountRepository.deleteAllByRecordId(record.getId());
+        recordRepository.deleteById(record.getId());
+        return SUCCESS_DELETE_RECORD;
     }
 
     private Integer sumVolume(Record record) {
