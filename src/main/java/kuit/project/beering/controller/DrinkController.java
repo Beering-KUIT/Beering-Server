@@ -1,5 +1,6 @@
 package kuit.project.beering.controller;
 
+import jakarta.validation.Valid;
 import kuit.project.beering.dto.request.drink.SearchDrinkRequest;
 import kuit.project.beering.dto.response.SliceResponse;
 import kuit.project.beering.dto.response.drink.DrinkPreview;
@@ -10,12 +11,17 @@ import kuit.project.beering.security.auth.AuthMember;
 import kuit.project.beering.service.DrinkService;
 import kuit.project.beering.util.BaseResponse;
 import kuit.project.beering.util.exception.domain.DrinkException;
+import kuit.project.beering.util.exception.validation.FieldValidationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Slice;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
 import static kuit.project.beering.util.CheckMember.validateMember;
 import static kuit.project.beering.util.CheckMember.getMemberId;
 
@@ -32,7 +38,7 @@ public class DrinkController {
 
     @GetMapping("/search")
     public BaseResponse<SliceResponse<DrinkSearchResponse>> searchDrinks(
-            @ModelAttribute SearchDrinkRequest searchDrinkRequest,
+            @Valid @ModelAttribute SearchDrinkRequest searchDrinkRequest,
             @AuthenticationPrincipal AuthMember member
     ) {
         Slice<DrinkSearchResponse> result = drinkService.searchDrinks(searchDrinkRequest, getMemberId(member));
