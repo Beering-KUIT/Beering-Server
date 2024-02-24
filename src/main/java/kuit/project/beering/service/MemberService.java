@@ -107,11 +107,11 @@ public class MemberService {
     }
 
     public MemberEmailResponse checkEmail(String username) {
-        return new MemberEmailResponse(memberRepository.existsByUsername(username));
+        return new MemberEmailResponse(!memberRepository.existsByUsername(username));
     }
 
     public MemberNicknameResponse checkNickname(String nickname) {
-        return new MemberNicknameResponse(memberRepository.existsByNickname(nickname));
+        return new MemberNicknameResponse(!memberRepository.existsByNickname(nickname));
     }
 
     @Transactional
