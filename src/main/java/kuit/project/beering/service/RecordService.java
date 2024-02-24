@@ -79,31 +79,30 @@ public class RecordService {
     }
 
 
-    // 특정 날짜, 특정 주류의 용량기록 가져오기
-    public List<GetRecordAmountResponse> getRecordAmounts(Long memberId, Long drinkId, Timestamp date) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new MemberException(NONE_MEMBER));
+    // 특정 기록 상세보기
+    public GetRecordResponse getRecord(Long recordId) {
+        Record record = recordRepository.findById(recordId)
+                .orElseThrow(() -> new RecordException(NONE_RECORD));
 
-        Drink drink = drinkRepository.findById(drinkId)
+        Drink drink = drinkRepository.findById(record.getDrink().getId())
                 .orElseThrow(() -> new DrinkException(NONE_DRINK));
-
-        date = preprocessDate(date);
-
-        Record record = recordRepository.findByDateAndMemberIdAndDrinkId(date, drinkId, memberId);
-
-        if(record == null) return new ArrayList<>();
 
         List<RecordAmount> recordAmounts = recordAmountRepository.findAllByRecordId(record.getId());
 
-        return recordAmounts.stream().map(
+        List<GetRecordAmountResponse> amountResponses = recordAmounts.stream().map(
                 recordAmount -> GetRecordAmountResponse.builder()
                         .recordAmountId(recordAmount.getId())
                         .quantity(recordAmount.getQuantity())
                         .volume(recordAmount.getVolume())
                         .build()
-                ).collect(Collectors.toList());
+                ).toList();
+
+        return new GetRecordResponse(
+                GetDrinkPreviewResponseBuilder.build(drink),
+                amountResponses);
     }
 
+    // 특정 날짜의 기록 리스트
     public List<GetRecordsResponse> getRecords(Long memberId, Timestamp date) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new MemberException(NONE_MEMBER));

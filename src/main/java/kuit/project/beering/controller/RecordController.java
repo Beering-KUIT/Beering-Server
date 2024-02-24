@@ -3,6 +3,7 @@ package kuit.project.beering.controller;
 import kuit.project.beering.dto.request.record.AddRecordRequest;
 import kuit.project.beering.dto.request.record.RecordStatisticRequest;
 import kuit.project.beering.dto.response.record.GetRecordAmountResponse;
+import kuit.project.beering.dto.response.record.GetRecordResponse;
 import kuit.project.beering.dto.response.record.GetRecordsResponse;
 import kuit.project.beering.dto.response.record.RecordByDateResponse;
 import kuit.project.beering.security.auth.AuthMember;
@@ -52,20 +53,18 @@ public class RecordController {
         return new BaseResponse<>(status);
     }
 
-    /** 특정 날짜, 특정 주류의 용량기록 가져오기
-     * @return (recordAmount Id, 용량, 개수) 리스트
+    /** 특정 기록 상세보기
+     * @return - DrinkPreview
+     * <br> - (recordAmount Id, 용량, 개수) 리스트
      */
-    @GetMapping("/members/{memberId}/drinks/{drinkId}/records")
-    public BaseResponse<List<GetRecordAmountResponse>> getRecordAmounts(
+    @GetMapping("/members/{memberId}/records/{recordId}")
+    public BaseResponse<GetRecordResponse> getRecord(
             @PathVariable Long memberId,
-            @PathVariable Long drinkId,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
+            @PathVariable Long recordId,
             @AuthenticationPrincipal AuthMember authMember){
 
         validateMember(authMember, memberId, RecordException::new);
-        List<GetRecordAmountResponse> result = recordService.getRecordAmounts(memberId, drinkId, new Timestamp(date.getTime()));
-        if(result.isEmpty())
-            return new BaseResponse<>(EMPTY_RECORD_AMOUNTS);
+        GetRecordResponse result = recordService.getRecord(recordId);
         return new BaseResponse<>(result);
     }
 
