@@ -1,8 +1,8 @@
 package kuit.project.beering.controller;
 
-import kuit.project.beering.dto.request.record.AddRecordRequest;
+import jakarta.validation.Valid;
+import kuit.project.beering.dto.request.record.AddRecordRequestList;
 import kuit.project.beering.dto.request.record.RecordStatisticRequest;
-import kuit.project.beering.dto.response.record.GetRecordAmountResponse;
 import kuit.project.beering.dto.response.record.GetRecordResponse;
 import kuit.project.beering.dto.response.record.GetRecordsResponse;
 import kuit.project.beering.dto.response.record.RecordByDateResponse;
@@ -43,11 +43,11 @@ public class RecordController {
             @PathVariable Long memberId,
             @PathVariable Long drinkId,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
-            @RequestBody @Validated List<AddRecordRequest> request,
+            @RequestBody @Valid AddRecordRequestList request,
             @AuthenticationPrincipal AuthMember member){
 
         validateMember(member, memberId, RecordException::new);
-        BaseResponseStatus status = recordService.addRecord(memberId, drinkId, request, new Timestamp(date.getTime()));
+        BaseResponseStatus status = recordService.addRecord(memberId, drinkId, request.getAmounts(), new Timestamp(date.getTime()));
         return new BaseResponse<>(status);
     }
 
