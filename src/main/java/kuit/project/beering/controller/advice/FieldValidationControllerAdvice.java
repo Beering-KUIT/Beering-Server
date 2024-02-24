@@ -7,6 +7,7 @@ import kuit.project.beering.dto.common.FieldValidationError;
 import kuit.project.beering.util.exception.validation.FieldValidationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,9 +24,16 @@ public class FieldValidationControllerAdvice {
     @ExceptionHandler(FieldValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public BaseResponse<Object> handleValidationException(FieldValidationException ex) {
+        return getFieldErrorsDtos(ex.getBindingResult().getFieldErrors());
+    }
 
-        List<FieldError> fieldErrors = ex.getBindingResult().getFieldErrors();
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public BaseResponse<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex){
+        return getFieldErrorsDtos(ex.getBindingResult().getFieldErrors());
+    }
 
+    private BaseResponse<Object> getFieldErrorsDtos(List<FieldError> fieldErrors) {
         FieldErrorsDto build = FieldErrorsDto.builder().errors(
                         fieldErrors.stream().map(fieldError ->
                                 new FieldValidationError(
