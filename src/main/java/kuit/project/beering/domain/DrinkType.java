@@ -9,10 +9,10 @@ import java.util.List;
 @RequiredArgsConstructor
 @Getter
 public enum DrinkType {
-    BEER("맥주", "Beer"),
-    WINE("와인", "Wine"),
-    TRADITIONAL_LIQUOR("전통주", "Traditional Liquor"),
-    WHISKEY("위스키", "Whiskey");
+    BEER("맥주", "beer"),
+    WINE("와인", "wine"),
+    TRADITIONAL_LIQUOR("전통주", "traditional_liquor"),
+    WHISKEY("위스키", "whiskey");
 
     private final String drinkTypeKr;
     private final String drinkTypeEn;
