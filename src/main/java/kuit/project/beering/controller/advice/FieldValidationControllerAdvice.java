@@ -73,13 +73,10 @@ public class FieldValidationControllerAdvice {
         log.info("MethodArgumentTypeMismatchException");
 
         String msg = messageTypeMismatchException.get(ex.getName());
-        if(msg == null)
-            msg = ex.getMessage();
+        if(msg == null) msg = ex.getMessage();
 
-        JSONObject result = new JSONObject();
-        result.put(ex.getName(), msg);
-
-        return new BaseResponse<>(METHOD_ARGUMENT_TYPE_MISMATCH, result);
+        return new BaseResponse<>(METHOD_ARGUMENT_TYPE_MISMATCH,
+                    new FieldValidationError(ex.getName(), (String) ex.getValue(), msg));
     }
 
     @ExceptionHandler(InvalidFormatException.class)
