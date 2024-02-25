@@ -133,9 +133,11 @@ public class RecordService {
     }
 
     private BaseResponseStatus deleteRecordAndRecordAmounts(Record record) {
-        List<RecordAmount> recordAmounts = recordAmountRepository.findAllByRecordId(record.getId());
-        recordAmountRepository.deleteAllByRecordId(record.getId());
-        recordRepository.deleteById(record.getId());
+        List<Long> recordAmountIds = recordAmountRepository.findAllByRecordId(record.getId())
+                                    .stream().map(RecordAmount::getId).toList();
+
+        recordAmountRepository.deleteAllByRecordAmountIds(recordAmountIds);
+        recordRepository.deleteAllByRecordId(record.getId());
         return SUCCESS_DELETE_RECORD;
     }
 
