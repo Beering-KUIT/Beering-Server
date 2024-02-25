@@ -20,8 +20,8 @@ public class AgreementJdbcRepository {
      * @param dtos
      */
     public void bulkInsertAgreement(List<AgreementBulkInsertDto> dtos) {
-        String sql = "INSERT INTO agreement (name, is_agreed, member_id, status) " +
-                "VALUES (:name, :isAgreed, :memberId, :status)";
+        String sql = "INSERT INTO agreement (name, is_agreed, member_id, status, created_at, updated_at) " +
+                "VALUES (:name, :isAgreed, :memberId, :status, :createdAt, :updatedAt)";
 
         SqlParameterSource[] sqlParameterSource =
                 dtos.stream().map(
