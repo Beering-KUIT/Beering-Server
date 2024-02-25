@@ -2,6 +2,7 @@ package kuit.project.beering.repository;
 
 import kuit.project.beering.domain.Record;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Repository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -17,4 +18,8 @@ public interface RecordRepository extends JpaRepository<Record, Long> {
     List<Record> findByDateAndMemberId(@Param("year") int year, @Param("month") int month, @Param("memberId") Long memberId);
 
     List<Record> findAllRecordsByMemberId(@Param("memberId") Long memberId);
+
+    @Modifying
+    @Query("delete from Record r where r.id in :id")
+    void deleteAllByRecordId(@Param("id") Long recordId);
 }

@@ -1,8 +1,9 @@
 package kuit.project.beering.controller;
 
-import kuit.project.beering.dto.request.record.AddRecordRequest;
+import jakarta.validation.Valid;
+import kuit.project.beering.dto.request.record.AddRecordRequestList;
 import kuit.project.beering.dto.request.record.RecordStatisticRequest;
-import kuit.project.beering.dto.response.record.GetRecordAmountResponse;
+import kuit.project.beering.dto.response.record.GetRecordResponse;
 import kuit.project.beering.dto.response.record.GetRecordsResponse;
 import kuit.project.beering.dto.response.record.RecordByDateResponse;
 import kuit.project.beering.security.auth.AuthMember;
@@ -35,8 +36,6 @@ public class RecordController {
     private final RecordService recordService;
 
     /** 기록 추가하기
-     * @param date
-     * @param drinkId
      * @param request (용량, 개수) 리스트
      */
     @PostMapping("/members/{memberId}/drinks/{drinkId}/records")
@@ -44,28 +43,42 @@ public class RecordController {
             @PathVariable Long memberId,
             @PathVariable Long drinkId,
             @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
-            @RequestBody @Validated List<AddRecordRequest> request,
+            @RequestBody @Valid AddRecordRequestList request,
             @AuthenticationPrincipal AuthMember member){
 
         validateMember(member, memberId, RecordException::new);
-        BaseResponseStatus status = recordService.addRecord(memberId, drinkId, request, new Timestamp(date.getTime()));
+        BaseResponseStatus status = recordService.addRecord(memberId, drinkId, request.getAmounts(), new Timestamp(date.getTime()));
         return new BaseResponse<>(status);
     }
 
-    /** 특정 날짜, 특정 주류의 용량기록 가져오기
-     * @return (recordAmount Id, 용량, 개수) 리스트
+    /** 기록 삭제하기
+     * @Params : memberId, recordId
      */
-    @GetMapping("/members/{memberId}/drinks/{drinkId}/records")
-    public BaseResponse<List<GetRecordAmountResponse>> getRecordAmounts(
+    @DeleteMapping("/members/{memberId}/records/{recordId}")
+    public BaseResponse<BaseResponseStatus> deleteRecord(
             @PathVariable Long memberId,
-            @PathVariable Long drinkId,
-            @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date,
+            @PathVariable Long recordId,
+            @AuthenticationPrincipal AuthMember member){
+
+        validateMember(member, memberId, RecordException::new);
+        BaseResponseStatus status = recordService.deleteRecord(recordId);
+        return new BaseResponse<>(status);
+    }
+
+
+
+    /** 특정 기록 상세보기
+     * @return - DrinkPreview
+     * <br> - (recordAmount Id, 용량, 개수) 리스트
+     */
+    @GetMapping("/members/{memberId}/records/{recordId}")
+    public BaseResponse<GetRecordResponse> getRecord(
+            @PathVariable Long memberId,
+            @PathVariable Long recordId,
             @AuthenticationPrincipal AuthMember authMember){
 
         validateMember(authMember, memberId, RecordException::new);
-        List<GetRecordAmountResponse> result = recordService.getRecordAmounts(memberId, drinkId, new Timestamp(date.getTime()));
-        if(result.isEmpty())
-            return new BaseResponse<>(EMPTY_RECORD_AMOUNTS);
+        GetRecordResponse result = recordService.getRecord(recordId);
         return new BaseResponse<>(result);
     }
 
