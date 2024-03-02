@@ -30,7 +30,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -49,9 +48,6 @@ public class MemberService {
 
     @Transactional
     public void signupForBeering(MemberSignupRequest request) {
-        /**
-         * @Brief 회원부터 저장, username이 중복일 경우에는 예외 발생하고 더이상 진행되지 않고 종료
-         */
         signup(request);
     }
 
@@ -144,8 +140,6 @@ public class MemberService {
                         .isAgreed(agreementRequest.getIsAgreed())
                         .status(Status.ACTIVE.name())
                         .memberId(member.getId())
-                        .createdAt(LocalDateTime.now())
-                        .updatedAt(LocalDateTime.now())
                         .build()
         ).toList();
 
