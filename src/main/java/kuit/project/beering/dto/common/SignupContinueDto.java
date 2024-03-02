@@ -22,6 +22,15 @@ public class SignupContinueDto {
     public String getNickname() {
         return request.getNickname();
     }
+
+    public String getAccessToken() {
+        return request.getAccessToken();
+    }
+
+    public String getRefreshToken() {
+        return request.getRefreshToken();
+    }
+
     public List<AgreementRequest> getAgreements() {
         return request.getAgreements();
     }

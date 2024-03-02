@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -47,31 +48,17 @@ public class MemberService {
     private final AwsS3Uploader awsS3Uploader;
 
     @Transactional
-    public void signup(MemberSignupRequest request) {
+    public void signupForBeering(MemberSignupRequest request) {
         /**
          * @Brief 회원부터 저장, username이 중복일 경우에는 예외 발생하고 더이상 진행되지 않고 종료
          */
-        if (memberRepository.existsByUsername(request.getUsername())) throw new MemberException(BaseResponseStatus.DUPLICATED_EMAIL);
-        if (memberRepository.existsByNickname(request.getNickname())) throw new MemberException(BaseResponseStatus.DUPLICATED_NICKNAME);
+        signup(request);
+    }
 
-        Member member = memberRepository.saveAndFlush(
-                Member.createMember(
-                        request.getUsername(),
-                        passwordEncoder.encode(request.getPassword()),
-                        request.getNickname()));
+    @Transactional
+    public Member signupForOAuth(MemberSignupRequest request) {
 
-        /**
-         * @Brief RequestDto 사용해서 AgreementBulkInsertDto 생성
-         */
-        List<AgreementBulkInsertDto> agreements = request.getAgreements().stream().map(
-                agreementRequest -> AgreementBulkInsertDto.builder()
-                        .name(agreementRequest.getName().name())
-                        .isAgreed(agreementRequest.getIsAgreed())
-                        .status(Status.ACTIVE.name())
-                        .memberId(member.getId()).build()
-        ).toList();
-
-        agreementJdbcRepository.bulkInsertAgreement(agreements);
+        return signup(request);
     }
 
     @Transactional
@@ -133,6 +120,37 @@ public class MemberService {
                                 .nickname(member.getNickname())
                                 .url(getProfileImageUrl(member)).build())
                 .orElseThrow(() -> new MemberException(BaseResponseStatus.NONE_MEMBER));
+    }
+
+    private Member signup(MemberSignupRequest request) {
+        /**
+         * @Brief 회원부터 저장, username이 중복일 경우에는 예외 발생하고 더이상 진행되지 않고 종료
+         */
+        if (memberRepository.existsByUsername(request.getUsername())) throw new MemberException(BaseResponseStatus.DUPLICATED_EMAIL);
+        if (memberRepository.existsByNickname(request.getNickname())) throw new MemberException(BaseResponseStatus.DUPLICATED_NICKNAME);
+
+        Member member = memberRepository.saveAndFlush(
+                Member.createMember(
+                        request.getUsername(),
+                        passwordEncoder.encode(request.getPassword()),
+                        request.getNickname()));
+
+        /**
+         * @Brief RequestDto 사용해서 AgreementBulkInsertDto 생성
+         */
+        List<AgreementBulkInsertDto> agreements = request.getAgreements().stream().map(
+                agreementRequest -> AgreementBulkInsertDto.builder()
+                        .name(agreementRequest.getName().name())
+                        .isAgreed(agreementRequest.getIsAgreed())
+                        .status(Status.ACTIVE.name())
+                        .memberId(member.getId())
+                        .createdAt(LocalDateTime.now())
+                        .updatedAt(LocalDateTime.now())
+                        .build()
+        ).toList();
+
+        agreementJdbcRepository.bulkInsertAgreement(agreements);
+        return member;
     }
 
     private void uploadMemberImage(MultipartFile multipartFile, Member member) {

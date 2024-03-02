@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDateTime;
+
 /**
  * @Brief 약관 삽입 시 사용되는 Dto
  */
@@ -16,4 +18,6 @@ public class AgreementBulkInsertDto {
     private Boolean isAgreed;
     private String status;
     private Long memberId;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

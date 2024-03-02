@@ -70,7 +70,7 @@ public class OAuthSdkController {
         if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
         if (bindingResult.hasGlobalErrors()) throw new AgreementValidationException(bindingResult);
 
-        MemberLoginResponse response = oauthService.signupContinue(createSignupRequestDto(request));
+        MemberLoginResponse response = oauthService.signup(createSignupRequestDto(request));
 
         return new BaseResponse<>(response);
     }
