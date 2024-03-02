@@ -28,17 +28,18 @@ public class OAuth extends BaseTimeEntity {
     @OneToOne(mappedBy = "oauth")
     private Member member;
 
-    public static OAuth createOauth(String sub, OAuthType oauthType, String accessToken, String refreshToken) {
+    public static OAuth createOauth(String sub, OAuthType oauthType, String accessToken, String refreshToken, Member member) {
         OAuth oauth = new OAuth();
         oauth.sub = sub;
         oauth.oauthType = oauthType;
         oauth.accessToken = accessToken;
         oauth.refreshToken = refreshToken;
         oauth.status = Status.ACTIVE;
+        oauth.member = member;
         return oauth;
     }
 
-    public void tokenReissue(String accessToken, String refreshToken) {
+    public void updateToken(String accessToken, String refreshToken) {
         this.accessToken = accessToken;
         if (StringUtils.hasText(refreshToken)) this.refreshToken = refreshToken;
     }
