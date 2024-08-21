@@ -42,7 +42,7 @@ public class AuthController {
         if (bindingResult.hasFieldErrors()) throw new FieldValidationException(bindingResult);
         if (bindingResult.hasGlobalErrors()) throw new AgreementValidationException(bindingResult);
 
-        memberService.signup(request);
+        memberService.signupForBeering(request);
 
         return new BaseResponse<>(new Object());
     }

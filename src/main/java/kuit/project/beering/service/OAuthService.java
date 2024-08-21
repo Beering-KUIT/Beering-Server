@@ -13,10 +13,7 @@ import kuit.project.beering.repository.OAuthRepository;
 import kuit.project.beering.security.jwt.JwtInfo;
 import kuit.project.beering.security.jwt.OAuthTokenInfo;
 import kuit.project.beering.security.jwt.jwtTokenProvider.JwtTokenProvider;
-import kuit.project.beering.util.BaseResponseStatus;
 import kuit.project.beering.util.exception.SignupNotCompletedException;
-import kuit.project.beering.util.exception.domain.MemberException;
-import kuit.project.beering.util.exception.domain.OAuthException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
@@ -47,12 +44,13 @@ public class OAuthService {
 
     @Transactional(noRollbackFor = SignupNotCompletedException.class)
     public MemberLoginResponse sdkLogin(OAuthSdkLoginDto oAuthSdkLoginDto) {
+
         OAuthTokenInfo oauthTokenInfo = oAuthSdkLoginDto.getOauthTokenInfo();
         OAuthType oAuthType = oAuthSdkLoginDto.getOAuthType();
         String sub = oAuthSdkLoginDto.getSub();
         String email = oAuthSdkLoginDto.getEmail();
 
-        // token의 sub로 OAuth 조회, 없으면 첫 로그인이므로 회원가입 마저 진행
+        // token의 sub로 OAuth 조회, 없으면 첫 로그인이므로 회원가입 진행 응답 생성
         Long memberId = checkAlreadySignup(oauthTokenInfo, oAuthType, sub);
 
         JwtInfo jwtInfo = createToken(email);
@@ -65,22 +63,18 @@ public class OAuthService {
 
     //sdk 전용?
     @Transactional
-    public MemberLoginResponse signupContinue(SignupContinueDto signupContinueDto) {
-
-        OAuth oauth = oauthRepository.findBySubAndOauthType(signupContinueDto.getSub(), signupContinueDto.getOAuthType())
-                .orElseThrow(
-                        () -> { throw new OAuthException(BaseResponseStatus.NONE_OAUTH);});
+    public MemberLoginResponse signup(SignupContinueDto signupContinueDto) {
 
         String email = signupContinueDto.getEmail();
         String nickname = signupContinueDto.getNickname();
         List<AgreementRequest> agreements = signupContinueDto.getAgreements();
 
         // 회원가입 처리
-        memberService.signup(new MemberSignupRequest(email, UUID.randomUUID().toString(), nickname, agreements));
-        Member member = memberRepository.findByUsername(email)
-                .orElseThrow(
-                        () -> { throw new MemberException(BaseResponseStatus.NONE_MEMBER);});
-        member.createOauthAssociation(oauth);
+        Member savedMember = memberService.signupForOAuth(new MemberSignupRequest(email, UUID.randomUUID().toString(), nickname, agreements));
+
+        OAuth savedOAuth = oauthRepository.save(OAuth.createOauth(signupContinueDto.getSub(), signupContinueDto.getOAuthType(), signupContinueDto.getAccessToken(), signupContinueDto.getRefreshToken(), savedMember));
+
+        savedMember.createOauthAssociation(savedOAuth);
 
         JwtInfo jwtInfo = createToken(email);
 
@@ -95,21 +89,19 @@ public class OAuthService {
 //        oauth.tokenReissue(accessToken, refreshToken);
 
         return MemberLoginResponse.builder()
-                .memberId(member.getId())
+                .memberId(savedMember.getId())
                 .jwtInfo(jwtInfo)
                 .build();
     }
 
     private Long checkAlreadySignup(OAuthTokenInfo oauthTokenInfo, OAuthType oauthType, String sub) {
 
-        OAuth oauth = oauthRepository.findBySubAndOauthType(sub, oauthType)
-                .orElseThrow(() -> {
-                    oauthRepository.save(OAuth.createOauth(sub, oauthType, oauthTokenInfo.getAccessToken(), oauthTokenInfo.getRefreshToken()));
-                    throw new SignupNotCompletedException();
-                });
-
-        Member member = memberRepository.findByOauthId(oauth.getId())
+        Member member = memberRepository.findByOAuthSubAndOAuthType(sub, oauthType)
                 .orElseThrow(SignupNotCompletedException::new);
+
+        OAuth oauth = member.getOauth();
+
+        oauth.updateToken(oauthTokenInfo.getAccessToken(), oauthTokenInfo.getRefreshToken());
 
         return member.getId();
     }

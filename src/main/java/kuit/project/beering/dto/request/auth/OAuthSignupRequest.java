@@ -26,5 +26,9 @@ public class OAuthSignupRequest {
 
     @NotBlank
     private String idToken;
+    @NotBlank
+    private String accessToken;
+    @NotBlank
+    private String refreshToken;
     private List<AgreementRequest> agreements = new ArrayList<>();
 }
